@@ -331,8 +331,10 @@ namespace OGF_tool
 
 				if (xr_loader.find_chunk((int)OGF.OGF4_S_USERDATA, false, true))		
 				{
-					string userdata = xr_loader.read_stringZ();
-					MessageBox.Show($"ёзердата [{userdata}]");
+					//string userdata
+					
+					richTextBox2.Text	= xr_loader.read_stringZ();
+					//MessageBox.Show($"ёзердата [{userdata}]");
 				}
 
 				xr_loader.SetStream(r.BaseStream);
