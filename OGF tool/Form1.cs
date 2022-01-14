@@ -329,6 +329,14 @@ namespace OGF_tool
 
 				xr_loader.SetStream(r.BaseStream);
 
+				if (xr_loader.find_chunk((int)OGF.OGF4_S_USERDATA, false, true))		
+				{
+					string userdata = xr_loader.read_stringZ();
+					MessageBox.Show($"ёзердата [{userdata}]");
+				}
+
+				xr_loader.SetStream(r.BaseStream);
+
 				bool v3 = false;
 
 				if (v3 = !xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS_1, false, true))
