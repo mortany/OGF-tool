@@ -242,11 +242,48 @@ namespace OGF_tool
 
         public MotionRefs refs = new MotionRefs();
 
+        public UserData usertdata = null;
+
         public OGF_Children()
         {
             refs.pos = -1;
         }
 
+    }
+
+    public class UserData
+    {
+        public long pos;
+        public string data;
+
+        public uint old_size;
+
+        public UserData()
+        {
+            this.pos = 0;
+            this.data = "";
+            this.old_size = 0;
+        }
+
+        public byte[] data_all()
+        {
+            List<byte> temp = new List<byte>();
+
+            temp.AddRange(Encoding.ASCII.GetBytes(data));
+            temp.Add(0);
+
+            return temp.ToArray();
+        }
+
+        public uint chunk_size()
+        {
+            return (uint)data.Length +1;
+        }
+
+        public uint NewSize()
+        {
+            return chunk_size() - old_size;
+        }
     }
 
     public struct MotionRefs
