@@ -127,7 +127,7 @@ namespace OGF_tool
 			if (OGF_V.refs.refs0 != null)
 				richTextBox1.Lines = OGF_V.refs.refs0.ToArray();
 
-			richTextBox2.Text = OGF_V.userdata.userdata;
+			richTextBox2.Text = OGF_V.usertdata.data;
 		}
 
 		private void button1_Click(object sender, EventArgs e)
@@ -152,9 +152,15 @@ namespace OGF_tool
 				OGF_V.refs.refs0.AddRange(richTextBox1.Lines);
 			}
 
-			if (richTextBox2.Lines.Count() > 0)
+			if (richTextBox2.Text != "" && OGF_V.usertdata!=null)
 			{
-				OGF_V.userdata.userdata = richTextBox2.Text;
+				OGF_V.usertdata.data = "";
+
+				for (int i = 0; i < richTextBox2.Lines.Count(); i++)
+				{
+					string ext = i == richTextBox2.Lines.Count() - 1 ? "" : "\r\n";
+					OGF_V.usertdata.data += richTextBox2.Lines[i] + ext;
+				}
 			}
 		}
 
@@ -201,13 +207,30 @@ namespace OGF_tool
 					fileStream.BaseStream.Position += ch.old_size + 8;
 				}
 
-				// Motion refs
-				if (OGF_V.refs.pos > 0)
-					temp = fileStream.ReadBytes((int)(OGF_V.refs.pos - fileStream.BaseStream.Position));
-				else
-					temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
+				if (OGF_V.usertdata != null)
+				{
+					if (OGF_V.usertdata.pos > 0)
+						temp = fileStream.ReadBytes((int)(OGF_V.usertdata.pos - fileStream.BaseStream.Position));
+					else
+						temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
 
-				file_bytes.AddRange(temp);
+					file_bytes.AddRange(temp);
+
+					file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_USERDATA));
+					file_bytes.AddRange(BitConverter.GetBytes(OGF_V.usertdata.chunk_size()));
+
+					file_bytes.AddRange(OGF_V.usertdata.data_all());
+
+				}
+				else
+				{
+					if (OGF_V.refs.pos > 0)
+						temp = fileStream.ReadBytes((int)(OGF_V.refs.pos - fileStream.BaseStream.Position));
+					else
+						temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
+
+					file_bytes.AddRange(temp);
+				}
 
 				if (OGF_V.refs.refs0 != null)
 				{
@@ -225,22 +248,6 @@ namespace OGF_tool
 
 					file_bytes.AddRange(OGF_V.refs.data());
 				}
-
-                // Userdata
-                if (OGF_V.userdata.pos > 0)
-                    temp = fileStream.ReadBytes((int)(OGF_V.userdata.pos - fileStream.BaseStream.Position));
-                else
-                    temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
-
-                file_bytes.AddRange(temp);
-
-                if (OGF_V.userdata.userdata != null)
-                {
-                    file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_USERDATA));
-                    file_bytes.AddRange(BitConverter.GetBytes(OGF_V.userdata.chunk_size()));
-
-                    file_bytes.AddRange(OGF_V.userdata.data());
-                }
             }
 
 			using (var fileStream = new FileStream(filename, FileMode.Truncate))
@@ -363,17 +370,21 @@ namespace OGF_tool
 					if (v3)
 						OGF_V.refs.refs0.Add(xr_loader.read_stringZ());
 					else
-						for (int i = 0; i < xr_loader.ReadUInt32(); i++)
-							OGF_V.refs.refs0.Add(xr_loader.read_stringZ());
+					{
+						uint count = xr_loader.ReadUInt32();
 
-					xr_loader.SetStream(r.BaseStream);
+						for (int i = 0; i < count; i++)
+							OGF_V.refs.refs0.Add(xr_loader.read_stringZ());
+					}
 				}
 
 				// Userdata
 				if (xr_loader.find_chunk((int)OGF.OGF4_S_USERDATA, false, true))
 				{
-					OGF_V.userdata.pos = xr_loader.chunk_pos;
-					OGF_V.userdata.userdata = xr_loader.read_stringZ();
+					OGF_V.usertdata = new UserData();
+					OGF_V.usertdata.pos = xr_loader.chunk_pos;
+					OGF_V.usertdata.data = xr_loader.read_stringZ();
+					OGF_V.usertdata.old_size = (uint)OGF_V.usertdata.data.Length+1;
 				}
 			}
 		}
