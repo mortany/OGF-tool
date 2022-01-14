@@ -242,9 +242,13 @@ namespace OGF_tool
 
         public MotionRefs refs = new MotionRefs();
 
+        public UserData userdata = new UserData();
+
         public OGF_Children()
         {
             refs.pos = -1;
+            userdata.pos = -1;
+            userdata.userdata = null;
         }
 
     }
@@ -273,6 +277,30 @@ namespace OGF_tool
                 temp.AddRange(Encoding.ASCII.GetBytes(str));
                 temp.Add(0);
             }
+
+            return temp.ToArray();
+        }
+    }
+
+    public struct UserData
+    {
+        public long pos;
+
+        public string userdata;
+
+        public uint chunk_size()
+        {
+            uint temp = 4;
+            temp += (uint)userdata.Length + 1;
+            return (uint)userdata.Length + 1;
+        }
+
+        public byte[] data()
+        {
+            List<byte> temp = new List<byte>();
+
+            temp.AddRange(Encoding.ASCII.GetBytes(userdata));
+            temp.Add(0);
 
             return temp.ToArray();
         }

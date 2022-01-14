@@ -124,9 +124,10 @@ namespace OGF_tool
 				}
 			}
 
-			if (OGF_V.refs.refs0 == null) return;
+			if (OGF_V.refs.refs0 != null)
+				richTextBox1.Lines = OGF_V.refs.refs0.ToArray();
 
-			richTextBox1.Lines = OGF_V.refs.refs0.ToArray();
+			richTextBox2.Text = OGF_V.userdata.userdata;
 		}
 
 		private void button1_Click(object sender, EventArgs e)
@@ -149,6 +150,11 @@ namespace OGF_tool
 			{
 				OGF_V.refs.refs0 = new List<string>();
 				OGF_V.refs.refs0.AddRange(richTextBox1.Lines);
+			}
+
+			if (richTextBox2.Lines.Count() > 0)
+			{
+				OGF_V.userdata.userdata = richTextBox2.Text;
 			}
 		}
 
@@ -195,6 +201,7 @@ namespace OGF_tool
 					fileStream.BaseStream.Position += ch.old_size + 8;
 				}
 
+				// Motion refs
 				if (OGF_V.refs.pos > 0)
 					temp = fileStream.ReadBytes((int)(OGF_V.refs.pos - fileStream.BaseStream.Position));
 				else
@@ -204,7 +211,6 @@ namespace OGF_tool
 
 				if (OGF_V.refs.refs0 != null)
 				{
-
 					if (OGF_V.refs.refs0.Count() > 1)
 					{
 						file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_MOTION_REFS_1));
@@ -219,7 +225,23 @@ namespace OGF_tool
 
 					file_bytes.AddRange(OGF_V.refs.data());
 				}
-			}
+
+                // Userdata
+                if (OGF_V.userdata.pos > 0)
+                    temp = fileStream.ReadBytes((int)(OGF_V.userdata.pos - fileStream.BaseStream.Position));
+                else
+                    temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
+
+                file_bytes.AddRange(temp);
+
+                if (OGF_V.userdata.userdata != null)
+                {
+                    file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_USERDATA));
+                    file_bytes.AddRange(BitConverter.GetBytes(OGF_V.userdata.chunk_size()));
+
+                    file_bytes.AddRange(OGF_V.userdata.data());
+                }
+            }
 
 			using (var fileStream = new FileStream(filename, FileMode.Truncate))
 			{
@@ -305,6 +327,7 @@ namespace OGF_tool
 
 				int id = 0;
 
+				// Texture && shader
 				while (true)
 				{
 
@@ -329,32 +352,29 @@ namespace OGF_tool
 
 				xr_loader.SetStream(r.BaseStream);
 
-				if (xr_loader.find_chunk((int)OGF.OGF4_S_USERDATA, false, true))		
+				// Motion Refs
+				bool v3 = xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS_0, false, true);
+
+				if (v3 || xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS_1, false, true))
 				{
-					//string userdata
-					
-					richTextBox2.Text	= xr_loader.read_stringZ();
-					//MessageBox.Show($"ёзердата [{userdata}]");
+					OGF_V.refs.pos = xr_loader.chunk_pos;
+					OGF_V.refs.refs0 = new List<string>();
+
+					if (v3)
+						OGF_V.refs.refs0.Add(xr_loader.read_stringZ());
+					else
+						for (int i = 0; i < xr_loader.ReadUInt32(); i++)
+							OGF_V.refs.refs0.Add(xr_loader.read_stringZ());
+
+					xr_loader.SetStream(r.BaseStream);
 				}
 
-				xr_loader.SetStream(r.BaseStream);
-
-				bool v3 = false;
-
-				if (v3 = !xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS_1, false, true))
-					if (!xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS_0, false, true))
-						return;
-
-				OGF_V.refs.pos = xr_loader.chunk_pos;
-				OGF_V.refs.refs0 = new List<string>();
-
-				if (v3) { OGF_V.refs.refs0.Add(xr_loader.read_stringZ()); return; }
-
-				uint count = xr_loader.ReadUInt32();
-
-				for (int i = 0; i < count; i++)
-					OGF_V.refs.refs0.Add(xr_loader.read_stringZ());
-
+				// Userdata
+				if (xr_loader.find_chunk((int)OGF.OGF4_S_USERDATA, false, true))
+				{
+					OGF_V.userdata.pos = xr_loader.chunk_pos;
+					OGF_V.userdata.userdata = xr_loader.read_stringZ();
+				}
 			}
 		}
 	}
