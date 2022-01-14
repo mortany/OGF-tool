@@ -127,7 +127,8 @@ namespace OGF_tool
 			if (OGF_V.refs.refs0 != null)
 				richTextBox1.Lines = OGF_V.refs.refs0.ToArray();
 
-			richTextBox2.Text = OGF_V.usertdata.data;
+			if (OGF_V.usertdata != null)
+				richTextBox2.Text = OGF_V.usertdata.data;
 		}
 
 		private void button1_Click(object sender, EventArgs e)
