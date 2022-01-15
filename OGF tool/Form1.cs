@@ -362,7 +362,15 @@ namespace OGF_tool
 
 				xr_loader.SetStream(r.BaseStream);
 
-				bool v3 = false;
+                if (xr_loader.find_chunk((int)OGF.OGF4_S_USERDATA, false, true))
+                {
+                    OGF_V.usertdata = new UserData();
+                    OGF_V.usertdata.pos = xr_loader.chunk_pos;
+                    OGF_V.usertdata.data = xr_loader.read_stringZ();
+                    OGF_V.usertdata.old_size = (uint)OGF_V.usertdata.data.Length + 1;
+                }
+
+                bool v3 = false;
 
 				if (v3 = !xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS_1, false, true))
 					if (!xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS_0, false, true))
@@ -378,14 +386,6 @@ namespace OGF_tool
 
                     for (int i = 0; i < count; i++)
                         OGF_V.refs.refs0.Add(xr_loader.read_stringZ());
-                }
-
-                if(xr_loader.find_chunk((int)OGF.OGF4_S_USERDATA, false, true))
-                {
-                    OGF_V.usertdata = new UserData();
-                    OGF_V.usertdata.pos = xr_loader.chunk_pos;
-                    OGF_V.usertdata.data = xr_loader.read_stringZ();
-                    OGF_V.usertdata.old_size = (uint)OGF_V.usertdata.data.Length+1;
                 }
 			}
 		}
