@@ -124,13 +124,14 @@ namespace OGF_tool
 				}
 			}
 
-			if (OGF_V.refs.refs0 == null) return;
+            richTextBox1.Clear();
+            richTextBox2.Clear();
 
-			richTextBox1.Lines = OGF_V.refs.refs0.ToArray();
+            if (OGF_V.refs.refs0 != null)
+			    richTextBox1.Lines = OGF_V.refs.refs0.ToArray();
 
-            if(OGF_V.usertdata!=null)
+            if (OGF_V.usertdata!=null)
                 richTextBox2.Text = OGF_V.usertdata.data;
-
         }
 
 		private void button1_Click(object sender, EventArgs e)
