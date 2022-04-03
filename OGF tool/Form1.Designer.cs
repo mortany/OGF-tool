@@ -91,9 +91,9 @@ namespace OGF_tool
             // richTextBox1
             // 
             this.richTextBox1.DetectUrls = false;
-            this.richTextBox1.Location = new System.Drawing.Point(0, 3);
+            this.richTextBox1.Location = new System.Drawing.Point(0, 0);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(392, 533);
+            this.richTextBox1.Size = new System.Drawing.Size(392, 367);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
             this.richTextBox1.WordWrap = false;
@@ -110,9 +110,9 @@ namespace OGF_tool
             // 
             // richTextBox2
             // 
-            this.richTextBox2.Location = new System.Drawing.Point(0, 3);
+            this.richTextBox2.Location = new System.Drawing.Point(0, 0);
             this.richTextBox2.Name = "richTextBox2";
-            this.richTextBox2.Size = new System.Drawing.Size(392, 364);
+            this.richTextBox2.Size = new System.Drawing.Size(392, 367);
             this.richTextBox2.TabIndex = 0;
             this.richTextBox2.Text = "";
             // 
@@ -153,7 +153,7 @@ namespace OGF_tool
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(427, 431);
+            this.ClientSize = new System.Drawing.Size(427, 432);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.menuStrip1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
