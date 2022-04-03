@@ -37,8 +37,8 @@ namespace OGF_tool
 				OpenFile(Environment.GetCommandLineArgs()[1]);
 				FILE_NAME = Environment.GetCommandLineArgs()[1];
 				AfterLoad();
+				StartPosition = FormStartPosition.CenterScreen;
 			}
-
 		}
 
 		private void CreateGroupBox(int idx)
@@ -131,20 +131,6 @@ namespace OGF_tool
 				richTextBox2.Text = OGF_V.usertdata.data;
 		}
 
-		private void button1_Click(object sender, EventArgs e)
-		{
-			openFileDialog1.FileName = "";
-			DialogResult res = openFileDialog1.ShowDialog();
-
-			if (res == DialogResult.OK)
-			{
-				Clear();
-				FILE_NAME = openFileDialog1.FileName;
-				OpenFile(FILE_NAME);
-				AfterLoad();
-			}
-		}
-
 		private void CopyParams()
 		{
 			if (richTextBox1.Lines.Count() > 0)
@@ -163,14 +149,6 @@ namespace OGF_tool
 					OGF_V.usertdata.data += richTextBox2.Lines[i] + ext;
 				}
 			}
-		}
-
-		private void button2_Click(object sender, EventArgs e)
-		{
-			if (FILE_NAME == "") return;
-
-			CopyParams();
-			SaveFile(FILE_NAME);
 		}
 
 		private void SaveFile(string filename)
@@ -365,6 +343,9 @@ namespace OGF_tool
 
 				if (v3 || xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS_1, false, true))
 				{
+					if (!tabControl1.Controls.Contains(tabPage2))
+						tabControl1.Controls.Add(tabPage2);
+
 					OGF_V.refs.pos = xr_loader.chunk_pos;
 					OGF_V.refs.refs0 = new List<string>();
 
@@ -378,16 +359,58 @@ namespace OGF_tool
 							OGF_V.refs.refs0.Add(xr_loader.read_stringZ());
 					}
 				}
+				else
+					tabControl1.Controls.Remove(tabPage2);
 
 				// Userdata
 				if (xr_loader.find_chunk((int)OGF.OGF4_S_USERDATA, false, true))
 				{
+					if (!tabControl1.Controls.Contains(tabPage3))
+						tabControl1.Controls.Add(tabPage3);
+
 					OGF_V.usertdata = new UserData();
 					OGF_V.usertdata.pos = xr_loader.chunk_pos;
 					OGF_V.usertdata.data = xr_loader.read_stringZ();
 					OGF_V.usertdata.old_size = (uint)OGF_V.usertdata.data.Length+1;
 				}
+				else
+					tabControl1.Controls.Remove(tabPage3);
+
+				// Motions
+				//if (xr_loader.find_chunk((int)OGF.OGF4_S_MOTIONS, false, true))
+				//{
+				//	xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk(0, false, false));
+				//	uint count = xr_loader.ReadUInt32();
+				//	MessageBox.Show($"find: {count}");
+				//	for (int i = 0; i < count; i++)
+				//	{
+				//		xr_loader.find_chunk(1 + 1);
+				//		MessageBox.Show($"name: {xr_loader.read_stringZ()}");
+				//	}
+				//}
 			}
 		}
-	}
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+			if (FILE_NAME == "") return;
+
+			CopyParams();
+			SaveFile(FILE_NAME);
+		}
+
+        private void loadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+			openFileDialog1.FileName = "";
+			DialogResult res = openFileDialog1.ShowDialog();
+
+			if (res == DialogResult.OK)
+			{
+				Clear();
+				FILE_NAME = openFileDialog1.FileName;
+				OpenFile(FILE_NAME);
+				AfterLoad();
+			}
+		}
+    }
 }
