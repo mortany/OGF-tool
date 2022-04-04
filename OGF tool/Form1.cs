@@ -12,9 +12,18 @@ using System.Windows.Forms;
 
 namespace OGF_tool
 {
-
-	public partial class Form1 : Form
+	public partial class OGF_Editor : Form
 	{
+		// About file
+		string m_source;
+		string m_export_tool;
+		uint m_export_time;
+		string m_owner_name;
+		uint m_creation_time;
+		string m_exportm_modif_name_tool;
+		uint m_modified_time;
+		byte m_version;
+		byte m_model_type;
 
 		// File sytem
 		public OGF_Children OGF_V = null;
@@ -25,9 +34,10 @@ namespace OGF_tool
 		public bool bKeyIsDown = false;
 
 
-		public Form1()
+		public OGF_Editor()
 		{
 			InitializeComponent();
+			StartPosition = FormStartPosition.CenterScreen;
 
 			//foreach (var box in textBoxes)
 			//tabPage1.Controls.Add(box);
@@ -37,7 +47,10 @@ namespace OGF_tool
 				OpenFile(Environment.GetCommandLineArgs()[1]);
 				FILE_NAME = Environment.GetCommandLineArgs()[1];
 				AfterLoad();
-				StartPosition = FormStartPosition.CenterScreen;
+			}
+			else
+            {
+				TabControl.Controls.Clear();
 			}
 		}
 
@@ -50,7 +63,7 @@ namespace OGF_tool
 			GroupBox.Name = "GrpBox_" + idx;
 			CreateBoxes(idx, GroupBox);
 			CreateLabels(idx, GroupBox);
-			tabPage1.Controls.Add(GroupBox);
+			TexturesPage.Controls.Add(GroupBox);
 		}
 
 		private void CreateBoxes(int idx, GroupBox box)
@@ -103,8 +116,8 @@ namespace OGF_tool
 			FILE_NAME = "";
 			OGF_V = null;
 			file_bytes.Clear();
-			tabPage1.Controls.Clear();
-			richTextBox1.Clear();
+			TexturesPage.Controls.Clear();
+			MotionRefsBox.Clear();
 		}
 
 		private void AfterLoad()
@@ -113,7 +126,7 @@ namespace OGF_tool
 			{
 				CreateGroupBox(i);
 
-				var box = tabPage1.Controls["GrpBox_" + i];
+				var box = TexturesPage.Controls["GrpBox_" + i];
 
 				if (box != null)
 				{
@@ -125,28 +138,28 @@ namespace OGF_tool
 			}
 
 			if (OGF_V.refs.refs0 != null)
-				richTextBox1.Lines = OGF_V.refs.refs0.ToArray();
+				MotionRefsBox.Lines = OGF_V.refs.refs0.ToArray();
 
 			if (OGF_V.usertdata != null)
-				richTextBox2.Text = OGF_V.usertdata.data;
+				CustomDataBox.Text = OGF_V.usertdata.data;
 		}
 
 		private void CopyParams()
 		{
-			if (richTextBox1.Lines.Count() > 0)
+			if (MotionRefsBox.Lines.Count() > 0)
 			{
 				OGF_V.refs.refs0 = new List<string>();
-				OGF_V.refs.refs0.AddRange(richTextBox1.Lines);
+				OGF_V.refs.refs0.AddRange(MotionRefsBox.Lines);
 			}
 
-			if (richTextBox2.Text != "" && OGF_V.usertdata!=null)
+			if (CustomDataBox.Text != "" && OGF_V.usertdata!=null)
 			{
 				OGF_V.usertdata.data = "";
 
-				for (int i = 0; i < richTextBox2.Lines.Count(); i++)
+				for (int i = 0; i < CustomDataBox.Lines.Count(); i++)
 				{
-					string ext = i == richTextBox2.Lines.Count() - 1 ? "" : "\r\n";
-					OGF_V.usertdata.data += richTextBox2.Lines[i] + ext;
+					string ext = i == CustomDataBox.Lines.Count() - 1 ? "" : "\r\n";
+					OGF_V.usertdata.data += CustomDataBox.Lines[i] + ext;
 				}
 			}
 		}
@@ -273,41 +286,31 @@ namespace OGF_tool
 
 			using (var r = new BinaryReader(File.OpenRead(filename)))
 			{
+				StatusFile.Text = filename.Substring(filename.LastIndexOf('\\') + 1);
+
+				if (!TabControl.Controls.Contains(TexturesPage))
+					TabControl.Controls.Add(TexturesPage);
 
 				xr_loader.SetStream(r.BaseStream);
 
 				uint size = xr_loader.find_chunkSize((int)OGF.OGF_HEADER);
 
-				xr_loader.ReadByte(); // Skip m_version
-				byte model_type = xr_loader.ReadByte();
+				m_version = xr_loader.ReadByte();
+				m_model_type = xr_loader.ReadByte();
 
 				xr_loader.ReadBytes((int)size - 2);
 
-				//MessageBox.Show("Model type is: "+ model_type);
-
 				if (!xr_loader.find_chunk((int)OGF.OGF4_S_DESC)) return;
 
-				string m_source = xr_loader.read_stringZ();
-				string m_export_tool = xr_loader.read_stringZ();
-				uint m_export_time = xr_loader.ReadUInt32();
-				string m_owner_name = xr_loader.read_stringZ();
-				uint m_creation_time = xr_loader.ReadUInt32();
-				string m_exportm_modif_name_tool = xr_loader.read_stringZ();
-				uint m_modified_time = xr_loader.ReadUInt32();
-				//System.DateTime dt_e = new System.DateTime(1970, 1, 1).AddSeconds(m_export_time);
-				//System.DateTime dt_c = new System.DateTime(1970, 1, 1).AddSeconds(m_creation_time);
-				//System.DateTime dt_m = new System.DateTime(1970, 1, 1).AddSeconds(m_modified_time);
-				//MessageBox.Show("Source: " + m_source + "\n" +
-				//	"Export Tool: " + m_export_tool + "\n" +
-				//	"Owner Name: " + m_owner_name + "\n" +
-				//	"Export modifed Tool:" + m_exportm_modif_name_tool);
-				//MessageBox.Show("Export Time: " + dt_e +"\n" + 
-				//	"Creation Time: " + dt_c + "\n"+
-				//	"Modified Time: " + dt_m);
+				m_source = xr_loader.read_stringZ();
+				m_export_tool = xr_loader.read_stringZ();
+				m_export_time = xr_loader.ReadUInt32();
+				m_owner_name = xr_loader.read_stringZ();
+				m_creation_time = xr_loader.ReadUInt32();
+				m_exportm_modif_name_tool = xr_loader.read_stringZ();
+				m_modified_time = xr_loader.ReadUInt32();
 
-
-
-				if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_CHILDREN, false, true))) return;
+                if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_CHILDREN, false, true))) return;
 
 				OGF_V.pos = xr_loader.chunk_pos;
 
@@ -343,8 +346,8 @@ namespace OGF_tool
 
 				if (v3 || xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS_1, false, true))
 				{
-					if (!tabControl1.Controls.Contains(tabPage2))
-						tabControl1.Controls.Add(tabPage2);
+					if (!TabControl.Controls.Contains(tabPage2))
+						TabControl.Controls.Add(tabPage2);
 
 					OGF_V.refs.pos = xr_loader.chunk_pos;
 					OGF_V.refs.refs0 = new List<string>();
@@ -360,13 +363,13 @@ namespace OGF_tool
 					}
 				}
 				else
-					tabControl1.Controls.Remove(tabPage2);
+					TabControl.Controls.Remove(tabPage2);
 
 				// Userdata
 				if (xr_loader.find_chunk((int)OGF.OGF4_S_USERDATA, false, true))
 				{
-					if (!tabControl1.Controls.Contains(tabPage3))
-						tabControl1.Controls.Add(tabPage3);
+					if (!TabControl.Controls.Contains(tabPage3))
+						TabControl.Controls.Add(tabPage3);
 
 					OGF_V.usertdata = new UserData();
 					OGF_V.usertdata.pos = xr_loader.chunk_pos;
@@ -374,21 +377,20 @@ namespace OGF_tool
 					OGF_V.usertdata.old_size = (uint)OGF_V.usertdata.data.Length+1;
 				}
 				else
-					tabControl1.Controls.Remove(tabPage3);
+					TabControl.Controls.Remove(tabPage3);
 
-				// Motions
-				//if (xr_loader.find_chunk((int)OGF.OGF4_S_MOTIONS, false, true))
-				//{
-				//	xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk(0, false, false));
-				//	uint count = xr_loader.ReadUInt32();
-				//	MessageBox.Show($"find: {count}");
-				//	for (int i = 0; i < count; i++)
-				//	{
-				//		xr_loader.find_chunk(1 + 1);
-				//		MessageBox.Show($"name: {xr_loader.read_stringZ()}");
-				//	}
-				//}
-			}
+     //           // Motions
+     //           if (xr_loader.find_chunk((int)OGF.OGF4_S_MOTIONS, false, true))
+     //           {
+     //               xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk(0, false, false));
+     //               uint count = xr_loader.ReadUInt32();
+					//for (int i = 0; i < count; i++)
+     //               {
+					//	xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk(i + 1, false, false));
+					//	MessageBox.Show($"name: {xr_loader.read_stringZ()}");
+     //               }
+     //           }
+            }
 		}
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -397,6 +399,7 @@ namespace OGF_tool
 
 			CopyParams();
 			SaveFile(FILE_NAME);
+			AutoClosingMessageBox.Show("Saved!", "", 500, MessageBoxIcon.Information);
 		}
 
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
@@ -411,6 +414,41 @@ namespace OGF_tool
 				OpenFile(FILE_NAME);
 				AfterLoad();
 			}
+		}
+
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+			if (e.Control && e.KeyCode == Keys.S)
+				saveToolStripMenuItem_Click(null, null);
+
+			switch (e.KeyData)
+			{
+				case Keys.F4: loadToolStripMenuItem_Click(null, null); break;
+				case Keys.F5: saveToolStripMenuItem_Click(null, null); break;
+			}
+		}
+
+        private void oGFInfoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+			if (FILE_NAME == "")
+			{
+				AutoClosingMessageBox.Show("Please, open the file!", "", 900, MessageBoxIcon.Information);
+				return;
+			}
+
+			System.DateTime dt_e = new System.DateTime(1970, 1, 1).AddSeconds(m_export_time);
+			System.DateTime dt_c = new System.DateTime(1970, 1, 1).AddSeconds(m_creation_time);
+			System.DateTime dt_m = new System.DateTime(1970, 1, 1).AddSeconds(m_modified_time);
+			MessageBox.Show(
+				"OGF Version: " + m_version + "\n" +
+				"Model type: " + m_model_type + "\n\n" +
+				"Source: " + m_source + "\n" +
+				"Export Tool: " + m_export_tool + "\n" +
+				"Owner Name: " + m_owner_name + "\n" +
+				"Export modifed Tool: " + m_exportm_modif_name_tool + "\n\n" +
+				"Export Time: " + dt_e +"\n" +
+				"Creation Time: " + dt_c + "\n"+
+				"Modified Time: " + dt_m, "OGF Info:", MessageBoxButtons.OK, MessageBoxIcon.Information);
 		}
     }
 }
