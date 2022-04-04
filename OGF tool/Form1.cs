@@ -440,15 +440,15 @@ namespace OGF_tool
 			System.DateTime dt_c = new System.DateTime(1970, 1, 1).AddSeconds(m_creation_time);
 			System.DateTime dt_m = new System.DateTime(1970, 1, 1).AddSeconds(m_modified_time);
 			MessageBox.Show(
-				"OGF Version: " + m_version + "\n" +
-				"Model type: " + m_model_type + "\n\n" +
-				"Source: " + m_source + "\n" +
-				"Export Tool: " + m_export_tool + "\n" +
-				"Owner Name: " + m_owner_name + "\n" +
-				"Export modifed Tool: " + m_exportm_modif_name_tool + "\n\n" +
-				"Export Time: " + dt_e +"\n" +
-				"Creation Time: " + dt_c + "\n"+
-				"Modified Time: " + dt_m, "OGF Info:", MessageBoxButtons.OK, MessageBoxIcon.Information);
+				$"OGF Version: {m_version}\n" +
+				$"Model type: {m_model_type}\n\n" +
+				$"Source: {m_source}\n" +
+				$"Export Tool: {m_export_tool}\n" +
+				$"Owner Name: {m_owner_name}\n" +
+				$"Export modifed Tool: {m_exportm_modif_name_tool}\n\n" +
+				$"Export Time: {dt_e}\n" +
+				$"Creation Time: {dt_c}\n" +
+				$"Modified Time: {dt_m}", "OGF Info:", MessageBoxButtons.OK, MessageBoxIcon.Information);
 		}
     }
 }
