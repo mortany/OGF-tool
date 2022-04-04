@@ -41,10 +41,11 @@ namespace OGF_tool
             this.FileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.LoadMenuParam = new System.Windows.Forms.ToolStripMenuItem();
             this.SaveMenuParam = new System.Windows.Forms.ToolStripMenuItem();
+            this.oGFInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.FileLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.StatusFile = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.oGFInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.BkpCheckBox = new System.Windows.Forms.CheckBox();
             this.TabControl.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
@@ -148,16 +149,23 @@ namespace OGF_tool
             // LoadMenuParam
             // 
             this.LoadMenuParam.Name = "LoadMenuParam";
-            this.LoadMenuParam.Size = new System.Drawing.Size(180, 22);
+            this.LoadMenuParam.Size = new System.Drawing.Size(100, 22);
             this.LoadMenuParam.Text = "Load";
             this.LoadMenuParam.Click += new System.EventHandler(this.loadToolStripMenuItem_Click);
             // 
             // SaveMenuParam
             // 
             this.SaveMenuParam.Name = "SaveMenuParam";
-            this.SaveMenuParam.Size = new System.Drawing.Size(180, 22);
+            this.SaveMenuParam.Size = new System.Drawing.Size(100, 22);
             this.SaveMenuParam.Text = "Save";
             this.SaveMenuParam.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
+            // 
+            // oGFInfoToolStripMenuItem
+            // 
+            this.oGFInfoToolStripMenuItem.Name = "oGFInfoToolStripMenuItem";
+            this.oGFInfoToolStripMenuItem.Size = new System.Drawing.Size(66, 20);
+            this.oGFInfoToolStripMenuItem.Text = "OGF Info";
+            this.oGFInfoToolStripMenuItem.Click += new System.EventHandler(this.oGFInfoToolStripMenuItem_Click);
             // 
             // FileLabel
             // 
@@ -183,18 +191,23 @@ namespace OGF_tool
             this.statusStrip1.TabIndex = 30;
             this.statusStrip1.Text = "statusStrip1";
             // 
-            // oGFInfoToolStripMenuItem
+            // BkpCheckBox
             // 
-            this.oGFInfoToolStripMenuItem.Name = "oGFInfoToolStripMenuItem";
-            this.oGFInfoToolStripMenuItem.Size = new System.Drawing.Size(66, 20);
-            this.oGFInfoToolStripMenuItem.Text = "OGF Info";
-            this.oGFInfoToolStripMenuItem.Click += new System.EventHandler(this.oGFInfoToolStripMenuItem_Click);
+            this.BkpCheckBox.AutoSize = true;
+            this.BkpCheckBox.Location = new System.Drawing.Point(319, 4);
+            this.BkpCheckBox.Name = "BkpCheckBox";
+            this.BkpCheckBox.Size = new System.Drawing.Size(96, 17);
+            this.BkpCheckBox.TabIndex = 31;
+            this.BkpCheckBox.Text = "Create backup";
+            this.BkpCheckBox.UseVisualStyleBackColor = true;
+            this.BkpCheckBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
             // OGF_Editor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(427, 335);
+            this.Controls.Add(this.BkpCheckBox);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.TabControl);
             this.Controls.Add(this.MenuPanel);
@@ -233,6 +246,7 @@ namespace OGF_tool
         private System.Windows.Forms.ToolStripStatusLabel StatusFile;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripMenuItem oGFInfoToolStripMenuItem;
+        private System.Windows.Forms.CheckBox BkpCheckBox;
     }
 }
 
