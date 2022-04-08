@@ -383,7 +383,9 @@ namespace OGF_tool
 				m_exportm_modif_name_tool = xr_loader.read_stringZ();
 				m_modified_time = xr_loader.ReadUInt32();
 
-                if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_CHILDREN, false, true))) return;
+				xr_loader.SetStream(r.BaseStream);
+
+				if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_CHILDREN, false, true))) return;
 
 				OGF_V.pos = xr_loader.chunk_pos;
 
@@ -423,6 +425,8 @@ namespace OGF_tool
 					OGF_V.usertdata.old_size = (uint)OGF_V.usertdata.data.Length+1;
 				}
 
+				xr_loader.SetStream(r.BaseStream);
+
 				// Motion Refs
 				bool v3 = xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS_0, false, true);
 
@@ -444,8 +448,41 @@ namespace OGF_tool
 					}
 				}
 
-                // Bones
-                if (xr_loader.find_chunk((int)OGF.OGF4_S_BONE_NAMES, false, true))
+				xr_loader.SetStream(r.BaseStream);
+
+				//Motions
+				if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_S_MOTIONS, false, true)))
+				{
+					MotionBox.Clear();
+					MotionBox.ReadOnly = true;
+
+					TabControl.Controls.Add(MotionPage);
+
+					id = 0;
+
+					while (true)
+					{
+
+						if (!xr_loader.find_chunk(id)) break;
+
+						Stream temp = xr_loader.reader.BaseStream;
+
+						if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk(id, false, true))) break;
+
+						if (id == 0)
+							MotionBox.Text += $"Motions count : {xr_loader.ReadUInt32()}\n";
+						else
+							MotionBox.Text += $"\n{id}. {xr_loader.read_stringZ()}";
+
+						id++;
+						xr_loader.SetStream(temp);
+					}
+				}
+
+				xr_loader.SetStream(r.BaseStream);
+
+				// Bones
+				if (xr_loader.find_chunk((int)OGF.OGF4_S_BONE_NAMES, false, true))
 				{
 					OGF_V.bones.pos = xr_loader.chunk_pos;
 					OGF_V.bones.bones = new List<string>();
@@ -478,68 +515,41 @@ namespace OGF_tool
 						OGF_V.bones.bones.Add(bone_name);
 						OGF_V.bones.parent_bones.Add(parent_name);
 					}
-
-					//// Ik Data
-					//if (xr_loader.find_chunk((int)OGF.OGF4_S_IKDATA, false, true))
-					//{
-					//	for (int i = 0; i < all_count; i++)
-					//                   {
-					//		uint version = xr_loader.ReadUInt32();
-					//		string gmtl_name = xr_loader.read_stringZ();
-					//		xr_loader.ReadBytes(112);   // struct SBoneShape
-
-					//		// Import
-					//		{
-					//			xr_loader.ReadBytes(4);
-					//			xr_loader.ReadBytes(16 * 3);
-					//			xr_loader.ReadBytes(4);
-					//			xr_loader.ReadBytes(4);
-					//			xr_loader.ReadBytes(4);
-					//			xr_loader.ReadBytes(4);
-					//			xr_loader.ReadBytes(4);
-
-					//			if (version > 0)
-					//				xr_loader.ReadBytes(4);
-					//		}
-
-					//		xr_loader.ReadBytes(12);	// vXYZ
-					//		xr_loader.ReadBytes(12);	// vT
-					//		float mass = xr_loader.ReadFloat();
-					//		xr_loader.ReadBytes(12);    // Center of mass
-					//		//MessageBox.Show($"gamemtl name: {gmtl_name}");
-					//		//MessageBox.Show($"mass: {mass}");
-					//	}
-					//}
 				}
 
-                //Motions
-                if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_S_MOTIONS, false, true)))
-                {
-					MotionBox.Clear();
-					MotionBox.ReadOnly = true;
+				xr_loader.SetStream(r.BaseStream);
 
-					TabControl.Controls.Add(MotionPage);
+				//// Ik Data
+				//if (xr_loader.find_chunk((int)OGF.OGF4_S_IKDATA, false, true))
+				//{
+				//	for (int i = 0; i < OGF_V.bones.Count; i++)
+				//                   {
+				//		uint version = xr_loader.ReadUInt32();
+				//		string gmtl_name = xr_loader.read_stringZ();
+				//		xr_loader.ReadBytes(112);   // struct SBoneShape
 
-                    id = 0;
+				//		// Import
+				//		{
+				//			xr_loader.ReadBytes(4);
+				//			xr_loader.ReadBytes(16 * 3);
+				//			xr_loader.ReadBytes(4);
+				//			xr_loader.ReadBytes(4);
+				//			xr_loader.ReadBytes(4);
+				//			xr_loader.ReadBytes(4);
+				//			xr_loader.ReadBytes(4);
 
-                    while (true)
-                    {
+				//			if (version > 0)
+				//				xr_loader.ReadBytes(4);
+				//		}
 
-						if (!xr_loader.find_chunk(id)) break;
-
-						Stream temp = xr_loader.reader.BaseStream;
-
-                        if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk(id, false, true))) break;
-
-						if (id == 0)
-							MotionBox.Text += $"Motions count : {xr_loader.ReadUInt32()}\n";
-						else
-							MotionBox.Text += $"\n{id}. {xr_loader.read_stringZ()}";
-
-						id++;
-                        xr_loader.SetStream(temp);
-                    }
-                }
+				//		xr_loader.ReadBytes(12);	// vXYZ
+				//		xr_loader.ReadBytes(12);	// vT
+				//		float mass = xr_loader.ReadFloat();
+				//		xr_loader.ReadBytes(12);    // Center of mass
+				//		//MessageBox.Show($"gamemtl name: {gmtl_name}");
+				//		//MessageBox.Show($"mass: {mass}");
+				//	}
+				//}
 			}
 		}
 

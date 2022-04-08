@@ -119,6 +119,7 @@ namespace OGF_tool
             this.CustomDataPage.Controls.Add(this.CustomDataBox);
             this.CustomDataPage.Location = new System.Drawing.Point(4, 25);
             this.CustomDataPage.Name = "CustomDataPage";
+            this.CustomDataPage.Padding = new System.Windows.Forms.Padding(3);
             this.CustomDataPage.Size = new System.Drawing.Size(395, 256);
             this.CustomDataPage.TabIndex = 2;
             this.CustomDataPage.Text = "Custom Data";
