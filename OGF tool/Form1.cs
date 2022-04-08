@@ -33,11 +33,20 @@ namespace OGF_tool
 		// Input
 		public bool bKeyIsDown = false;
 
+		// Elements Size
+		int FormHeight = 0;
+		int BoxesHeight = 0;
+		int TabControlHeight = 0;
+
 
 		public OGF_Editor()
 		{
 			InitializeComponent();
 			StartPosition = FormStartPosition.CenterScreen;
+
+			FormHeight = Height;
+			BoxesHeight = MotionRefsBox.Height;
+			TabControlHeight = TabControl.Height;
 
 			//foreach (var box in textBoxes)
 			//tabPage1.Controls.Add(box);
@@ -111,6 +120,41 @@ namespace OGF_tool
 			//box.Controls.Add(newLbl3);
 		}
 
+		private void RecalcFormSize()
+        {
+			int set_size = 125;
+			Height = FormHeight;
+			MotionRefsBox.Height = BoxesHeight;
+			CustomDataBox.Height = BoxesHeight;
+			BoneNamesBox.Height = BoxesHeight;
+			TabControl.Height = TabControlHeight;
+
+			if (OGF_V.childs.Count <= 1)
+			{
+				Height -= set_size;
+				MotionRefsBox.Height -= set_size;
+				CustomDataBox.Height -= set_size;
+				BoneNamesBox.Height -= set_size;
+				TabControl.Height -= set_size;
+			}
+			else if (OGF_V.childs.Count == 2)
+			{
+				Height = FormHeight;
+				MotionRefsBox.Height = BoxesHeight;
+				CustomDataBox.Height = BoxesHeight;
+				BoneNamesBox.Height = BoxesHeight;
+				TabControl.Height = TabControlHeight;
+			}
+			else if (OGF_V.childs.Count >= 3)
+			{
+				Height += set_size;
+				MotionRefsBox.Height += set_size;
+				CustomDataBox.Height += set_size;
+				BoneNamesBox.Height += set_size;
+				TabControl.Height += set_size;
+			}
+		}
+
 		private void Clear()
 		{
 			FILE_NAME = "";
@@ -123,6 +167,8 @@ namespace OGF_tool
 
 		private void AfterLoad()
 		{
+			RecalcFormSize();
+
 			for (int i = 0; i < OGF_V.childs.Count; i++)
 			{
 				CreateGroupBox(i);
@@ -350,7 +396,6 @@ namespace OGF_tool
 
 					id++;
 					xr_loader.SetStream(temp);
-
 				}
 
 				xr_loader.SetStream(r.BaseStream);
