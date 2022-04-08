@@ -37,6 +37,8 @@ namespace OGF_tool
             this.MotionRefsBox = new System.Windows.Forms.RichTextBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.CustomDataBox = new System.Windows.Forms.RichTextBox();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.BoneNamesBox = new System.Windows.Forms.RichTextBox();
             this.MenuPanel = new System.Windows.Forms.MenuStrip();
             this.FileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.LoadMenuParam = new System.Windows.Forms.ToolStripMenuItem();
@@ -49,6 +51,7 @@ namespace OGF_tool
             this.TabControl.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
+            this.tabPage1.SuspendLayout();
             this.MenuPanel.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -64,6 +67,7 @@ namespace OGF_tool
             this.TabControl.Controls.Add(this.TexturesPage);
             this.TabControl.Controls.Add(this.tabPage2);
             this.TabControl.Controls.Add(this.tabPage3);
+            this.TabControl.Controls.Add(this.tabPage1);
             this.TabControl.Location = new System.Drawing.Point(12, 27);
             this.TabControl.Multiline = true;
             this.TabControl.Name = "TabControl";
@@ -92,7 +96,7 @@ namespace OGF_tool
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage2.Size = new System.Drawing.Size(395, 256);
             this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "MotionRefs";
+            this.tabPage2.Text = "Motion Refs";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
             // MotionRefsBox
@@ -124,6 +128,26 @@ namespace OGF_tool
             this.CustomDataBox.TabIndex = 0;
             this.CustomDataBox.Text = "";
             this.CustomDataBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.BoneNamesBox);
+            this.tabPage1.Location = new System.Drawing.Point(4, 25);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(395, 256);
+            this.tabPage1.TabIndex = 3;
+            this.tabPage1.Text = "Bone Names";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // BoneNamesBox
+            // 
+            this.BoneNamesBox.Location = new System.Drawing.Point(0, 0);
+            this.BoneNamesBox.Name = "BoneNamesBox";
+            this.BoneNamesBox.Size = new System.Drawing.Size(395, 256);
+            this.BoneNamesBox.TabIndex = 1;
+            this.BoneNamesBox.Text = "";
+            this.BoneNamesBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
             // MenuPanel
             // 
@@ -221,6 +245,7 @@ namespace OGF_tool
             this.TabControl.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.tabPage3.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
             this.MenuPanel.ResumeLayout(false);
             this.MenuPanel.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
@@ -247,6 +272,8 @@ namespace OGF_tool
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripMenuItem oGFInfoToolStripMenuItem;
         private System.Windows.Forms.CheckBox BkpCheckBox;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.RichTextBox BoneNamesBox;
     }
 }
 

@@ -118,6 +118,7 @@ namespace OGF_tool
 			file_bytes.Clear();
 			TexturesPage.Controls.Clear();
 			MotionRefsBox.Clear();
+			BoneNamesBox.Clear();
 		}
 
 		private void AfterLoad()
@@ -215,7 +216,6 @@ namespace OGF_tool
 					file_bytes.AddRange(BitConverter.GetBytes(OGF_V.usertdata.chunk_size()));
 
 					file_bytes.AddRange(OGF_V.usertdata.data_all());
-
 				}
 				else
 				{
@@ -334,7 +334,6 @@ namespace OGF_tool
 				// Texture && shader
 				while (true)
 				{
-
 					if (!xr_loader.find_chunk(id)) break;
 
 					Stream temp = xr_loader.reader.BaseStream;
@@ -399,13 +398,46 @@ namespace OGF_tool
      //           {
      //               xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk(0, false, false));
      //               uint count = xr_loader.ReadUInt32();
+
+					//xr_loader.find_chunk((int)OGF.OGF4_S_MOTIONS, false, true); // Родительский чанк
 					//for (int i = 0; i < count; i++)
      //               {
 					//	xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk(i + 1, false, false));
-					//	MessageBox.Show($"name: {xr_loader.read_stringZ()}");
+     //                   MessageBox.Show($"name: {xr_loader.read_stringZ()}");	// Дата - не работает
      //               }
      //           }
-            }
+
+				// Bones
+				if (xr_loader.find_chunk((int)OGF.OGF4_S_BONE_NAMES, false, true))
+				{
+					BoneNamesBox.Clear();
+					BoneNamesBox.ReadOnly = true;
+
+					if (!TabControl.Controls.Contains(tabPage1))
+						TabControl.Controls.Add(tabPage1);
+					uint count = xr_loader.ReadUInt32();
+
+					BoneNamesBox.Text += $"Bones count : {count} \n\n";
+
+					uint all_count = count;
+					for (; count != 0; count--)
+					{
+						uint bone_id = all_count - count;
+						string bone_name = xr_loader.read_stringZ();
+						string parent_name = xr_loader.read_stringZ();
+						xr_loader.ReadBytes(60);
+						BoneNamesBox.Text += $"Id: {bone_id}, name: [{bone_name}]";
+
+						if (parent_name != "")
+							BoneNamesBox.Text += $", parent bone: [{parent_name}]";
+
+						if (count != 1)
+							BoneNamesBox.Text += "\n";
+					}
+				}
+				else
+					TabControl.Controls.Remove(tabPage1);
+			}
 		}
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
