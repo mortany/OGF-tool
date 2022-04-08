@@ -306,12 +306,14 @@ namespace OGF_tool
 
 			if (BkpCheckBox.Checked)
 			{
-				string backup_path = filename + ".bkp";
+				string backup_path = filename + ".bak";
+
 				if (File.Exists(backup_path))
 				{
 					FileInfo backup_file = new FileInfo(backup_path);
 					backup_file.Delete();
 				}
+
 				FileInfo file = new FileInfo(filename);
 				file.CopyTo(backup_path);
 			}
@@ -559,7 +561,7 @@ namespace OGF_tool
 
 			CopyParams();
 			SaveFile(FILE_NAME);
-			AutoClosingMessageBox.Show("Saved!", "", BkpCheckBox.Checked ? 2000 : 500, MessageBoxIcon.Information);
+			AutoClosingMessageBox.Show("Saved!", "", 500, MessageBoxIcon.Information);
 		}
 
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
