@@ -244,6 +244,8 @@ namespace OGF_tool
 
         public UserData usertdata = null;
 
+        public BoneData bones = new BoneData();
+
         public OGF_Children()
         {
             refs.pos = -1;
@@ -312,6 +314,44 @@ namespace OGF_tool
         public uint NewSize()
         {
             return chunk_size() - old_size;
+        }
+    }
+
+    public struct BoneData
+    {
+        public long pos;
+        public List<string> bones;
+        public List<string> parent_bones;
+        public uint chunk_size()
+        {
+            uint temp = 4;                                  // count byte
+
+            for (int i = 0; i < bones.Count; i++)
+            {
+                temp += (uint)bones[i].Length + 1;          // bone name
+                temp += (uint)parent_bones[i].Length + 1;   // parent bone name
+                temp += 60;                                 // obb
+            }
+
+            return temp;
+        }
+        public byte[] count()
+        {
+            return BitConverter.GetBytes(bones.Count);
+        }
+        public byte[] data()
+        {
+            List<byte> temp = new List<byte>();
+
+            for (int i = 0; i < bones.Count; i++)
+            {
+                temp.AddRange(Encoding.ASCII.GetBytes(bones[i]));       // bone name
+                temp.AddRange(Encoding.ASCII.GetBytes(parent_bones[i]));// parent bone name
+                temp.Add(60);                                           // obb
+                temp.Add(0);
+            }
+
+            return temp.ToArray();
         }
     }
 
