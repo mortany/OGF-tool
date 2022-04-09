@@ -130,8 +130,6 @@ namespace OGF_tool
 			if (parent_bone_name != "")
 				newTextBox.Text += $"Parent bone name: {parent_bone_name}\n";
 			newTextBox.Text += $"Material: {material}\nMass: {mass}";
-			if (parent_bone_name == "")
-				newTextBox.Text += "\n";
 
 			box.Controls.Add(newTextBox);
 		}
