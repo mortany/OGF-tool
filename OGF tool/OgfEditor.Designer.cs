@@ -114,7 +114,6 @@ namespace OGF_tool
             this.MotionRefsBox.TabIndex = 0;
             this.MotionRefsBox.Text = "";
             this.MotionRefsBox.WordWrap = false;
-            this.MotionRefsBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
             // MotionPage
             // 
@@ -135,15 +134,14 @@ namespace OGF_tool
             this.MotionBox.Size = new System.Drawing.Size(395, 256);
             this.MotionBox.TabIndex = 2;
             this.MotionBox.Text = "";
-            this.MotionBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
             // CustomDataPage
             // 
             this.CustomDataPage.Controls.Add(this.CustomDataBox);
-            this.CustomDataPage.Location = new System.Drawing.Point(4, 25);
+            this.CustomDataPage.Location = new System.Drawing.Point(4, 49);
             this.CustomDataPage.Name = "CustomDataPage";
             this.CustomDataPage.Padding = new System.Windows.Forms.Padding(3);
-            this.CustomDataPage.Size = new System.Drawing.Size(395, 256);
+            this.CustomDataPage.Size = new System.Drawing.Size(395, 232);
             this.CustomDataPage.TabIndex = 2;
             this.CustomDataPage.Text = "Custom Data";
             this.CustomDataPage.UseVisualStyleBackColor = true;
@@ -155,7 +153,6 @@ namespace OGF_tool
             this.CustomDataBox.Size = new System.Drawing.Size(395, 256);
             this.CustomDataBox.TabIndex = 0;
             this.CustomDataBox.Text = "";
-            this.CustomDataBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
             // BoneParamsPage
             // 
@@ -248,10 +245,10 @@ namespace OGF_tool
             // BoneNamesPage
             // 
             this.BoneNamesPage.Controls.Add(this.BoneNamesBox);
-            this.BoneNamesPage.Location = new System.Drawing.Point(4, 25);
+            this.BoneNamesPage.Location = new System.Drawing.Point(4, 49);
             this.BoneNamesPage.Name = "BoneNamesPage";
             this.BoneNamesPage.Padding = new System.Windows.Forms.Padding(3);
-            this.BoneNamesPage.Size = new System.Drawing.Size(395, 256);
+            this.BoneNamesPage.Size = new System.Drawing.Size(395, 232);
             this.BoneNamesPage.TabIndex = 5;
             this.BoneNamesPage.Text = "Bone Names";
             this.BoneNamesPage.UseVisualStyleBackColor = true;
@@ -266,7 +263,6 @@ namespace OGF_tool
             this.BoneNamesBox.TabIndex = 1;
             this.BoneNamesBox.Text = "";
             this.BoneNamesBox.WordWrap = false;
-            this.BoneNamesBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
             // OGF_Editor
             // 
