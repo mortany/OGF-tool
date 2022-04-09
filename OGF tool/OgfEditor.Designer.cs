@@ -35,10 +35,11 @@ namespace OGF_tool
             this.TexturesPage = new System.Windows.Forms.TabPage();
             this.MotionRefsPage = new System.Windows.Forms.TabPage();
             this.MotionRefsBox = new System.Windows.Forms.RichTextBox();
+            this.MotionPage = new System.Windows.Forms.TabPage();
+            this.MotionBox = new System.Windows.Forms.RichTextBox();
             this.CustomDataPage = new System.Windows.Forms.TabPage();
             this.CustomDataBox = new System.Windows.Forms.RichTextBox();
-            this.BoneNamesPage = new System.Windows.Forms.TabPage();
-            this.BoneNamesBox = new System.Windows.Forms.RichTextBox();
+            this.BoneParamsPage = new System.Windows.Forms.TabPage();
             this.MenuPanel = new System.Windows.Forms.MenuStrip();
             this.FileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.LoadMenuParam = new System.Windows.Forms.ToolStripMenuItem();
@@ -48,15 +49,15 @@ namespace OGF_tool
             this.StatusFile = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.BkpCheckBox = new System.Windows.Forms.CheckBox();
-            this.MotionPage = new System.Windows.Forms.TabPage();
-            this.MotionBox = new System.Windows.Forms.RichTextBox();
+            this.BoneNamesPage = new System.Windows.Forms.TabPage();
+            this.BoneNamesBox = new System.Windows.Forms.RichTextBox();
             this.TabControl.SuspendLayout();
             this.MotionRefsPage.SuspendLayout();
+            this.MotionPage.SuspendLayout();
             this.CustomDataPage.SuspendLayout();
-            this.BoneNamesPage.SuspendLayout();
             this.MenuPanel.SuspendLayout();
             this.statusStrip1.SuspendLayout();
-            this.MotionPage.SuspendLayout();
+            this.BoneNamesPage.SuspendLayout();
             this.SuspendLayout();
             // 
             // openFileDialog1
@@ -72,6 +73,7 @@ namespace OGF_tool
             this.TabControl.Controls.Add(this.MotionPage);
             this.TabControl.Controls.Add(this.CustomDataPage);
             this.TabControl.Controls.Add(this.BoneNamesPage);
+            this.TabControl.Controls.Add(this.BoneParamsPage);
             this.TabControl.Location = new System.Drawing.Point(12, 27);
             this.TabControl.Multiline = true;
             this.TabControl.Name = "TabControl";
@@ -84,10 +86,10 @@ namespace OGF_tool
             // TexturesPage
             // 
             this.TexturesPage.AutoScroll = true;
-            this.TexturesPage.Location = new System.Drawing.Point(4, 25);
+            this.TexturesPage.Location = new System.Drawing.Point(4, 49);
             this.TexturesPage.Name = "TexturesPage";
             this.TexturesPage.Padding = new System.Windows.Forms.Padding(3);
-            this.TexturesPage.Size = new System.Drawing.Size(395, 256);
+            this.TexturesPage.Size = new System.Drawing.Size(395, 232);
             this.TexturesPage.TabIndex = 0;
             this.TexturesPage.Text = "Textures";
             this.TexturesPage.UseVisualStyleBackColor = true;
@@ -95,10 +97,10 @@ namespace OGF_tool
             // MotionRefsPage
             // 
             this.MotionRefsPage.Controls.Add(this.MotionRefsBox);
-            this.MotionRefsPage.Location = new System.Drawing.Point(4, 25);
+            this.MotionRefsPage.Location = new System.Drawing.Point(4, 49);
             this.MotionRefsPage.Name = "MotionRefsPage";
             this.MotionRefsPage.Padding = new System.Windows.Forms.Padding(3);
-            this.MotionRefsPage.Size = new System.Drawing.Size(395, 256);
+            this.MotionRefsPage.Size = new System.Drawing.Size(395, 232);
             this.MotionRefsPage.TabIndex = 1;
             this.MotionRefsPage.Text = "Motion Refs";
             this.MotionRefsPage.UseVisualStyleBackColor = true;
@@ -113,6 +115,27 @@ namespace OGF_tool
             this.MotionRefsBox.Text = "";
             this.MotionRefsBox.WordWrap = false;
             this.MotionRefsBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
+            // 
+            // MotionPage
+            // 
+            this.MotionPage.Controls.Add(this.MotionBox);
+            this.MotionPage.Location = new System.Drawing.Point(4, 49);
+            this.MotionPage.Name = "MotionPage";
+            this.MotionPage.Padding = new System.Windows.Forms.Padding(3);
+            this.MotionPage.Size = new System.Drawing.Size(395, 232);
+            this.MotionPage.TabIndex = 4;
+            this.MotionPage.Text = "Motions";
+            this.MotionPage.UseVisualStyleBackColor = true;
+            // 
+            // MotionBox
+            // 
+            this.MotionBox.Location = new System.Drawing.Point(0, 0);
+            this.MotionBox.Name = "MotionBox";
+            this.MotionBox.ReadOnly = true;
+            this.MotionBox.Size = new System.Drawing.Size(395, 256);
+            this.MotionBox.TabIndex = 2;
+            this.MotionBox.Text = "";
+            this.MotionBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
             // CustomDataPage
             // 
@@ -134,25 +157,16 @@ namespace OGF_tool
             this.CustomDataBox.Text = "";
             this.CustomDataBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
-            // BoneNamesPage
+            // BoneParamsPage
             // 
-            this.BoneNamesPage.Controls.Add(this.BoneNamesBox);
-            this.BoneNamesPage.Location = new System.Drawing.Point(4, 25);
-            this.BoneNamesPage.Name = "BoneNamesPage";
-            this.BoneNamesPage.Padding = new System.Windows.Forms.Padding(3);
-            this.BoneNamesPage.Size = new System.Drawing.Size(395, 256);
-            this.BoneNamesPage.TabIndex = 3;
-            this.BoneNamesPage.Text = "Bone Names";
-            this.BoneNamesPage.UseVisualStyleBackColor = true;
-            // 
-            // BoneNamesBox
-            // 
-            this.BoneNamesBox.Location = new System.Drawing.Point(0, 0);
-            this.BoneNamesBox.Name = "BoneNamesBox";
-            this.BoneNamesBox.Size = new System.Drawing.Size(395, 256);
-            this.BoneNamesBox.TabIndex = 1;
-            this.BoneNamesBox.Text = "";
-            this.BoneNamesBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
+            this.BoneParamsPage.AutoScroll = true;
+            this.BoneParamsPage.Location = new System.Drawing.Point(4, 49);
+            this.BoneParamsPage.Name = "BoneParamsPage";
+            this.BoneParamsPage.Padding = new System.Windows.Forms.Padding(3);
+            this.BoneParamsPage.Size = new System.Drawing.Size(395, 232);
+            this.BoneParamsPage.TabIndex = 3;
+            this.BoneParamsPage.Text = "Bone Params";
+            this.BoneParamsPage.UseVisualStyleBackColor = true;
             // 
             // MenuPanel
             // 
@@ -231,25 +245,28 @@ namespace OGF_tool
             this.BkpCheckBox.UseVisualStyleBackColor = true;
             this.BkpCheckBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
-            // MotionPage
+            // BoneNamesPage
             // 
-            this.MotionPage.Controls.Add(this.MotionBox);
-            this.MotionPage.Location = new System.Drawing.Point(4, 25);
-            this.MotionPage.Name = "MotionPage";
-            this.MotionPage.Padding = new System.Windows.Forms.Padding(3);
-            this.MotionPage.Size = new System.Drawing.Size(395, 256);
-            this.MotionPage.TabIndex = 4;
-            this.MotionPage.Text = "Motions";
-            this.MotionPage.UseVisualStyleBackColor = true;
+            this.BoneNamesPage.Controls.Add(this.BoneNamesBox);
+            this.BoneNamesPage.Location = new System.Drawing.Point(4, 25);
+            this.BoneNamesPage.Name = "BoneNamesPage";
+            this.BoneNamesPage.Padding = new System.Windows.Forms.Padding(3);
+            this.BoneNamesPage.Size = new System.Drawing.Size(395, 256);
+            this.BoneNamesPage.TabIndex = 5;
+            this.BoneNamesPage.Text = "Bone Names";
+            this.BoneNamesPage.UseVisualStyleBackColor = true;
             // 
-            // MotionBox
+            // BoneNamesBox
             // 
-            this.MotionBox.Location = new System.Drawing.Point(0, 0);
-            this.MotionBox.Name = "MotionBox";
-            this.MotionBox.Size = new System.Drawing.Size(395, 256);
-            this.MotionBox.TabIndex = 2;
-            this.MotionBox.Text = "";
-            this.MotionBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
+            this.BoneNamesBox.DetectUrls = false;
+            this.BoneNamesBox.Location = new System.Drawing.Point(0, 0);
+            this.BoneNamesBox.Name = "BoneNamesBox";
+            this.BoneNamesBox.ReadOnly = true;
+            this.BoneNamesBox.Size = new System.Drawing.Size(395, 256);
+            this.BoneNamesBox.TabIndex = 1;
+            this.BoneNamesBox.Text = "";
+            this.BoneNamesBox.WordWrap = false;
+            this.BoneNamesBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
             // OGF_Editor
             // 
@@ -269,13 +286,13 @@ namespace OGF_tool
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.TabControl.ResumeLayout(false);
             this.MotionRefsPage.ResumeLayout(false);
+            this.MotionPage.ResumeLayout(false);
             this.CustomDataPage.ResumeLayout(false);
-            this.BoneNamesPage.ResumeLayout(false);
             this.MenuPanel.ResumeLayout(false);
             this.MenuPanel.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
-            this.MotionPage.ResumeLayout(false);
+            this.BoneNamesPage.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -298,10 +315,11 @@ namespace OGF_tool
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripMenuItem oGFInfoToolStripMenuItem;
         private System.Windows.Forms.CheckBox BkpCheckBox;
-        private System.Windows.Forms.TabPage BoneNamesPage;
-        private System.Windows.Forms.RichTextBox BoneNamesBox;
+        private System.Windows.Forms.TabPage BoneParamsPage;
         private System.Windows.Forms.TabPage MotionPage;
         private System.Windows.Forms.RichTextBox MotionBox;
+        private System.Windows.Forms.TabPage BoneNamesPage;
+        private System.Windows.Forms.RichTextBox BoneNamesBox;
     }
 }
 

@@ -322,6 +322,8 @@ namespace OGF_tool
         public long pos;
         public List<string> bones;
         public List<string> parent_bones;
+        public List<string> materials;
+        public List<float>  mass;
         public uint chunk_size()
         {
             uint temp = 4;                                  // count byte

@@ -48,9 +48,6 @@ namespace OGF_tool
 			BoxesHeight = MotionRefsBox.Height;
 			TabControlHeight = TabControl.Height;
 
-			//foreach (var box in textBoxes)
-			//tabPage1.Controls.Add(box);
-
 			if (Environment.GetCommandLineArgs().Length > 1)
 			{
 				Clear();
@@ -64,61 +61,79 @@ namespace OGF_tool
 			}
 		}
 
-		private void CreateGroupBox(int idx)
+		private void CreateTextureGroupBox(int idx)
 		{
 			var GroupBox = new GroupBox();
 			GroupBox.Location = new System.Drawing.Point(3, 3 + 126 * idx);
 			GroupBox.Size = new System.Drawing.Size(366, 126);
 			GroupBox.Text = "Set: [" + idx + "]";
-			GroupBox.Name = "GrpBox_" + idx;
-			CreateBoxes(idx, GroupBox);
-			CreateLabels(idx, GroupBox);
+			GroupBox.Name = "TextureGrpBox_" + idx;
+			CreateTextureBoxes(idx, GroupBox);
+			CreateTextureLabels(idx, GroupBox);
 			TexturesPage.Controls.Add(GroupBox);
 		}
 
-		private void CreateBoxes(int idx, GroupBox box)
+		private void CreateTextureBoxes(int idx, GroupBox box)
 		{
 			var newTextBox = new TextBox();
 			newTextBox.Name = "textureBox_" + idx;
 			newTextBox.Size = new System.Drawing.Size(355, 23);
-			//newTextBox.Location = new System.Drawing.Point(56,30+88*idx + 15* idx);
 			newTextBox.Location = new System.Drawing.Point(6, 39);
 			newTextBox.TextChanged += new System.EventHandler(this.TextBoxFilter);
 
 			var newTextBox2 = new TextBox();
 			newTextBox2.Name = "shaderBox_" + idx;
 			newTextBox2.Size = new System.Drawing.Size(355, 23);
-			//newTextBox2.Location = new System.Drawing.Point(56, 74 + 88* idx + 15 * idx);
 			newTextBox2.Location = new System.Drawing.Point(6, 88);
 			newTextBox2.TextChanged += new System.EventHandler(this.TextBoxFilter);
 			box.Controls.Add(newTextBox);
 			box.Controls.Add(newTextBox2);
 		}
 
-		private void CreateLabels(int idx, GroupBox box)
+		private void CreateTextureLabels(int idx, GroupBox box)
 		{
 			var newLbl = new Label();
 			newLbl.Name = "textureLbl_" + idx;
 			newLbl.Text = "Texture Path:";
-			//newLbl.Size = new System.Drawing.Size(75, 15);
-			//newLbl.Location = new System.Drawing.Point(56, 12 + 88*idx + 15 * idx);
 			newLbl.Location = new System.Drawing.Point(6, 21);
 
 			var newLbl2 = new Label();
 			newLbl2.Name = "shaderLbl_" + idx;
 			newLbl2.Text = "Shader Name:";
-			//newLbl2.Size = new System.Drawing.Size(81, 15);
-			//newLbl2.Location = new System.Drawing.Point(56, 56 + 88 *idx + 15 * idx);
 			newLbl2.Location = new System.Drawing.Point(6, 70);
-
-			//var newLbl3 = new Label();
-			//newLbl3.Name = "textureSetLbl_" + idx;
-			//newLbl3.Text = "Set: [" + idx +"]";
-			//newLbl3.Location = new System.Drawing.Point(0, 44 + 88 * idx + 15 * idx);
 
 			box.Controls.Add(newLbl);
 			box.Controls.Add(newLbl2);
-			//box.Controls.Add(newLbl3);
+		}
+
+		private void CreateBoneGroupBox(int idx, string bone_name, string parent_bone_name, string material, float mass)
+		{
+			var GroupBox = new GroupBox();
+			GroupBox.Location = new System.Drawing.Point(3, 3 + 85 * idx);
+			GroupBox.Size = new System.Drawing.Size(366, 83);
+			GroupBox.Text = "Bone id: [" + idx + "]";
+			GroupBox.Name = "BoneGrpBox_" + idx;
+
+			CreateBoneTextBox(idx, GroupBox, bone_name, parent_bone_name, material, mass);
+			BoneParamsPage.Controls.Add(GroupBox);
+		}
+
+		private void CreateBoneTextBox(int idx, GroupBox box, string bone_name, string parent_bone_name, string material, float mass)
+		{
+			var newTextBox = new RichTextBox();
+			newTextBox.Name = "boneBox_" + idx;
+			newTextBox.Size = new System.Drawing.Size(355, 58);
+			newTextBox.Location = new System.Drawing.Point(6, 18);
+			newTextBox.ReadOnly = true;
+
+			newTextBox.Text = $"Bone name: {bone_name}\n";
+			if (parent_bone_name != "")
+				newTextBox.Text += $"Parent bone name: {parent_bone_name}\n";
+			newTextBox.Text += $"Material: {material}\nMass: {mass}";
+			if (parent_bone_name == "")
+				newTextBox.Text += "\n";
+
+			box.Controls.Add(newTextBox);
 		}
 
 		private void RecalcFormSize()
@@ -157,6 +172,7 @@ namespace OGF_tool
 			OGF_V = null;
 			file_bytes.Clear();
 			TexturesPage.Controls.Clear();
+			BoneParamsPage.Controls.Clear();
 			TabControl.Controls.Clear();
 			MotionRefsBox.Clear();
 			BoneNamesBox.Clear();
@@ -168,9 +184,9 @@ namespace OGF_tool
 
 			for (int i = 0; i < OGF_V.childs.Count; i++)
 			{
-				CreateGroupBox(i);
+				CreateTextureGroupBox(i);
 
-				var box = TexturesPage.Controls["GrpBox_" + i];
+				var box = TexturesPage.Controls["TextureGrpBox_" + i];
 
 				if (box != null)
 				{
@@ -179,6 +195,11 @@ namespace OGF_tool
 					var Cntrl2 = box.Controls["shaderBox_" + i];
 					Cntrl2.Text = OGF_V.childs[i].m_shader;
 				}
+			}
+
+			for (int i = 0; i < OGF_V.bones.bones.Count; i++)
+			{
+				CreateBoneGroupBox(i, OGF_V.bones.bones[i], OGF_V.bones.parent_bones[i], OGF_V.bones.materials[i], OGF_V.bones.mass[i]);
 			}
 
 			MotionRefsBox.Clear();
@@ -364,8 +385,6 @@ namespace OGF_tool
 			{
 				StatusFile.Text = filename.Substring(filename.LastIndexOf('\\') + 1);
 
-				TabControl.Controls.Add(TexturesPage);
-
 				xr_loader.SetStream(r.BaseStream);
 
 				uint size = xr_loader.find_chunkSize((int)OGF.OGF_HEADER);
@@ -388,6 +407,8 @@ namespace OGF_tool
 				xr_loader.SetStream(r.BaseStream);
 
 				if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_CHILDREN, false, true))) return;
+
+				TabControl.Controls.Add(TexturesPage);
 
 				OGF_V.pos = xr_loader.chunk_pos;
 
@@ -456,7 +477,6 @@ namespace OGF_tool
 				if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_S_MOTIONS, false, true)))
 				{
 					MotionBox.Clear();
-					MotionBox.ReadOnly = true;
 
 					TabControl.Controls.Add(MotionPage);
 
@@ -464,7 +484,6 @@ namespace OGF_tool
 
 					while (true)
 					{
-
 						if (!xr_loader.find_chunk(id)) break;
 
 						Stream temp = xr_loader.reader.BaseStream;
@@ -491,25 +510,20 @@ namespace OGF_tool
 					OGF_V.bones.parent_bones = new List<string>();
 
 					BoneNamesBox.Clear();
-					BoneNamesBox.ReadOnly = true;
-
 					TabControl.Controls.Add(BoneNamesPage);
+					TabControl.Controls.Add(BoneParamsPage);
 
 					uint count = xr_loader.ReadUInt32();
+					uint count_saved = count;
 
 					BoneNamesBox.Text += $"Bones count : {count}\n\n";
 
-					uint all_count = count;
 					for (; count != 0; count--)
 					{
-						uint bone_id = all_count - count;
 						string bone_name = xr_loader.read_stringZ();
 						string parent_name = xr_loader.read_stringZ();
 						xr_loader.ReadBytes(60);    // Fobb
-						BoneNamesBox.Text += $"Id: {bone_id}, name: [{bone_name}]";
-
-						if (parent_name != "")
-							BoneNamesBox.Text += $", parent bone: [{parent_name}]";
+						BoneNamesBox.Text += $"{count_saved - count + 1}. {bone_name}";
 
 						if (count != 1)
 							BoneNamesBox.Text += "\n";
@@ -521,38 +535,43 @@ namespace OGF_tool
 
 				xr_loader.SetStream(r.BaseStream);
 
-				//// Ik Data
-				//if (xr_loader.find_chunk((int)OGF.OGF4_S_IKDATA, false, true))
-				//{
-				//	for (int i = 0; i < OGF_V.bones.Count; i++)
-				//                   {
-				//		uint version = xr_loader.ReadUInt32();
-				//		string gmtl_name = xr_loader.read_stringZ();
-				//		xr_loader.ReadBytes(112);   // struct SBoneShape
+                // Ik Data
+                if (xr_loader.find_chunk((int)OGF.OGF4_S_IKDATA, false, true))
+                {
+					OGF_V.bones.materials = new List<string>();
+					OGF_V.bones.mass = new List<float>();
 
-				//		// Import
-				//		{
-				//			xr_loader.ReadBytes(4);
-				//			xr_loader.ReadBytes(16 * 3);
-				//			xr_loader.ReadBytes(4);
-				//			xr_loader.ReadBytes(4);
-				//			xr_loader.ReadBytes(4);
-				//			xr_loader.ReadBytes(4);
-				//			xr_loader.ReadBytes(4);
+					for (int i = 0; i < OGF_V.bones.bones.Count; i++)
+                    {
+                        uint version = xr_loader.ReadUInt32();
+                        string gmtl_name = xr_loader.read_stringZ();
 
-				//			if (version > 0)
-				//				xr_loader.ReadBytes(4);
-				//		}
+						xr_loader.ReadBytes(112);   // struct SBoneShape
 
-				//		xr_loader.ReadBytes(12);	// vXYZ
-				//		xr_loader.ReadBytes(12);	// vT
-				//		float mass = xr_loader.ReadFloat();
-				//		xr_loader.ReadBytes(12);    // Center of mass
-				//		//MessageBox.Show($"gamemtl name: {gmtl_name}");
-				//		//MessageBox.Show($"mass: {mass}");
-				//	}
-				//}
-			}
+                        // Import
+                        {
+                            xr_loader.ReadBytes(4);
+                            xr_loader.ReadBytes(16 * 3);
+                            xr_loader.ReadBytes(4);
+                            xr_loader.ReadBytes(4);
+                            xr_loader.ReadBytes(4);
+                            xr_loader.ReadBytes(4);
+                            xr_loader.ReadBytes(4);
+
+                            if (version > 0)
+                                xr_loader.ReadBytes(4);
+                        }
+
+                        xr_loader.ReadBytes(12);    // vXYZ
+                        xr_loader.ReadBytes(12);    // vT
+                        float mass = xr_loader.ReadFloat();
+                        xr_loader.ReadBytes(12);    // Center of mass
+
+						OGF_V.bones.materials.Add(gmtl_name);
+						OGF_V.bones.mass.Add(mass);
+					}
+                }
+            }
 		}
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
