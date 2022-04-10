@@ -128,6 +128,14 @@ namespace OGF_tool
 			newTextBox.Location = new System.Drawing.Point(6, 18);
 			newTextBox.ReadOnly = true;
 
+			newTextBox.MouseWheel += (s, e) =>
+			{
+				int sc = 0;
+				if (e.Delta < 0) sc = BoneParamsPage.ClientSize.Height + 120;
+				else sc = -120;
+				using (Control c = new Control() { Parent = BoneParamsPage, Height = 1, Top = sc }){BoneParamsPage.ScrollControlIntoView(c);}
+			};
+
 			newTextBox.Text = $"Bone name: {bone_name}\n";
 			if (parent_bone_name != "")
 				newTextBox.Text += $"Parent bone name: {parent_bone_name}\n";
