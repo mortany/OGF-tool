@@ -606,6 +606,7 @@ namespace OGF_tool
 			{
 				case Keys.F4: loadToolStripMenuItem_Click(null, null); break;
 				case Keys.F5: saveToolStripMenuItem_Click(null, null); break;
+				case Keys.F6: saveAsToolStripMenuItem_Click(null, null); break;
 			}
 		}
 
