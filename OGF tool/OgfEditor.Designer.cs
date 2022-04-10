@@ -39,6 +39,8 @@ namespace OGF_tool
             this.MotionBox = new System.Windows.Forms.RichTextBox();
             this.CustomDataPage = new System.Windows.Forms.TabPage();
             this.CustomDataBox = new System.Windows.Forms.RichTextBox();
+            this.BoneNamesPage = new System.Windows.Forms.TabPage();
+            this.BoneNamesBox = new System.Windows.Forms.RichTextBox();
             this.BoneParamsPage = new System.Windows.Forms.TabPage();
             this.MenuPanel = new System.Windows.Forms.MenuStrip();
             this.FileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -49,15 +51,17 @@ namespace OGF_tool
             this.StatusFile = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.BkpCheckBox = new System.Windows.Forms.CheckBox();
-            this.BoneNamesPage = new System.Windows.Forms.TabPage();
-            this.BoneNamesBox = new System.Windows.Forms.RichTextBox();
+            this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.TabControl.SuspendLayout();
             this.MotionRefsPage.SuspendLayout();
             this.MotionPage.SuspendLayout();
             this.CustomDataPage.SuspendLayout();
+            this.BoneNamesPage.SuspendLayout();
             this.MenuPanel.SuspendLayout();
             this.statusStrip1.SuspendLayout();
-            this.BoneNamesPage.SuspendLayout();
             this.SuspendLayout();
             // 
             // openFileDialog1
@@ -154,6 +158,28 @@ namespace OGF_tool
             this.CustomDataBox.TabIndex = 0;
             this.CustomDataBox.Text = "";
             // 
+            // BoneNamesPage
+            // 
+            this.BoneNamesPage.Controls.Add(this.BoneNamesBox);
+            this.BoneNamesPage.Location = new System.Drawing.Point(4, 49);
+            this.BoneNamesPage.Name = "BoneNamesPage";
+            this.BoneNamesPage.Padding = new System.Windows.Forms.Padding(3);
+            this.BoneNamesPage.Size = new System.Drawing.Size(395, 232);
+            this.BoneNamesPage.TabIndex = 5;
+            this.BoneNamesPage.Text = "Bone Names";
+            this.BoneNamesPage.UseVisualStyleBackColor = true;
+            // 
+            // BoneNamesBox
+            // 
+            this.BoneNamesBox.DetectUrls = false;
+            this.BoneNamesBox.Location = new System.Drawing.Point(0, 0);
+            this.BoneNamesBox.Name = "BoneNamesBox";
+            this.BoneNamesBox.ReadOnly = true;
+            this.BoneNamesBox.Size = new System.Drawing.Size(395, 256);
+            this.BoneNamesBox.TabIndex = 1;
+            this.BoneNamesBox.Text = "";
+            this.BoneNamesBox.WordWrap = false;
+            // 
             // BoneParamsPage
             // 
             this.BoneParamsPage.AutoScroll = true;
@@ -181,7 +207,10 @@ namespace OGF_tool
             // 
             this.FileMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.LoadMenuParam,
-            this.SaveMenuParam});
+            this.SaveMenuParam,
+            this.saveAsToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.exitToolStripMenuItem});
             this.FileMenuItem.Name = "FileMenuItem";
             this.FileMenuItem.Size = new System.Drawing.Size(37, 20);
             this.FileMenuItem.Text = "File";
@@ -189,14 +218,14 @@ namespace OGF_tool
             // LoadMenuParam
             // 
             this.LoadMenuParam.Name = "LoadMenuParam";
-            this.LoadMenuParam.Size = new System.Drawing.Size(100, 22);
+            this.LoadMenuParam.Size = new System.Drawing.Size(180, 22);
             this.LoadMenuParam.Text = "Load";
             this.LoadMenuParam.Click += new System.EventHandler(this.loadToolStripMenuItem_Click);
             // 
             // SaveMenuParam
             // 
             this.SaveMenuParam.Name = "SaveMenuParam";
-            this.SaveMenuParam.Size = new System.Drawing.Size(100, 22);
+            this.SaveMenuParam.Size = new System.Drawing.Size(180, 22);
             this.SaveMenuParam.Text = "Save";
             this.SaveMenuParam.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
@@ -242,27 +271,28 @@ namespace OGF_tool
             this.BkpCheckBox.UseVisualStyleBackColor = true;
             this.BkpCheckBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
-            // BoneNamesPage
+            // saveAsToolStripMenuItem
             // 
-            this.BoneNamesPage.Controls.Add(this.BoneNamesBox);
-            this.BoneNamesPage.Location = new System.Drawing.Point(4, 49);
-            this.BoneNamesPage.Name = "BoneNamesPage";
-            this.BoneNamesPage.Padding = new System.Windows.Forms.Padding(3);
-            this.BoneNamesPage.Size = new System.Drawing.Size(395, 232);
-            this.BoneNamesPage.TabIndex = 5;
-            this.BoneNamesPage.Text = "Bone Names";
-            this.BoneNamesPage.UseVisualStyleBackColor = true;
+            this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveAsToolStripMenuItem.Text = "Save as...";
+            this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
             // 
-            // BoneNamesBox
+            // toolStripSeparator1
             // 
-            this.BoneNamesBox.DetectUrls = false;
-            this.BoneNamesBox.Location = new System.Drawing.Point(0, 0);
-            this.BoneNamesBox.Name = "BoneNamesBox";
-            this.BoneNamesBox.ReadOnly = true;
-            this.BoneNamesBox.Size = new System.Drawing.Size(395, 256);
-            this.BoneNamesBox.TabIndex = 1;
-            this.BoneNamesBox.Text = "";
-            this.BoneNamesBox.WordWrap = false;
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            // 
+            // exitToolStripMenuItem
+            // 
+            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exitToolStripMenuItem.Text = "Exit";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            // 
+            // saveFileDialog1
+            // 
+            this.saveFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.saveFileDialog1_FileOk);
             // 
             // OGF_Editor
             // 
@@ -284,11 +314,11 @@ namespace OGF_tool
             this.MotionRefsPage.ResumeLayout(false);
             this.MotionPage.ResumeLayout(false);
             this.CustomDataPage.ResumeLayout(false);
+            this.BoneNamesPage.ResumeLayout(false);
             this.MenuPanel.ResumeLayout(false);
             this.MenuPanel.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
-            this.BoneNamesPage.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -316,6 +346,10 @@ namespace OGF_tool
         private System.Windows.Forms.RichTextBox MotionBox;
         private System.Windows.Forms.TabPage BoneNamesPage;
         private System.Windows.Forms.RichTextBox BoneNamesBox;
+        private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog1;
     }
 }
 

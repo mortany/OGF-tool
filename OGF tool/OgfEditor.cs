@@ -48,6 +48,8 @@ namespace OGF_tool
 			BoxesHeight = MotionRefsBox.Height;
 			TabControlHeight = TabControl.Height;
 
+			openFileDialog1.Filter = saveFileDialog1.Filter = "OGF file|*.ogf";
+
 			if (Environment.GetCommandLineArgs().Length > 1)
 			{
 				Clear();
@@ -628,6 +630,42 @@ namespace OGF_tool
 				$"Export Time: {dt_e}\n" +
 				$"Creation Time: {dt_c}\n" +
 				$"Modified Time: {dt_m}", "OGF Info:", MessageBoxButtons.OK, MessageBoxIcon.Information);
+		}
+
+        private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+			if (FILE_NAME == "")
+			{
+				AutoClosingMessageBox.Show("Please, open the file!", "", 900, MessageBoxIcon.Information);
+				return;
+			}
+
+			saveFileDialog1.FileName = "";
+			saveFileDialog1.ShowDialog();
+		}
+
+		private void saveFileDialog1_FileOk(object sender, CancelEventArgs e)
+		{
+			string Filename = (sender as SaveFileDialog).FileName;
+
+			if (File.Exists(Filename))
+			{
+				FileInfo backup_file = new FileInfo(Filename);
+				backup_file.Delete();
+			}
+
+			FileInfo file = new FileInfo(FILE_NAME);
+			file.CopyTo(Filename);
+
+			CopyParams();
+			SaveFile((sender as SaveFileDialog).FileName);
+			AutoClosingMessageBox.Show("Saved!", "", 500, MessageBoxIcon.Information);
+		}
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+			if (MessageBox.Show("Are you sure you want to exit?", "OGF Editor", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+				Close();
 		}
     }
 }
