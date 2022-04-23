@@ -18,13 +18,14 @@ namespace OGF_tool
 
 		// File sytem
 		public OGF_Children OGF_V = null;
+        public byte[] Current_OGF = null;
 		public List<byte> file_bytes = new List<byte>();
 		public string FILE_NAME = "";
 
 		// Input
 		public bool bKeyIsDown = false;
 
-
+        
 		public Form1()
 		{
 			InitializeComponent();
@@ -155,6 +156,11 @@ namespace OGF_tool
 				OGF_V.refs.refs0 = new List<string>();
 				OGF_V.refs.refs0.AddRange(richTextBox1.Lines);
 			}
+            else
+            {
+                OGF_V.refs.refs0 = null;
+            }
+            
 
             if(richTextBox2.Text != "" && OGF_V.usertdata!=null)
             {
@@ -179,7 +185,11 @@ namespace OGF_tool
 		private void SaveFile(string filename)
 		{
 			file_bytes.Clear();
-			using (var fileStream = new BinaryReader(File.OpenRead(filename)))
+
+            if(Current_OGF == null) return;
+
+
+			using (var fileStream = new BinaryReader(new MemoryStream(Current_OGF)))
 			{
 				byte[] temp = fileStream.ReadBytes((int)(OGF_V.pos));
 				file_bytes.AddRange(temp);
@@ -238,7 +248,6 @@ namespace OGF_tool
 
                 if (OGF_V.refs.refs0 != null)
 				{
-
 					if (OGF_V.refs.refs0.Count() > 1)
 					{
 						file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_MOTION_REFS_1));
@@ -297,9 +306,13 @@ namespace OGF_tool
 
 			OGF_V = new OGF_Children();
 
-			using (var r = new BinaryReader(File.OpenRead(filename)))
+            Current_OGF = File.ReadAllBytes(filename);
+
+
+            using (var r = new BinaryReader(new MemoryStream(Current_OGF)))
 			{
 
+                
 				xr_loader.SetStream(r.BaseStream);
 
 				uint size = xr_loader.find_chunkSize((int)OGF.OGF_HEADER);
@@ -320,20 +333,30 @@ namespace OGF_tool
 				uint m_creation_time = xr_loader.ReadUInt32();
 				string m_exportm_modif_name_tool = xr_loader.read_stringZ();
 				uint m_modified_time = xr_loader.ReadUInt32();
-				//System.DateTime dt_e = new System.DateTime(1970, 1, 1).AddSeconds(m_export_time);
-				//System.DateTime dt_c = new System.DateTime(1970, 1, 1).AddSeconds(m_creation_time);
-				//System.DateTime dt_m = new System.DateTime(1970, 1, 1).AddSeconds(m_modified_time);
-				//MessageBox.Show("Source: " + m_source + "\n" +
-				//	"Export Tool: " + m_export_tool + "\n" +
-				//	"Owner Name: " + m_owner_name + "\n" +
-				//	"Export modifed Tool:" + m_exportm_modif_name_tool);
-				//MessageBox.Show("Export Time: " + dt_e +"\n" + 
-				//	"Creation Time: " + dt_c + "\n"+
-				//	"Modified Time: " + dt_m);
+				System.DateTime dt_e = new System.DateTime(1970, 1, 1).AddSeconds(m_export_time);
+				System.DateTime dt_c = new System.DateTime(1970, 1, 1).AddSeconds(m_creation_time);
+				System.DateTime dt_m = new System.DateTime(1970, 1, 1).AddSeconds(m_modified_time);
+
+                SourceTBox.Text = m_source;
+                UserTBox.Text = m_export_tool;
+                OwnerTBox.Text = m_owner_name;
+                LastExpTBox.Text = m_exportm_modif_name_tool;
+
+                maskedTextBox1.Text = dt_e.ToShortDateString();
+                maskedTextBox2.Text = dt_c.ToShortDateString();
+                maskedTextBox3.Text = dt_m.ToShortDateString();
+
+                //MessageBox.Show("Source: " + m_source + "\n" +
+                //	"Export Tool: " + m_export_tool + "\n" +
+                //	"Owner Name: " + m_owner_name + "\n" +
+                //	"Export modifed Tool:" + m_exportm_modif_name_tool);
+                //MessageBox.Show("Export Time: " + dt_e +"\n" + 
+                //	"Creation Time: " + dt_c + "\n"+
+                //	"Modified Time: " + dt_m);
 
 
 
-				if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_CHILDREN, false, true))) return;
+                if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_CHILDREN, false, true))) return;
 
 				OGF_V.pos = xr_loader.chunk_pos;
 
@@ -390,5 +413,5 @@ namespace OGF_tool
                 }
 			}
 		}
-	}
+    }
 }
