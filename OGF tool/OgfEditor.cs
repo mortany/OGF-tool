@@ -27,6 +27,7 @@ namespace OGF_tool
 
 		// File sytem
 		public OGF_Children OGF_V = null;
+		public byte[] Current_OGF = null;
 		public List<byte> file_bytes = new List<byte>();
 		public string FILE_NAME = "";
 
@@ -227,8 +228,12 @@ namespace OGF_tool
 				OGF_V.refs.refs0 = new List<string>();
 				OGF_V.refs.refs0.AddRange(MotionRefsBox.Lines);
 			}
+			else
+			{
+				OGF_V.refs.refs0 = null;
+			}
 
-			if (CustomDataBox.Text != "" && OGF_V.usertdata!=null)
+			if (CustomDataBox.Text != "" && OGF_V.usertdata != null)
 			{
 				OGF_V.usertdata.data = "";
 
@@ -243,9 +248,13 @@ namespace OGF_tool
 		private void SaveFile(string filename)
 		{
 			file_bytes.Clear();
-			using (var fileStream = new BinaryReader(File.OpenRead(filename)))
+
+			if (Current_OGF == null) return;
+
+			using (var fileStream = new BinaryReader(new MemoryStream(Current_OGF)))
 			{
 				byte[] temp = fileStream.ReadBytes((int)(OGF_V.pos));
+
 				file_bytes.AddRange(temp);
 
 				uint chld_section = fileStream.ReadUInt32();
@@ -275,21 +284,21 @@ namespace OGF_tool
 					fileStream.BaseStream.Position += ch.old_size + 8;
 				}
 
-    //            if (OGF_V.bones.bones != null)
-    //            {
-				//	if (OGF_V.bones.pos > 0)
-				//		temp = fileStream.ReadBytes((int)(OGF_V.bones.pos - fileStream.BaseStream.Position));
-				//	else
-				//		temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
+                //if (OGF_V.bones.bones != null)
+                //{
+                //    if (OGF_V.bones.pos > 0)
+                //        temp = fileStream.ReadBytes((int)(OGF_V.bones.pos - fileStream.BaseStream.Position));
+                //    else
+                //        temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
 
-				//	file_bytes.AddRange(temp);
+                //    file_bytes.AddRange(temp);
 
-				//	file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_BONE_NAMES));
-    //                file_bytes.AddRange(BitConverter.GetBytes(OGF_V.bones.chunk_size()));
-    //                file_bytes.AddRange(OGF_V.bones.count());
+                //    file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_BONE_NAMES));
+                //    file_bytes.AddRange(BitConverter.GetBytes(OGF_V.bones.chunk_size()));
 
-    //                file_bytes.AddRange(OGF_V.bones.data());
-				//}
+                //    file_bytes.AddRange(OGF_V.bones.count());
+                //    file_bytes.AddRange(OGF_V.bones.data());
+                //}
 
                 if (OGF_V.usertdata != null)
 				{
@@ -389,7 +398,9 @@ namespace OGF_tool
 
 			OGF_V = new OGF_Children();
 
-			using (var r = new BinaryReader(File.OpenRead(filename)))
+			Current_OGF = File.ReadAllBytes(filename);
+
+			using (var r = new BinaryReader(new MemoryStream(Current_OGF)))
 			{
 				StatusFile.Text = filename.Substring(filename.LastIndexOf('\\') + 1);
 
@@ -516,6 +527,7 @@ namespace OGF_tool
 					OGF_V.bones.pos = xr_loader.chunk_pos;
 					OGF_V.bones.bones = new List<string>();
 					OGF_V.bones.parent_bones = new List<string>();
+					OGF_V.bones.fobb = new List<byte[]>();
 
 					BoneNamesBox.Clear();
 					TabControl.Controls.Add(BoneNamesPage);
@@ -530,7 +542,7 @@ namespace OGF_tool
 					{
 						string bone_name = xr_loader.read_stringZ();
 						string parent_name = xr_loader.read_stringZ();
-						xr_loader.ReadBytes(60);    // Fobb
+						byte[] obb = xr_loader.ReadBytes(60);    // Fobb
 						BoneNamesBox.Text += $"{count_saved - count + 1}. {bone_name}";
 
 						if (count != 1)
@@ -538,6 +550,7 @@ namespace OGF_tool
 
 						OGF_V.bones.bones.Add(bone_name);
 						OGF_V.bones.parent_bones.Add(parent_name);
+						OGF_V.bones.fobb.Add(obb);
 					}
 				}
 
@@ -636,9 +649,9 @@ namespace OGF_tool
 				$"Export Tool: {m_export_tool}\n" +
 				$"Owner Name: {m_owner_name}\n" +
 				$"Export modifed Tool: {m_exportm_modif_name_tool}\n\n" +
-				$"Export Time: {dt_e}\n" +
-				$"Creation Time: {dt_c}\n" +
-				$"Modified Time: {dt_m}", "OGF Info:", MessageBoxButtons.OK, MessageBoxIcon.Information);
+				$"Export Time: {dt_e.ToShortDateString()}\n" +
+				$"Creation Time: {dt_c.ToShortDateString()}\n" +
+				$"Modified Time: {dt_m.ToShortDateString()}", "OGF Info:", MessageBoxButtons.OK, MessageBoxIcon.Information);
 		}
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)

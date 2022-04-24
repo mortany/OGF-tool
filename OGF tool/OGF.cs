@@ -324,6 +324,8 @@ namespace OGF_tool
         public List<string> parent_bones;
         public List<string> materials;
         public List<float>  mass;
+        public List<byte[]> fobb;
+
         public uint chunk_size()
         {
             uint temp = 4;                                  // count byte
@@ -349,7 +351,7 @@ namespace OGF_tool
             {
                 temp.AddRange(Encoding.ASCII.GetBytes(bones[i]));       // bone name
                 temp.AddRange(Encoding.ASCII.GetBytes(parent_bones[i]));// parent bone name
-                temp.Add(60);                                           // obb
+                temp.AddRange(fobb[i]);                                 // obb
                 temp.Add(0);
             }
 
