@@ -62,7 +62,7 @@ void usage()
 	printf(" -flt <MASK> 	extract only files, filtered by mask\n");
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char* argv[], std::vector<std::string> motions)
 {
 	static const cl_parser::option_desc options[] = {
 		{"-ogf",	cl_parser::OT_BOOL},
@@ -133,9 +133,11 @@ int main(int argc, char* argv[])
 	switch (format) {
 	case tools_base::TOOLS_OGF:
 		tools = new ogf_tools;
+		tools->motions_vec = motions;
 		break;
 	case tools_base::TOOLS_OMF:
 		tools = new omf_tools;
+		tools->motions_vec = motions;
 		break;
 	}
 	if (tools == 0) {
@@ -162,7 +164,7 @@ void tools_base::check_path(const char* path, bool& status) const
 
 extern "C"
 {
-	_declspec(dllexport) int CSharpStartAgent(char* path, char* out_path, int mode, int convert_to_mode)
+	_declspec(dllexport) int CSharpStartAgent(char* path, char* out_path, int mode, int convert_to_mode, const char* motions)
 	{
 		static const unsigned int size = 6;
 		char *args[size];
@@ -216,6 +218,24 @@ extern "C"
 
 		const int ret_size = (args[4] == "-skl" ? size : size - 1);
 
-		return main(ret_size, args);
+		std::string motions_list = motions;
+		std::string temp_motion = "";
+		std::vector<std::string> mot_vector;
+
+		for (size_t i = 0; i < motions_list.size(); i++)
+		{
+			if (motions_list[i] != ',')
+				temp_motion += motions_list[i];
+			else
+			{
+				mot_vector.push_back(temp_motion);
+				temp_motion = "";
+			}
+		}
+
+		if (temp_motion != "")
+			mot_vector.push_back(temp_motion);
+
+		return main(ret_size, args, mot_vector);
 	}
 }

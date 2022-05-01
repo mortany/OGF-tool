@@ -366,16 +366,33 @@ bool xr_object::load_skls(const char* path)
 	return status;
 }
 
-void xr_object::save_skls(xr_writer& w) const
+void xr_object::save_skls(xr_writer& w, std::vector<std::string> motions) const
 {
-	w.w_size_u32(m_motions.size());
-	w.w_seq(m_motions, xr_writer::f_w_const<xr_skl_motion>(&xr_skl_motion::save));
+	if (motions.size())
+	{
+		xr_skl_motion_vec tmp_motions;
+		for (int i = 0; i < m_motions.size(); i++)
+		{
+			for (int j = 0; j < motions.size(); j++)
+			{
+				if (m_motions[i]->name() == motions[j])
+					tmp_motions.push_back(m_motions[i]);
+			}
+		}
+		w.w_size_u32(tmp_motions.size());
+		w.w_seq(tmp_motions, xr_writer::f_w_const<xr_skl_motion>(&xr_skl_motion::save));
+	}
+	else
+	{
+		w.w_size_u32(m_motions.size());
+		w.w_seq(m_motions, xr_writer::f_w_const<xr_skl_motion>(&xr_skl_motion::save));
+	}
 }
 
-bool xr_object::save_skls(const char* path) const
+bool xr_object::save_skls(const char* path, std::vector<std::string> motions) const
 {
 	xr_memory_writer* w = new xr_memory_writer();
-	save_skls(*w);
+	save_skls(*w, motions);
 	bool status = w->save_to(path);
 	delete w;
 	return status;

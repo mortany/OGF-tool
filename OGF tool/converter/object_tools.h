@@ -5,6 +5,7 @@
 #define __OBJECT_TOOLS_H__
 
 #include <string>
+#include <vector>
 #include "tools_base.h"
 #include "batch_helper.h"
 
@@ -30,8 +31,8 @@ public:
 
 protected:
 	void		save_object(xray_re::xr_object& object, const char* source) const;
-	void		save_skl(xray_re::xr_object& object, const char* source, const cl_parser& cl) const;
-	void		save_skls(xray_re::xr_object& object, const char* source) const;
+	void		save_skl(xray_re::xr_object& object, const char* source, std::vector<std::string> motions) const;
+	void		save_skls(xray_re::xr_object& object, const char* source, std::vector<std::string> motions) const;
 	void		save_bones(xray_re::xr_object& object, const char* source) const;
 
 	target_format	get_target_format(const cl_parser& cl) const;

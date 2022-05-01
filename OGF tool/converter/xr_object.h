@@ -77,8 +77,8 @@ public:
 
 	virtual bool	load_skls(const char* path);
 	virtual void	load_skls(xr_reader& r);
-	virtual bool	save_skls(const char* path) const;
-	virtual void	save_skls(xr_writer& w) const;
+	virtual bool	save_skls(const char* path, std::vector<std::string> motions) const;
+	virtual void	save_skls(xr_writer& w, std::vector<std::string> motions) const;
 
 	xr_surface*	attach(const xr_raw_surface& raw_surface);
 

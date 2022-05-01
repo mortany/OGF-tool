@@ -39,14 +39,16 @@ void object_tools::save_bones(xray_re::xr_object& object, const char* source) co
 	}
 }
 
-void object_tools::save_skls(xray_re::xr_object& object, const char* source) const
+void object_tools::save_skls(xray_re::xr_object& object, const char* source, std::vector<std::string> motions) const
 {
 	if (object.motions().empty()) {
 		msg("game object has no own motions");
-	} else {
+	} 
+	else 
+	{
 		std::string target;
 		make_target_name(target, source, ".skls");
-		if (!object.save_skls(target.c_str()))
+		if (!object.save_skls(target.c_str(), motions))
 			msg("can't save motions in %s", target.c_str());
 	}
 }
@@ -104,11 +106,25 @@ std::function<bool(const std::string&)> create_filter(const std::string& motion_
 	return [motion_name](const std::string& name) {return name == motion_name; };
 }
 
-void object_tools::save_skl(xray_re::xr_object& object, const char* source, const cl_parser& cl) const
+void object_tools::save_skl(xray_re::xr_object& object, const char* source, std::vector<std::string> motions) const
 {
 	for (auto el : object.motions()) 
 	{
 		std::string name{ el->name() };
+		bool find = false;
+
+		if (motions.size())
+		{
+			for (auto mot : motions)
+				if (name == mot)
+					find = true;
+		}
+		else
+			find = true;
+
+		if (!find)
+			continue;
+
 		std::string target = m_output_file + "\\" + name + ".skl";
 		if (!el->save_skl(target.c_str()))
 			msg("can't save %s", target.c_str());

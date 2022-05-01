@@ -5,6 +5,7 @@
 #define __TOOLS_BASE_H__
 
 #include <string>
+#include <vector>
 #include "xr_cl_parser.h"
 
 class tools_base {
@@ -20,6 +21,8 @@ public:
 
 	virtual void	process(const cl_parser& cl) = 0;
 	void		check_path(const char* path, bool& status) const;
+
+	std::vector<std::string> motions_vec;
 };
 
 inline tools_base::~tools_base() {}

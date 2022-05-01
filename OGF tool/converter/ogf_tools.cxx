@@ -22,6 +22,7 @@ void ogf_tools::process(const cl_parser& cl)
 	for (size_t i = 0, num_params = cl.num_params(); i != num_params; ++i) {
 		const char* source = cl.param(i);
 		xr_ogf* ogf = xr_ogf::load_ogf(source);
+		std::vector<std::string> vec;
 		if (ogf) {
 			switch (format) {
 			case TARGET_DEFAULT:
@@ -32,11 +33,11 @@ void ogf_tools::process(const cl_parser& cl)
 				if (ogf->motions().empty()) {
 					msg("object has no own motions");
 				} else {
-					save_skls(*ogf, source);
+					save_skls(*ogf, source, vec);
 				}
 				break;
 			case TARGET_SKL:
-				save_skl(*ogf, source, cl);
+				save_skl(*ogf, source, vec);
 				break;
 			case TARGET_BONES:
 				save_bones(*ogf, source);
@@ -74,10 +75,10 @@ void omf_tools::process(const cl_parser& cl)
 			switch (format) {
 			case TARGET_DEFAULT:
 			case TARGET_SKLS:
-				save_skls(*omf, source);
+				save_skls(*omf, source, motions_vec);
 				break;
 			case TARGET_SKL:
-				save_skl(*omf, source, cl);
+				save_skl(*omf, source, motions_vec);
 				break;
 			default:
 				break;

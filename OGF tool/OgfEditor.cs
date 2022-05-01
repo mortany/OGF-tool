@@ -34,18 +34,18 @@ namespace OGF_tool
 		int TabControlHeight = 0;
 
 		[DllImport("converter.dll")]
-		private static extern int CSharpStartAgent(string path, string out_path, int mode, int convert_to_mode);
+		private static extern int CSharpStartAgent(string path, string out_path, int mode, int convert_to_mode, string motion_list);
 
 		private int RunConverter(string path, string out_path, int mode, int convert_to_mode)
-        {
+		{
 			string dll_path = Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\converter.dll";
 			if (File.Exists(dll_path))
-				return CSharpStartAgent(path, out_path, mode, convert_to_mode);
+				return CSharpStartAgent(path, out_path, mode, convert_to_mode, "");
 			else
-            {
+			{
 				MessageBox.Show("Can't find converter.dll", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return -1;
-            }
+			}
 		}
 
 		public OGF_Editor()
