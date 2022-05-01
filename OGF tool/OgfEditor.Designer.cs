@@ -218,33 +218,33 @@ namespace OGF_tool
             // LoadMenuParam
             // 
             this.LoadMenuParam.Name = "LoadMenuParam";
-            this.LoadMenuParam.Size = new System.Drawing.Size(180, 22);
+            this.LoadMenuParam.Size = new System.Drawing.Size(121, 22);
             this.LoadMenuParam.Text = "Load";
             this.LoadMenuParam.Click += new System.EventHandler(this.loadToolStripMenuItem_Click);
             // 
             // SaveMenuParam
             // 
             this.SaveMenuParam.Name = "SaveMenuParam";
-            this.SaveMenuParam.Size = new System.Drawing.Size(180, 22);
+            this.SaveMenuParam.Size = new System.Drawing.Size(121, 22);
             this.SaveMenuParam.Text = "Save";
             this.SaveMenuParam.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
             this.saveAsToolStripMenuItem.Text = "Save as...";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(118, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -308,7 +308,7 @@ namespace OGF_tool
             this.MainMenuStrip = this.MenuPanel;
             this.MaximizeBox = false;
             this.Name = "OGF_Editor";
-            this.Text = "OGF Params Editor v0.2";
+            this.Text = "OGF Params Editor v1.0";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.TabControl.ResumeLayout(false);
             this.MotionRefsPage.ResumeLayout(false);
