@@ -9,19 +9,13 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
 namespace OGF_tool
 {
 	public partial class OGF_Editor : Form
 	{
 		// About file
-		string m_source;
-		string m_export_tool;
-		uint m_export_time;
-		string m_owner_name;
-		uint m_creation_time;
-		string m_exportm_modif_name_tool;
-		uint m_modified_time;
 		byte m_version;
 		byte m_model_type;
 
@@ -39,6 +33,20 @@ namespace OGF_tool
 		int BoxesHeight = 0;
 		int TabControlHeight = 0;
 
+		[DllImport("converter.dll")]
+		private static extern int CSharpStartAgent(string path, string out_path, int mode, int convert_to_mode);
+
+		private int RunConverter(string path, string out_path, int mode, int convert_to_mode)
+        {
+			string dll_path = Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\converter.dll";
+			if (File.Exists(dll_path))
+				return CSharpStartAgent(path, out_path, mode, convert_to_mode);
+			else
+            {
+				MessageBox.Show("Can't find converter.dll", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return -1;
+            }
+		}
 
 		public OGF_Editor()
 		{
@@ -49,7 +57,9 @@ namespace OGF_tool
 			BoxesHeight = MotionRefsBox.Height;
 			TabControlHeight = TabControl.Height;
 
-			openFileDialog1.Filter = saveFileDialog1.Filter = "OGF file|*.ogf";
+			openFileDialog1.Filter = "OGF file|*.ogf";
+
+			saveFileDialog1.Filter = "OGF file|*.ogf|Object file|*.object|Bones file|*.bones|Skl file|*.skl|Skls file|*.skls";
 
 			if (Environment.GetCommandLineArgs().Length > 1)
 			{
@@ -415,13 +425,17 @@ namespace OGF_tool
 
 				if (!xr_loader.find_chunk((int)OGF.OGF4_S_DESC)) return;
 
-				m_source = xr_loader.read_stringZ();
-				m_export_tool = xr_loader.read_stringZ();
-				m_export_time = xr_loader.ReadUInt32();
-				m_owner_name = xr_loader.read_stringZ();
-				m_creation_time = xr_loader.ReadUInt32();
-				m_exportm_modif_name_tool = xr_loader.read_stringZ();
-				m_modified_time = xr_loader.ReadUInt32();
+				OGF_V.descr = new Description();
+
+				OGF_V.descr.pos = xr_loader.chunk_pos;
+
+				OGF_V.descr.m_source = xr_loader.read_stringZ();
+				OGF_V.descr.m_export_tool = xr_loader.read_stringZ();
+				OGF_V.descr.m_export_time = xr_loader.ReadUInt32();
+				OGF_V.descr.m_owner_name = xr_loader.read_stringZ();
+				OGF_V.descr.m_creation_time = xr_loader.ReadUInt32();
+				OGF_V.descr.m_export_modif_name_tool = xr_loader.read_stringZ();
+				OGF_V.descr.m_modified_time = xr_loader.ReadUInt32();
 
 				xr_loader.SetStream(r.BaseStream);
 
@@ -592,7 +606,7 @@ namespace OGF_tool
 						OGF_V.bones.mass.Add(mass);
 					}
                 }
-            }
+			}
 		}
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -639,16 +653,16 @@ namespace OGF_tool
 				return;
 			}
 
-			System.DateTime dt_e = new System.DateTime(1970, 1, 1).AddSeconds(m_export_time);
-			System.DateTime dt_c = new System.DateTime(1970, 1, 1).AddSeconds(m_creation_time);
-			System.DateTime dt_m = new System.DateTime(1970, 1, 1).AddSeconds(m_modified_time);
+			System.DateTime dt_e = new System.DateTime(1970, 1, 1).AddSeconds(OGF_V.descr.m_export_time);
+			System.DateTime dt_c = new System.DateTime(1970, 1, 1).AddSeconds(OGF_V.descr.m_creation_time);
+			System.DateTime dt_m = new System.DateTime(1970, 1, 1).AddSeconds(OGF_V.descr.m_modified_time);
 			MessageBox.Show(
 				$"OGF Version: {m_version}\n" +
 				$"Model type: {m_model_type}\n\n" +
-				$"Source: {m_source}\n" +
-				$"Export Tool: {m_export_tool}\n" +
-				$"Owner Name: {m_owner_name}\n" +
-				$"Export modifed Tool: {m_exportm_modif_name_tool}\n\n" +
+				$"Source: {OGF_V.descr.m_source}\n" +
+				$"Export Tool: {OGF_V.descr.m_export_tool}\n" +
+				$"Owner Name: {OGF_V.descr.m_owner_name}\n" +
+				$"Export modifed Tool: {OGF_V.descr.m_export_modif_name_tool}\n\n" +
 				$"Export Time: {dt_e.ToShortDateString()}\n" +
 				$"Creation Time: {dt_c.ToShortDateString()}\n" +
 				$"Modified Time: {dt_m.ToShortDateString()}", "OGF Info:", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -656,7 +670,7 @@ namespace OGF_tool
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-			if (FILE_NAME == "")
+			if (FILE_NAME == "" || OGF_V.descr == null)
 			{
 				AutoClosingMessageBox.Show("Please, open the file!", "", 900, MessageBoxIcon.Information);
 				return;
@@ -670,17 +684,50 @@ namespace OGF_tool
 		{
 			string Filename = (sender as SaveFileDialog).FileName;
 
+			string format = Path.GetExtension(Filename);
+
 			if (File.Exists(Filename))
 			{
 				FileInfo backup_file = new FileInfo(Filename);
 				backup_file.Delete();
 			}
 
-			FileInfo file = new FileInfo(FILE_NAME);
-			file.CopyTo(Filename);
+			if (format == ".ogf")
+			{
+				FileInfo file = new FileInfo(FILE_NAME);
+				file.CopyTo(Filename);
 
-			CopyParams();
-			SaveFile((sender as SaveFileDialog).FileName);
+				CopyParams();
+				SaveFile((sender as SaveFileDialog).FileName);
+			}
+			else if (format == ".object")
+			{
+				if (File.Exists(Filename + ".ogf"))
+				{
+					FileInfo backup_file = new FileInfo(Filename + ".ogf");
+					backup_file.Delete();
+				}
+
+				FileInfo file = new FileInfo(FILE_NAME);
+				file.CopyTo(Filename + ".ogf");
+
+				CopyParams();
+				SaveFile((sender as SaveFileDialog).FileName + ".ogf");
+
+				RunConverter(Filename + ".ogf", Filename, 0, 0);
+
+				if (File.Exists(Filename + ".ogf"))
+				{
+					FileInfo backup_file = new FileInfo(Filename + ".ogf");
+					backup_file.Delete();
+				}
+			}
+			else if (format == ".bones")
+				RunConverter(FILE_NAME, Filename, 0, 1);
+			else if (format == ".skl")
+				RunConverter(FILE_NAME, Filename, 0, 2);
+			else if (format == ".skls")
+				RunConverter(FILE_NAME, Filename, 0, 3);
 			AutoClosingMessageBox.Show("Saved!", "", 500, MessageBoxIcon.Information);
 		}
 

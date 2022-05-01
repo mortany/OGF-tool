@@ -246,6 +246,8 @@ namespace OGF_tool
 
         public BoneData bones = new BoneData();
 
+        public Description descr = null;
+
         public OGF_Children()
         {
             refs.pos = -1;
@@ -356,6 +358,59 @@ namespace OGF_tool
             }
 
             return temp.ToArray();
+        }
+    }
+
+    public class Description
+    {
+        public long pos;
+
+        public string m_source;
+        public string m_export_tool;
+        public uint m_export_time;
+        public string m_owner_name;
+        public uint m_creation_time;
+        public string m_export_modif_name_tool;
+        public uint m_modified_time;
+
+        public Description()
+        {
+            this.pos = 0;
+        }
+
+        public byte[] data()
+        {
+            List<byte> temp = new List<byte>();
+
+            temp.AddRange(Encoding.ASCII.GetBytes(m_source));
+            temp.Add(0);
+            temp.AddRange(Encoding.ASCII.GetBytes(m_export_tool));
+            temp.Add(0);
+            temp.AddRange(BitConverter.GetBytes(m_export_time));
+            temp.Add(0);
+            temp.AddRange(Encoding.ASCII.GetBytes(m_owner_name));
+            temp.Add(0);
+            temp.AddRange(BitConverter.GetBytes(m_creation_time));
+            temp.Add(0);
+            temp.AddRange(Encoding.ASCII.GetBytes(m_export_modif_name_tool));
+            temp.Add(0);
+            temp.AddRange(BitConverter.GetBytes(m_modified_time));
+            temp.Add(0);
+
+            return temp.ToArray();
+        }
+
+        public uint chunk_size()
+        {
+            uint size = 0;
+            size += (uint)m_source.Length + 1;
+            size += (uint)m_export_tool.Length + 1;
+            size += 4;
+            size += (uint)m_owner_name.Length + 1;
+            size += 4;
+            size += (uint)m_export_modif_name_tool.Length + 1;
+            size += 4;
+            return size;
         }
     }
 
