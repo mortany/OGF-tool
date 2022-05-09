@@ -658,11 +658,11 @@ namespace OGF_tool
 			System.DateTime dt_m = new System.DateTime(1970, 1, 1).AddSeconds(OGF_V.descr.m_modified_time);
 			MessageBox.Show(
 				$"OGF Version: {m_version}\n" +
-				$"Model type: {m_model_type}\n\n" +
-				$"Source: {OGF_V.descr.m_source}\n" +
-				$"Export Tool: {OGF_V.descr.m_export_tool}\n" +
-				$"Owner Name: {OGF_V.descr.m_owner_name}\n" +
-				$"Export modifed Tool: {OGF_V.descr.m_export_modif_name_tool}\n\n" +
+				$"Model type: {(m_model_type == 3 ? "Animated" : "Rigid")}\n\n" +
+				$"Source File: {OGF_V.descr.m_source}\n" +
+				$"Export Owner: {OGF_V.descr.m_export_tool}\n" +
+				$"Model Owner: {OGF_V.descr.m_owner_name}\n" +
+				$"Modifed Model Owner: {OGF_V.descr.m_export_modif_name_tool}\n\n" +
 				$"Export Time: {dt_e.ToShortDateString()}\n" +
 				$"Creation Time: {dt_c.ToShortDateString()}\n" +
 				$"Modified Time: {dt_m.ToShortDateString()}", "OGF Info:", MessageBoxButtons.OK, MessageBoxIcon.Information);
