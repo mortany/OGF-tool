@@ -220,6 +220,8 @@ namespace OGF_tool
 
         public BoneData bones = new BoneData();
 
+        public IK_Data ikdata = new IK_Data();
+
         public Description descr = null;
 
         public OGF_Children()
@@ -288,10 +290,10 @@ namespace OGF_tool
     public struct BoneData
     {
         public long pos;
+        public int old_size;
+
         public List<string> bones;
         public List<string> parent_bones;
-        public List<string> materials;
-        public List<float>  mass;
         public List<byte[]> fobb;
 
         public uint chunk_size()
@@ -318,9 +320,79 @@ namespace OGF_tool
             for (int i = 0; i < bones.Count; i++)
             {
                 temp.AddRange(Encoding.ASCII.GetBytes(bones[i]));       // bone name
-                temp.AddRange(Encoding.ASCII.GetBytes(parent_bones[i]));// parent bone name
-                temp.AddRange(fobb[i]);                                 // obb
                 temp.Add(0);
+                temp.AddRange(Encoding.ASCII.GetBytes(parent_bones[i]));// parent bone name
+                temp.Add(0);
+                temp.AddRange(fobb[i]);                                 // obb
+            }
+
+            return temp.ToArray();
+        }
+    }
+
+    public struct Fvector
+    {
+        public float x;
+        public float y;
+        public float z;
+    }
+
+    public struct IK_Data
+    {
+        public long pos;
+        public int old_size;
+
+        public List<string> materials;
+        public List<float> mass;
+        public List<uint> version;
+        public List<Fvector> center_mass;
+        public List<List<byte[]>> bytes_1;
+
+        public uint chunk_size()
+        {
+            uint temp = 0;
+            for (int i = 0; i < materials.Count; i++)
+            {
+                temp += 4;
+                temp += (uint)materials[i].Length + 1;       // bone name
+                temp += 112;
+
+                temp += 4;
+                temp += 16 * 3;
+                temp += 4;
+                temp += 4;
+                temp += 4;
+                temp += 4;
+                temp += 4;
+
+                if (version[i] > 0)
+                    temp += 4;
+
+                temp += 12;
+                temp += 12;
+                temp += 4;
+                temp += 12;
+            }
+
+            return temp;
+        }
+
+        public byte[] data()
+        {
+            List<byte> temp = new List<byte>();
+
+            for (int i = 0; i < materials.Count; i++)
+            {
+                temp.AddRange(BitConverter.GetBytes(version[i]));
+                temp.AddRange(Encoding.ASCII.GetBytes(materials[i]));
+                temp.Add(0);
+                for (int j = 0; j < bytes_1[i].Count; j++)
+                    temp.AddRange(bytes_1[i][j]);
+                temp.AddRange(BitConverter.GetBytes(mass[i]));
+
+                temp.AddRange(BitConverter.GetBytes(center_mass[i].x));
+                temp.AddRange(BitConverter.GetBytes(center_mass[i].y));
+                temp.AddRange(BitConverter.GetBytes(center_mass[i].z));
             }
 
             return temp.ToArray();

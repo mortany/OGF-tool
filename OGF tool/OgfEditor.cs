@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 
+
 namespace OGF_tool
 {
 	public partial class OGF_Editor : Form
@@ -27,6 +28,7 @@ namespace OGF_tool
 
 		// Input
 		public bool bKeyIsDown = false;
+		string number_mask = "";
 
 		// Elements Size
 		int FormHeight = 0;
@@ -57,8 +59,10 @@ namespace OGF_tool
 			TabControlHeight = TabControl.Height;
 
 			openFileDialog1.Filter = "OGF file|*.ogf";
-
 			saveFileDialog1.Filter = "OGF file|*.ogf|Object file|*.object|Bones file|*.bones|Skl file|*.skl|Skls file|*.skls";
+
+			number_mask = @"^[0-9.]*$";
+			System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
 			oGFInfoToolStripMenuItem.Enabled = false;
 			viewToolStripMenuItem.Enabled = false;
@@ -123,40 +127,125 @@ namespace OGF_tool
 			box.Controls.Add(newLbl2);
 		}
 
-		private void CreateBoneGroupBox(int idx, string bone_name, string parent_bone_name, string material, float mass)
+		private void CreateBoneGroupBox(int idx, string bone_name, string parent_bone_name, string material, float mass, Fvector center)
 		{
 			var GroupBox = new GroupBox();
-			GroupBox.Location = new System.Drawing.Point(3, 3 + 85 * idx);
-			GroupBox.Size = new System.Drawing.Size(366, 83);
+			GroupBox.Location = new System.Drawing.Point(3, 3 + 155 * idx);
+			GroupBox.Size = new System.Drawing.Size(366, 153);
 			GroupBox.Text = "Bone id: [" + idx + "]";
 			GroupBox.Name = "BoneGrpBox_" + idx;
 
-			CreateBoneTextBox(idx, GroupBox, bone_name, parent_bone_name, material, mass);
+			CreateBoneTextBox(idx, GroupBox, bone_name, parent_bone_name, material, mass, center);
 			BoneParamsPage.Controls.Add(GroupBox);
 		}
 
-		private void CreateBoneTextBox(int idx, GroupBox box, string bone_name, string parent_bone_name, string material, float mass)
+		private void CreateBoneTextBox(int idx, GroupBox box, string bone_name, string parent_bone_name, string material, float mass, Fvector center)
 		{
-			var newTextBox = new RichTextBox();
-			newTextBox.Name = "boneBox_" + idx;
-			newTextBox.Size = new System.Drawing.Size(355, 58);
-			newTextBox.Location = new System.Drawing.Point(6, 18);
-			newTextBox.ReadOnly = true;
+			var BoneNameTextBox = new TextBox();
+			BoneNameTextBox.Name = "boneBox_" + idx;
+			BoneNameTextBox.Size = new System.Drawing.Size(285, 58);
+			BoneNameTextBox.Location = new System.Drawing.Point(76, 18);
+			BoneNameTextBox.Text = bone_name;
+			BoneNameTextBox.Tag = "string";
+			BoneNameTextBox.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			BoneNameTextBox.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 
-			newTextBox.MouseWheel += (s, e) =>
-			{
-				int sc = 0;
-				if (e.Delta < 0) sc = BoneParamsPage.ClientSize.Height + 120;
-				else sc = -120;
-				using (Control c = new Control() { Parent = BoneParamsPage, Height = 1, Top = sc }){BoneParamsPage.ScrollControlIntoView(c);}
-			};
+			var BoneNameLabel = new Label();
+			BoneNameLabel.Name = "boneLabel_" + idx;
+			BoneNameLabel.Size = new System.Drawing.Size(100, 20);
+			BoneNameLabel.Location = new System.Drawing.Point(6, 20);
+			BoneNameLabel.Text = "Bone Name:";
 
-			newTextBox.Text = $"Bone name: {bone_name}\n";
-			if (parent_bone_name != "")
-				newTextBox.Text += $"Parent bone name: {parent_bone_name}\n";
-			newTextBox.Text += $"Material: {material}\nMass: {mass}";
+			var ParentBoneNameTextBox = new TextBox();
+			ParentBoneNameTextBox.Name = "ParentboneBox_" + idx;
+			ParentBoneNameTextBox.Size = new System.Drawing.Size(285, 58);
+			ParentBoneNameTextBox.Location = new System.Drawing.Point(76, 45);
+			ParentBoneNameTextBox.Text = parent_bone_name;
+			ParentBoneNameTextBox.Tag = "string";
+			ParentBoneNameTextBox.ReadOnly = true;
 
-			box.Controls.Add(newTextBox);
+			var ParentBoneNameLabel = new Label();
+			ParentBoneNameLabel.Name = "ParentboneLabel_" + idx;
+			ParentBoneNameLabel.Size = new System.Drawing.Size(100, 20);
+			ParentBoneNameLabel.Location = new System.Drawing.Point(6, 47);
+			ParentBoneNameLabel.Text = "Parent Name:";
+
+			var MaterialTextBox = new TextBox();
+			MaterialTextBox.Name = "MaterialBox_" + idx;
+			MaterialTextBox.Size = new System.Drawing.Size(285, 58);
+			MaterialTextBox.Location = new System.Drawing.Point(76, 72);
+			MaterialTextBox.Text = material;
+			MaterialTextBox.Tag = "string";
+			MaterialTextBox.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			MaterialTextBox.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+
+			var MaterialLabel = new Label();
+			MaterialLabel.Name = "MaterialLabel_" + idx;
+			MaterialLabel.Size = new System.Drawing.Size(100, 20);
+			MaterialLabel.Location = new System.Drawing.Point(6, 74);
+			MaterialLabel.Text = "Material:";
+
+			var MassTextBox = new TextBox();
+			MassTextBox.Name = "MassBox_" + idx;
+			MassTextBox.Size = new System.Drawing.Size(285, 58);
+			MassTextBox.Location = new System.Drawing.Point(76, 99);
+			MassTextBox.Text = mass.ToString();
+			MassTextBox.Tag = "float";
+			MassTextBox.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			MassTextBox.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+
+			var MassLabel = new Label();
+			MassLabel.Name = "MassLabel_" + idx;
+			MassLabel.Size = new System.Drawing.Size(100, 20);
+			MassLabel.Location = new System.Drawing.Point(6, 101);
+			MassLabel.Text = "Mass:";
+
+			var CenterMassTextBoxX = new TextBox();
+			CenterMassTextBoxX.Name = "CenterBoxX_" + idx;
+			CenterMassTextBoxX.Size = new System.Drawing.Size(90, 58);
+			CenterMassTextBoxX.Location = new System.Drawing.Point(76, 124);
+			CenterMassTextBoxX.Text = center.x.ToString();
+			CenterMassTextBoxX.Tag = "float";
+			CenterMassTextBoxX.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			CenterMassTextBoxX.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+
+			var CenterMassTextBoxY = new TextBox();
+			CenterMassTextBoxY.Name = "CenterBoxY_" + idx;
+			CenterMassTextBoxY.Size = new System.Drawing.Size(90, 58);
+			CenterMassTextBoxY.Location = new System.Drawing.Point(174, 124);
+			CenterMassTextBoxY.Text = center.y.ToString();
+			CenterMassTextBoxY.Tag = "float";
+			CenterMassTextBoxY.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			CenterMassTextBoxY.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+
+			var CenterMassTextBoxZ = new TextBox();
+			CenterMassTextBoxZ.Name = "CenterBoxZ_" + idx;
+			CenterMassTextBoxZ.Size = new System.Drawing.Size(90, 58);
+			CenterMassTextBoxZ.Location = new System.Drawing.Point(271, 124);
+			CenterMassTextBoxZ.Text = center.z.ToString();
+			CenterMassTextBoxZ.Tag = "float";
+			CenterMassTextBoxZ.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			CenterMassTextBoxZ.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+
+			var CenterMassLabel = new Label();
+			CenterMassLabel.Name = "CenterMassLabel_" + idx;
+			CenterMassLabel.Size = new System.Drawing.Size(100, 20);
+			CenterMassLabel.Location = new System.Drawing.Point(6, 126);
+			CenterMassLabel.Text = "Center Mass:";
+
+			box.Controls.Add(BoneNameTextBox);
+			box.Controls.Add(ParentBoneNameTextBox);
+			box.Controls.Add(MaterialTextBox);
+			box.Controls.Add(MassTextBox);
+			box.Controls.Add(CenterMassTextBoxX);
+			box.Controls.Add(CenterMassTextBoxY);
+			box.Controls.Add(CenterMassTextBoxZ);
+
+			box.Controls.Add(BoneNameLabel);
+			box.Controls.Add(ParentBoneNameLabel);
+			box.Controls.Add(MaterialLabel);
+			box.Controls.Add(MassLabel);
+			box.Controls.Add(CenterMassLabel);
 		}
 
 		private void RecalcFormSize()
@@ -169,16 +258,18 @@ namespace OGF_tool
 			MotionBox.Height = BoxesHeight;
 			TabControl.Height = TabControlHeight;
 
-			if (OGF_V.childs.Count <= 1)
-			{
-				Height -= set_size;
-				MotionRefsBox.Height -= set_size;
-				CustomDataBox.Height -= set_size;
-				BoneNamesBox.Height -= set_size;
-				MotionBox.Height -= set_size;
-				TabControl.Height -= set_size;
-			}
-			else if (OGF_V.childs.Count >= 3)
+			//if (OGF_V.childs.Count <= 1) // Отключил маленький размер формы для нормального просмотра bone params
+			//{
+			//	Height -= set_size;
+			//	MotionRefsBox.Height -= set_size;
+			//	CustomDataBox.Height -= set_size;
+			//	BoneNamesBox.Height -= set_size;
+			//	MotionBox.Height -= set_size;
+			//	TabControl.Height -= set_size;
+			//}
+			//else
+
+			if (OGF_V.childs.Count >= 3)
 			{
 				Height += set_size;
 				MotionRefsBox.Height += set_size;
@@ -227,7 +318,7 @@ namespace OGF_tool
 
 			for (int i = 0; i < OGF_V.bones.bones.Count; i++)
 			{
-				CreateBoneGroupBox(i, OGF_V.bones.bones[i], OGF_V.bones.parent_bones[i], OGF_V.bones.materials[i], OGF_V.bones.mass[i]);
+				CreateBoneGroupBox(i, OGF_V.bones.bones[i], OGF_V.bones.parent_bones[i], OGF_V.ikdata.materials[i], OGF_V.ikdata.mass[i], OGF_V.ikdata.center_mass[i]);
 			}
 
 			MotionRefsBox.Clear();
@@ -314,23 +405,41 @@ namespace OGF_tool
 					fileStream.BaseStream.Position += ch.old_size + 8;
 				}
 
-                //if (OGF_V.bones.bones != null)
-                //{
-                //    if (OGF_V.bones.pos > 0)
-                //        temp = fileStream.ReadBytes((int)(OGF_V.bones.pos - fileStream.BaseStream.Position));
-                //    else
-                //        temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
+                if (OGF_V.bones.bones != null)
+                {
+                    if (OGF_V.bones.pos > 0)
+                        temp = fileStream.ReadBytes((int)(OGF_V.bones.pos - fileStream.BaseStream.Position));
+                    else
+                        temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
 
-                //    file_bytes.AddRange(temp);
+                    file_bytes.AddRange(temp);
 
-                //    file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_BONE_NAMES));
-                //    file_bytes.AddRange(BitConverter.GetBytes(OGF_V.bones.chunk_size()));
+                    file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_BONE_NAMES));
+                    file_bytes.AddRange(BitConverter.GetBytes(OGF_V.bones.chunk_size()));
 
-                //    file_bytes.AddRange(OGF_V.bones.count());
-                //    file_bytes.AddRange(OGF_V.bones.data());
-                //}
+                    file_bytes.AddRange(OGF_V.bones.count());
+                    file_bytes.AddRange(OGF_V.bones.data());
 
-                if (OGF_V.usertdata != null)
+					fileStream.ReadBytes(OGF_V.bones.old_size + 8);
+				}
+
+				if (OGF_V.ikdata.materials != null)
+				{
+					if (OGF_V.ikdata.pos > 0)
+						temp = fileStream.ReadBytes((int)(OGF_V.ikdata.pos - fileStream.BaseStream.Position));
+					else
+						temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
+
+					file_bytes.AddRange(temp);
+
+					file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_IKDATA));
+					file_bytes.AddRange(BitConverter.GetBytes(OGF_V.ikdata.chunk_size()));
+					file_bytes.AddRange(OGF_V.ikdata.data());
+
+					fileStream.ReadBytes(OGF_V.ikdata.old_size + 8);
+				}
+
+				if (OGF_V.usertdata != null)
 				{
 					if (OGF_V.usertdata.pos > 0)
 						temp = fileStream.ReadBytes((int)(OGF_V.usertdata.pos - fileStream.BaseStream.Position));
@@ -393,24 +502,14 @@ namespace OGF_tool
 			}
 		}
 
+		private void TextBoxKeyDown(object sender, KeyEventArgs e)
+        {
+			bKeyIsDown = true;
+		}
+
 		private void TextBoxFilter(object sender, EventArgs e)
 		{
-
 			TextBox curBox = sender as TextBox;
-
-			if (bKeyIsDown)
-			{
-				string mask = @"^[A-Za-z0-9_$]*$";
-				Match match = Regex.Match(curBox.Text, mask);
-				if (!match.Success)
-				{
-					int temp = curBox.SelectionStart;
-					curBox.Text = curBox.Text.Remove(curBox.SelectionStart - 1, 1);
-					curBox.SelectionStart = temp - 1;
-				}
-			}
-
-			bKeyIsDown = false;
 
 			string currentField = curBox.Name.ToString().Split('_')[0];
 			int idx = Convert.ToInt32(curBox.Name.ToString().Split('_')[1]);
@@ -419,9 +518,104 @@ namespace OGF_tool
 			{
 				case "textureBox": OGF_V.childs[idx].m_texture = curBox.Text; break;
 				case "shaderBox": OGF_V.childs[idx].m_shader = curBox.Text; break;
-
 			}
 		}
+
+		private void TextBoxBonesFilter(object sender, EventArgs e)
+		{
+			TextBox curBox = sender as TextBox;
+
+			string currentField = curBox.Name.ToString().Split('_')[0];
+			int idx = Convert.ToInt32(curBox.Name.ToString().Split('_')[1]);
+
+			switch (curBox.Tag.ToString())
+			{
+				case "float":
+					{
+						if (bKeyIsDown)
+						{
+							if (curBox.Text.Length == 0)
+								return;
+
+							while (curBox.Text.Length >= 8)
+							{
+								if (curBox.SelectionStart < 1)
+									curBox.SelectionStart = curBox.Text.Length;
+
+								int temp = curBox.SelectionStart;
+								curBox.Text = curBox.Text.Remove(curBox.Text.Length - 1, 1);
+								curBox.SelectionStart = temp;
+							}
+
+							string mask = number_mask;
+							Match match = Regex.Match(curBox.Text, mask);
+							if (!match.Success)
+							{
+								if (curBox.SelectionStart < 1)
+									curBox.SelectionStart = curBox.Text.Length;
+
+								int temp = curBox.SelectionStart;
+								curBox.Text = curBox.Text.Remove(curBox.SelectionStart - 1, 1);
+								curBox.SelectionStart = temp - 1;
+							}
+
+							try
+							{
+								Convert.ToSingle(curBox.Text);
+							}
+							catch (Exception)
+							{
+								switch (currentField)
+								{
+									case "MassBox": curBox.Text = OGF_V.ikdata.mass[idx].ToString(); break;
+									case "CenterBoxX": curBox.Text = OGF_V.ikdata.center_mass[idx].x.ToString(); break;
+									case "CenterBoxY": curBox.Text = OGF_V.ikdata.center_mass[idx].y.ToString(); break;
+									case "CenterBoxZ": curBox.Text = OGF_V.ikdata.center_mass[idx].z.ToString(); break;
+								}
+							}
+						}
+					}
+					break;
+			}
+
+			switch (currentField)
+			{
+				case "boneBox":
+					{
+						string old_name = OGF_V.bones.bones[idx];
+						OGF_V.bones.bones[idx] = curBox.Text;
+
+						for (int i = 0; i < OGF_V.bones.parent_bones.Count; i++)
+                        {
+							if (OGF_V.bones.parent_bones[i] == old_name && OGF_V.bones.parent_bones[i] != "")
+							{
+								var MainGroup = BoneParamsPage.Controls[i];
+								OGF_V.bones.parent_bones[i] = curBox.Text;
+                                MainGroup.Controls[1].Text = OGF_V.bones.parent_bones[i];
+							}
+						}
+
+						BoneNamesBox.Clear();
+						BoneNamesBox.Text += $"Bones count : {OGF_V.bones.bones.Count}\n\n";
+
+						for (int i = 0; i < OGF_V.bones.bones.Count; i++)
+						{
+							BoneNamesBox.Text += $"{i + 1}. {OGF_V.bones.bones[i]}";
+							if (i != OGF_V.bones.bones.Count - 1)
+								BoneNamesBox.Text += "\n";
+						}
+					}
+					break;
+				case "MaterialBox": OGF_V.ikdata.materials[idx] = curBox.Text; break;
+				case "MassBox": OGF_V.ikdata.mass[idx] = Convert.ToSingle(curBox.Text); break;
+				case "CenterBoxX": Fvector vec = new Fvector(); vec.x = Convert.ToSingle(curBox.Text); vec.y =  OGF_V.ikdata.center_mass[idx].y; vec.z =  OGF_V.ikdata.center_mass[idx].z; OGF_V.ikdata.center_mass[idx] = vec; break;
+				case "CenterBoxY": vec = new Fvector(); vec.x = OGF_V.ikdata.center_mass[idx].x; vec.y =  Convert.ToSingle(curBox.Text); vec.z =  OGF_V.ikdata.center_mass[idx].z; OGF_V.ikdata.center_mass[idx] = vec; break;
+				case "CenterBoxZ": vec = new Fvector(); vec.x = OGF_V.ikdata.center_mass[idx].x; vec.y =  OGF_V.ikdata.center_mass[idx].y; vec.z =  Convert.ToSingle(curBox.Text); OGF_V.ikdata.center_mass[idx] = vec; break;
+			}
+
+			bKeyIsDown = false;
+		}
+
 		private void OpenFile(string filename)
 		{
 			var xr_loader = new XRayLoader();
@@ -562,6 +756,7 @@ namespace OGF_tool
 					OGF_V.bones.bones = new List<string>();
 					OGF_V.bones.parent_bones = new List<string>();
 					OGF_V.bones.fobb = new List<byte[]>();
+					OGF_V.bones.old_size = 0;
 
 					BoneNamesBox.Clear();
 					TabControl.Controls.Add(BoneNamesPage);
@@ -569,6 +764,7 @@ namespace OGF_tool
 
 					uint count = xr_loader.ReadUInt32();
 					uint count_saved = count;
+					OGF_V.bones.old_size += 4;
 
 					BoneNamesBox.Text += $"Bones count : {count}\n\n";
 
@@ -585,6 +781,8 @@ namespace OGF_tool
 						OGF_V.bones.bones.Add(bone_name);
 						OGF_V.bones.parent_bones.Add(parent_name);
 						OGF_V.bones.fobb.Add(obb);
+
+						OGF_V.bones.old_size += bone_name.Length + 1 + parent_name.Length + 1 + 60;
 					}
 				}
 
@@ -593,37 +791,73 @@ namespace OGF_tool
                 // Ik Data
                 if (xr_loader.find_chunk((int)OGF.OGF4_S_IKDATA, false, true))
                 {
-					OGF_V.bones.materials = new List<string>();
-					OGF_V.bones.mass = new List<float>();
+					OGF_V.ikdata.pos = xr_loader.chunk_pos;
+					OGF_V.ikdata.materials = new List<string>();
+					OGF_V.ikdata.mass = new List<float>();
+					OGF_V.ikdata.version = new List<uint>();
+					OGF_V.ikdata.center_mass = new List<Fvector>();
+					OGF_V.ikdata.bytes_1 = new List<List<byte[]>>();
+					OGF_V.ikdata.old_size = 0;
 
 					for (int i = 0; i < OGF_V.bones.bones.Count; i++)
                     {
-                        uint version = xr_loader.ReadUInt32();
+						List<byte[]> bytes_1 = new List<byte[]>();
+						OGF_V.ikdata.old_size += 4;
+
+						byte[] temp_byte;
+						uint version = xr_loader.ReadUInt32();
                         string gmtl_name = xr_loader.read_stringZ();
 
-						xr_loader.ReadBytes(112);   // struct SBoneShape
+						temp_byte = xr_loader.ReadBytes(112);   // struct SBoneShape
+						bytes_1.Add(temp_byte);
+						OGF_V.ikdata.old_size += gmtl_name.Length + 1 + 112;
 
-                        // Import
-                        {
-                            xr_loader.ReadBytes(4);
-                            xr_loader.ReadBytes(16 * 3);
-                            xr_loader.ReadBytes(4);
-                            xr_loader.ReadBytes(4);
-                            xr_loader.ReadBytes(4);
-                            xr_loader.ReadBytes(4);
-                            xr_loader.ReadBytes(4);
+						// Import
+						{
+							temp_byte = xr_loader.ReadBytes(4);
+							bytes_1.Add(temp_byte);
+							temp_byte = xr_loader.ReadBytes(16 * 3);
+							bytes_1.Add(temp_byte);
+							temp_byte = xr_loader.ReadBytes(4);
+							bytes_1.Add(temp_byte);
+							temp_byte = xr_loader.ReadBytes(4);
+							bytes_1.Add(temp_byte);
+							temp_byte = xr_loader.ReadBytes(4);
+							bytes_1.Add(temp_byte);
+							temp_byte = xr_loader.ReadBytes(4);
+							bytes_1.Add(temp_byte);
+							temp_byte = xr_loader.ReadBytes(4);
+							bytes_1.Add(temp_byte);
 
-                            if (version > 0)
-                                xr_loader.ReadBytes(4);
+							OGF_V.ikdata.old_size += 4 + 16 * 3 + 4 + 4 + 4 + 4 + 4;
+
+							if (version > 0)
+							{
+								temp_byte = xr_loader.ReadBytes(4);
+								bytes_1.Add(temp_byte);
+								OGF_V.ikdata.old_size += 4;
+							}
                         }
 
-                        xr_loader.ReadBytes(12);    // vXYZ
-                        xr_loader.ReadBytes(12);    // vT
-                        float mass = xr_loader.ReadFloat();
-                        xr_loader.ReadBytes(12);    // Center of mass
+						temp_byte = xr_loader.ReadBytes(12);    // vXYZ
+						bytes_1.Add(temp_byte);    // vT
+						temp_byte = xr_loader.ReadBytes(12);
+						bytes_1.Add(temp_byte);
+						float mass = xr_loader.ReadFloat();
 
-						OGF_V.bones.materials.Add(gmtl_name);
-						OGF_V.bones.mass.Add(mass);
+						float x, y, z;
+						Fvector center = new Fvector();
+						center.x = xr_loader.ReadFloat();
+						center.y = xr_loader.ReadFloat();
+						center.z = xr_loader.ReadFloat();
+
+						OGF_V.ikdata.old_size += 12 + 12 + 4 + 12;
+
+						OGF_V.ikdata.materials.Add(gmtl_name);
+						OGF_V.ikdata.mass.Add(mass);
+						OGF_V.ikdata.version.Add(version);
+						OGF_V.ikdata.center_mass.Add(center);
+						OGF_V.ikdata.bytes_1.Add(bytes_1);
 					}
                 }
 			}
@@ -667,19 +901,20 @@ namespace OGF_tool
 
         private void oGFInfoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            OgfInfo Info = new OgfInfo(OGF_V.descr, m_version, m_model_type);
+			System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("ru-RU");
+
+			OgfInfo Info = new OgfInfo(OGF_V.descr, m_version, m_model_type);
             Info.ShowDialog();
 
 			if (Info.res)
 			{
 				OGF_V.descr.m_source = Info.descr.m_source;
 				OGF_V.descr.m_export_tool = Info.descr.m_export_tool;
-				OGF_V.descr.m_export_time = Info.descr.m_export_time;
 				OGF_V.descr.m_owner_name = Info.descr.m_owner_name;
-				OGF_V.descr.m_creation_time = Info.descr.m_creation_time;
 				OGF_V.descr.m_export_modif_name_tool = Info.descr.m_export_modif_name_tool;
-				OGF_V.descr.m_modified_time = Info.descr.m_modified_time;
 			}
+
+			System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 		}
 
 		private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
