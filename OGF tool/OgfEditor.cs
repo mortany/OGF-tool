@@ -51,7 +51,6 @@ namespace OGF_tool
 		public OGF_Editor()
 		{
 			InitializeComponent();
-			StartPosition = FormStartPosition.CenterScreen;
 
 			FormHeight = Height;
 			BoxesHeight = MotionRefsBox.Height;
@@ -60,6 +59,11 @@ namespace OGF_tool
 			openFileDialog1.Filter = "OGF file|*.ogf";
 
 			saveFileDialog1.Filter = "OGF file|*.ogf|Object file|*.object|Bones file|*.bones|Skl file|*.skl|Skls file|*.skls";
+
+			oGFInfoToolStripMenuItem.Enabled = false;
+			viewToolStripMenuItem.Enabled = false;
+			SaveMenuParam.Enabled = false;
+			saveAsToolStripMenuItem.Enabled = false;
 
 			if (Environment.GetCommandLineArgs().Length > 1)
 			{
@@ -199,6 +203,11 @@ namespace OGF_tool
 
 		private void AfterLoad()
 		{
+			oGFInfoToolStripMenuItem.Enabled = true;
+			viewToolStripMenuItem.Enabled = true;
+			SaveMenuParam.Enabled = true;
+			saveAsToolStripMenuItem.Enabled = true;
+
 			RecalcFormSize();
 
 			for (int i = 0; i < OGF_V.childs.Count; i++)
@@ -263,9 +272,20 @@ namespace OGF_tool
 
 			using (var fileStream = new BinaryReader(new MemoryStream(Current_OGF)))
 			{
-				byte[] temp = fileStream.ReadBytes((int)(OGF_V.pos));
-
+				byte[] temp = fileStream.ReadBytes((int)(OGF_V.descr.pos));
 				file_bytes.AddRange(temp);
+
+				OGF_V.descr.m_modified_time = Convert.ToUInt32(DateTime.Now.Subtract(new DateTime(1970, 1, 1)).TotalSeconds);
+				if (OGF_V.descr.m_creation_time == 0)
+					OGF_V.descr.m_creation_time = OGF_V.descr.m_modified_time;
+				if (OGF_V.descr.m_export_time == 0)
+					OGF_V.descr.m_export_time = OGF_V.descr.m_modified_time;
+
+				file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_DESC));
+				file_bytes.AddRange(BitConverter.GetBytes(OGF_V.descr.chunk_size()));
+				file_bytes.AddRange(OGF_V.descr.data());
+
+				fileStream.ReadBytes(OGF_V.descr.old_size + 8);
 
 				uint chld_section = fileStream.ReadUInt32();
 				uint new_size = fileStream.ReadUInt32();
@@ -338,13 +358,13 @@ namespace OGF_tool
 				{
 					if (OGF_V.refs.refs0.Count() > 1)
 					{
-						file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_MOTION_REFS_1));
+						file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_MOTION_REFS2));
 						file_bytes.AddRange(BitConverter.GetBytes(OGF_V.refs.chunk_size()));
 						file_bytes.AddRange(OGF_V.refs.count());
 					}
 					else
 					{
-						file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_MOTION_REFS_0));
+						file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_MOTION_REFS));
 						file_bytes.AddRange(BitConverter.GetBytes(OGF_V.refs.chunk_size()));
 					}
 
@@ -416,14 +436,12 @@ namespace OGF_tool
 
 				xr_loader.SetStream(r.BaseStream);
 
-				uint size = xr_loader.find_chunkSize((int)OGF.OGF_HEADER);
+				xr_loader.find_chunkSize((int)OGF.OGF4_HEADER);
 
 				m_version = xr_loader.ReadByte();
 				m_model_type = xr_loader.ReadByte();
 
-				xr_loader.ReadBytes((int)size - 2);
-
-				if (!xr_loader.find_chunk((int)OGF.OGF4_S_DESC)) return;
+				if (!xr_loader.find_chunk((int)OGF.OGF4_S_DESC, false, true)) return;
 
 				OGF_V.descr = new Description();
 
@@ -437,6 +455,8 @@ namespace OGF_tool
 				OGF_V.descr.m_export_modif_name_tool = xr_loader.read_stringZ();
 				OGF_V.descr.m_modified_time = xr_loader.ReadUInt32();
 
+				OGF_V.descr.old_size = OGF_V.descr.m_source.Length + 1 + OGF_V.descr.m_export_tool.Length + 1 + 4 + OGF_V.descr.m_owner_name.Length + 1 + 4 + OGF_V.descr.m_export_modif_name_tool.Length + 1 + 4;
+
 				xr_loader.SetStream(r.BaseStream);
 
 				if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_CHILDREN, false, true))) return;
@@ -446,6 +466,7 @@ namespace OGF_tool
 				OGF_V.pos = xr_loader.chunk_pos;
 
 				int id = 0;
+				uint size;
 
 				// Texture && shader
 				while (true)
@@ -478,15 +499,14 @@ namespace OGF_tool
 					OGF_V.usertdata = new UserData();
 					OGF_V.usertdata.pos = xr_loader.chunk_pos;
 					OGF_V.usertdata.data = xr_loader.read_stringZ();
-					OGF_V.usertdata.old_size = (uint)OGF_V.usertdata.data.Length+1;
 				}
 
 				xr_loader.SetStream(r.BaseStream);
 
 				// Motion Refs
-				bool v3 = xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS_0, false, true);
+				bool v3 = xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS, false, true);
 
-				if (v3 || xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS_1, false, true))
+				if (v3 || xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS2, false, true))
 				{
 					TabControl.Controls.Add(MotionRefsPage);
 
@@ -647,35 +667,23 @@ namespace OGF_tool
 
         private void oGFInfoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-			if (FILE_NAME == "")
-			{
-				AutoClosingMessageBox.Show("Please, open the file!", "", 900, MessageBoxIcon.Information);
-				return;
-			}
+            OgfInfo Info = new OgfInfo(OGF_V.descr, m_version, m_model_type);
+            Info.ShowDialog();
 
-			System.DateTime dt_e = new System.DateTime(1970, 1, 1).AddSeconds(OGF_V.descr.m_export_time);
-			System.DateTime dt_c = new System.DateTime(1970, 1, 1).AddSeconds(OGF_V.descr.m_creation_time);
-			System.DateTime dt_m = new System.DateTime(1970, 1, 1).AddSeconds(OGF_V.descr.m_modified_time);
-			MessageBox.Show(
-				$"OGF Version: {m_version}\n" +
-				$"Model type: {(m_model_type == 3 ? "Animated" : "Rigid")}\n\n" +
-				$"Source File: {OGF_V.descr.m_source}\n" +
-				$"Export Owner: {OGF_V.descr.m_export_tool}\n" +
-				$"Model Owner: {OGF_V.descr.m_owner_name}\n" +
-				$"Modifed Model Owner: {OGF_V.descr.m_export_modif_name_tool}\n\n" +
-				$"Export Time: {dt_e.ToShortDateString()}\n" +
-				$"Creation Time: {dt_c.ToShortDateString()}\n" +
-				$"Modified Time: {dt_m.ToShortDateString()}", "OGF Info:", MessageBoxButtons.OK, MessageBoxIcon.Information);
+			if (Info.res)
+			{
+				OGF_V.descr.m_source = Info.descr.m_source;
+				OGF_V.descr.m_export_tool = Info.descr.m_export_tool;
+				OGF_V.descr.m_export_time = Info.descr.m_export_time;
+				OGF_V.descr.m_owner_name = Info.descr.m_owner_name;
+				OGF_V.descr.m_creation_time = Info.descr.m_creation_time;
+				OGF_V.descr.m_export_modif_name_tool = Info.descr.m_export_modif_name_tool;
+				OGF_V.descr.m_modified_time = Info.descr.m_modified_time;
+			}
 		}
 
-        private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
+		private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-			if (FILE_NAME == "" || OGF_V.descr == null)
-			{
-				AutoClosingMessageBox.Show("Please, open the file!", "", 900, MessageBoxIcon.Information);
-				return;
-			}
-
 			saveFileDialog1.FileName = "";
 			saveFileDialog1.ShowDialog();
 		}
@@ -735,6 +743,22 @@ namespace OGF_tool
         {
 			if (MessageBox.Show("Are you sure you want to exit?", "OGF Editor", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
 				Close();
+		}
+
+        private void viewToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+			string exe_path = Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\OGFViewer.exe";
+			if (File.Exists(exe_path))
+			{
+				System.Diagnostics.Process p = new System.Diagnostics.Process();
+				p.StartInfo.FileName = exe_path;
+				p.StartInfo.Arguments += FILE_NAME;
+				p.Start();
+			}
+			else
+            {
+				MessageBox.Show("Can't find OGFViewer.exe in program folder.\nDownload OGF Viewer 1.0.2 or later!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			}
 		}
     }
 }

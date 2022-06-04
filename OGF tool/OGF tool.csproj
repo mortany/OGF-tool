@@ -76,10 +76,19 @@
       <DependentUpon>OgfEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="OGF.cs" />
+    <Compile Include="OgfInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OgfInfo.Designer.cs">
+      <DependentUpon>OgfInfo.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="OgfEditor.resx">
       <DependentUpon>OgfEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OgfInfo.resx">
+      <DependentUpon>OgfInfo.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

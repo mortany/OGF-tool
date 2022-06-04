@@ -7,68 +7,32 @@ namespace OGF_tool
 {
     public enum OGF
     {
-        OGF_HEADER = 0x1,
-
-        //build 729
-        OGF2_TEXTURE = 0x2,
-        OGF2_TEXTURE_L = 0x3,
-        OGF2_BBOX = 0x6,
-        OGF2_VERTICES = 0x7,
-        OGF2_INDICES = 0x8,
-        OGF2_VCONTAINER = 0xb,
-        OGF2_BSPHERE = 0xc,
-
-        OGF3_TEXTURE = 0x2,
-        OGF3_TEXTURE_L = 0x3,
-        OGF3_CHILD_REFS = 0x5,
-        OGF3_BBOX = 0x6,
-        OGF3_VERTICES = 0x7,
-        OGF3_INDICES = 0x8,
-        OGF3_LODDATA = 0x9, // not sure
-        OGF3_VCONTAINER = 0xa,
-        OGF3_BSPHERE = 0xb,
-        OGF3_CHILDREN_L = 0xc,
-        OGF3_S_BONE_NAMES = 0xd,
-        OGF3_S_MOTIONS = 0xe,// build 1469 - 1580
-        OGF3_DPATCH = 0xf,  // guessed name
-        OGF3_LODS = 0x10,   // guessed name
-        OGF3_CHILDREN = 0x11,
-        OGF3_S_SMPARAMS = 0x12,// build 1469
-        OGF3_ICONTAINER = 0x13,// build 1865
-        OGF3_S_SMPARAMS_NEW = 0x14,// build 1472 - 1865
-        OGF3_LODDEF2 = 0x15,// build 1865
-        OGF3_TREEDEF2 = 0x16,// build 1865
-        OGF3_S_IKDATA_0 = 0x17,// build 1475 - 1580
-        OGF3_S_USERDATA = 0x18,// build 1537 - 1865
-        OGF3_S_IKDATA = 0x19,// build 1616 - 1829, 1844
-        OGF3_S_MOTIONS_NEW = 0x1a,// build 1616 - 1865
-        OGF3_S_DESC = 0x1b,// build 1844
-        OGF3_S_IKDATA_2 = 0x1C,// build 1842 - 1865
-        OGF3_S_MOTION_REFS = 0x1D,// build 1842
-
-        OGF4_TEXTURE = 0x2,
-        OGF4_VERTICES = 0x3,
-        OGF4_INDICES = 0x4,
-        OGF4_P_MAP = 0x5,
-        OGF4_SWIDATA = 0x6,
-        OGF4_VCONTAINER = 0x7,
-        OGF4_ICONTAINER = 0x8,
-        OGF4_CHILDREN = 0x9,
-        OGF4_CHILDREN_L = 0xa,
-        OGF4_LODDEF2 = 0xb,
-        OGF4_TREEDEF2 = 0xc,
-        OGF4_S_BONE_NAMES = 0xd,
-        OGF4_S_MOTIONS = 0xe,
-        OGF4_S_SMPARAMS = 0xf,
-        OGF4_S_IKDATA = 0x10,
-        OGF4_S_USERDATA = 0x11,
-        OGF4_S_DESC = 0x12,
-        OGF4_S_MOTION_REFS_0 = 0x13,    // pre-CS format
-        OGF4_SWICONTAINER = 0x14,
-        OGF4_GCONTAINER = 0x15,
-        OGF4_FASTPATH = 0x16,
-        OGF4_S_LODS = 0x17,
-        OGF4_S_MOTION_REFS_1 = 0x18,    // introduced in clear sky
+        OGF4_HEADER = 1,
+        OGF4_TEXTURE = 2,
+        OGF4_VERTICES = 3,
+        OGF4_INDICES = 4,
+        OGF4_P_MAP = 5,  //---------------------- unused
+        OGF4_SWIDATA = 6,
+        OGF4_VCONTAINER = 7, // not used ??
+        OGF4_ICONTAINER = 8, // not used ??
+        OGF4_CHILDREN = 9,   // * For skeletons only
+        OGF4_CHILDREN_L = 10,    // Link to child visuals
+        OGF4_LODDEF2 = 11,   // + 5 channel data
+        OGF4_TREEDEF2 = 12,  // + 5 channel data
+        OGF4_S_BONE_NAMES = 13,  // * For skeletons only
+        OGF4_S_MOTIONS = 14, // * For skeletons only
+        OGF4_S_SMPARAMS = 15,    // * For skeletons only
+        OGF4_S_IKDATA = 16,  // * For skeletons only
+        OGF4_S_USERDATA = 17,    // * For skeletons only (Ini-file)
+        OGF4_S_DESC = 18,    // * For skeletons only
+        OGF4_S_MOTION_REFS = 19, // * For skeletons only
+        OGF4_SWICONTAINER = 20,  // * SlidingWindowItem record container
+        OGF4_GCONTAINER = 21,    // * both VB&IB
+        OGF4_FASTPATH = 22,  // * extended/fast geometry
+        OGF4_S_LODS = 23,    // * For skeletons only (Ini-file)
+        OGF4_S_MOTION_REFS2 = 24,    // * changes in format
+        OGF4_COLLISION_VERTICES = 25,
+        OGF4_COLLISION_INDICES = 26,
     };
     public class XRayLoader
     {
@@ -96,9 +60,19 @@ namespace OGF_tool
             return reader.ReadInt32();
         }
 
+        public long ReadInt64()
+        {
+            return reader.ReadInt64();
+        }
+
         public float ReadFloat()
         {
             return reader.ReadSingle();
+        }
+
+        public uint ReadUInt16()
+        {
+            return reader.ReadUInt16();
         }
 
         public uint ReadUInt32()
@@ -289,13 +263,10 @@ namespace OGF_tool
         public long pos;
         public string data;
 
-        public uint old_size;
-
         public UserData()
         {
             this.pos = 0;
             this.data = "";
-            this.old_size = 0;
         }
 
         public byte[] data_all()
@@ -311,11 +282,6 @@ namespace OGF_tool
         public uint chunk_size()
         {
             return (uint)data.Length +1;
-        }
-
-        public uint NewSize()
-        {
-            return chunk_size() - old_size;
         }
     }
 
@@ -364,6 +330,7 @@ namespace OGF_tool
     public class Description
     {
         public long pos;
+        public int old_size;
 
         public string m_source;
         public string m_export_tool;
@@ -376,6 +343,7 @@ namespace OGF_tool
         public Description()
         {
             this.pos = 0;
+            this.old_size = 0;
         }
 
         public byte[] data()
@@ -387,15 +355,12 @@ namespace OGF_tool
             temp.AddRange(Encoding.ASCII.GetBytes(m_export_tool));
             temp.Add(0);
             temp.AddRange(BitConverter.GetBytes(m_export_time));
-            temp.Add(0);
             temp.AddRange(Encoding.ASCII.GetBytes(m_owner_name));
             temp.Add(0);
             temp.AddRange(BitConverter.GetBytes(m_creation_time));
-            temp.Add(0);
             temp.AddRange(Encoding.ASCII.GetBytes(m_export_modif_name_tool));
             temp.Add(0);
             temp.AddRange(BitConverter.GetBytes(m_modified_time));
-            temp.Add(0);
 
             return temp.ToArray();
         }
