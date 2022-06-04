@@ -204,6 +204,11 @@ namespace OGF_tool
 
             w.Write((byte)0);
         }
+
+        public void write_u32(BinaryWriter w, uint num)
+        {
+            w.Write(num);
+        }
     }
 
     public class OGF_Children
@@ -214,7 +219,7 @@ namespace OGF_tool
 
         public long pos;
 
-        public MotionRefs refs = new MotionRefs();
+        public MotionRefs refs = null;
 
         public UserData usertdata = null;
 
@@ -226,15 +231,24 @@ namespace OGF_tool
 
         public OGF_Children()
         {
-            refs.pos = -1;
+
         }
 
     }
 
-    public struct MotionRefs
+    public class MotionRefs
     {
         public long pos;
         public List<string> refs0;
+        public bool need_create;
+
+        public MotionRefs()
+        {
+            this.pos = 0;
+            this.refs0 = null;
+            this.need_create = false;
+        }
+
         public uint chunk_size()
         {
             uint temp = 4;
@@ -264,11 +278,13 @@ namespace OGF_tool
     {
         public long pos;
         public string data;
+        public bool need_create;
 
         public UserData()
         {
             this.pos = 0;
             this.data = "";
+            this.need_create = false;
         }
 
         public byte[] data_all()

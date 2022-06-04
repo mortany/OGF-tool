@@ -34,11 +34,13 @@ namespace OGF_tool
             this.TabControl = new System.Windows.Forms.TabControl();
             this.TexturesPage = new System.Windows.Forms.TabPage();
             this.MotionRefsPage = new System.Windows.Forms.TabPage();
+            this.CreateMotionRefsButton = new System.Windows.Forms.Button();
             this.MotionRefsBox = new System.Windows.Forms.RichTextBox();
             this.MotionPage = new System.Windows.Forms.TabPage();
             this.MotionBox = new System.Windows.Forms.RichTextBox();
-            this.CustomDataPage = new System.Windows.Forms.TabPage();
-            this.CustomDataBox = new System.Windows.Forms.RichTextBox();
+            this.UserDataPage = new System.Windows.Forms.TabPage();
+            this.CreateUserdataButton = new System.Windows.Forms.Button();
+            this.UserDataBox = new System.Windows.Forms.RichTextBox();
             this.BoneNamesPage = new System.Windows.Forms.TabPage();
             this.BoneNamesBox = new System.Windows.Forms.RichTextBox();
             this.BoneParamsPage = new System.Windows.Forms.TabPage();
@@ -59,7 +61,7 @@ namespace OGF_tool
             this.TabControl.SuspendLayout();
             this.MotionRefsPage.SuspendLayout();
             this.MotionPage.SuspendLayout();
-            this.CustomDataPage.SuspendLayout();
+            this.UserDataPage.SuspendLayout();
             this.BoneNamesPage.SuspendLayout();
             this.MenuPanel.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -76,7 +78,7 @@ namespace OGF_tool
             this.TabControl.Controls.Add(this.TexturesPage);
             this.TabControl.Controls.Add(this.MotionRefsPage);
             this.TabControl.Controls.Add(this.MotionPage);
-            this.TabControl.Controls.Add(this.CustomDataPage);
+            this.TabControl.Controls.Add(this.UserDataPage);
             this.TabControl.Controls.Add(this.BoneNamesPage);
             this.TabControl.Controls.Add(this.BoneParamsPage);
             this.TabControl.Location = new System.Drawing.Point(12, 27);
@@ -91,24 +93,35 @@ namespace OGF_tool
             // TexturesPage
             // 
             this.TexturesPage.AutoScroll = true;
-            this.TexturesPage.Location = new System.Drawing.Point(4, 49);
+            this.TexturesPage.Location = new System.Drawing.Point(4, 25);
             this.TexturesPage.Name = "TexturesPage";
             this.TexturesPage.Padding = new System.Windows.Forms.Padding(3);
-            this.TexturesPage.Size = new System.Drawing.Size(395, 232);
+            this.TexturesPage.Size = new System.Drawing.Size(395, 256);
             this.TexturesPage.TabIndex = 0;
             this.TexturesPage.Text = "Textures";
             this.TexturesPage.UseVisualStyleBackColor = true;
             // 
             // MotionRefsPage
             // 
+            this.MotionRefsPage.Controls.Add(this.CreateMotionRefsButton);
             this.MotionRefsPage.Controls.Add(this.MotionRefsBox);
-            this.MotionRefsPage.Location = new System.Drawing.Point(4, 49);
+            this.MotionRefsPage.Location = new System.Drawing.Point(4, 25);
             this.MotionRefsPage.Name = "MotionRefsPage";
             this.MotionRefsPage.Padding = new System.Windows.Forms.Padding(3);
-            this.MotionRefsPage.Size = new System.Drawing.Size(395, 232);
+            this.MotionRefsPage.Size = new System.Drawing.Size(395, 256);
             this.MotionRefsPage.TabIndex = 1;
             this.MotionRefsPage.Text = "Motion Refs";
             this.MotionRefsPage.UseVisualStyleBackColor = true;
+            // 
+            // CreateMotionRefsButton
+            // 
+            this.CreateMotionRefsButton.Location = new System.Drawing.Point(6, 6);
+            this.CreateMotionRefsButton.Name = "CreateMotionRefsButton";
+            this.CreateMotionRefsButton.Size = new System.Drawing.Size(383, 244);
+            this.CreateMotionRefsButton.TabIndex = 1;
+            this.CreateMotionRefsButton.Text = "Create Motion Refs";
+            this.CreateMotionRefsButton.UseVisualStyleBackColor = true;
+            this.CreateMotionRefsButton.Click += new System.EventHandler(this.CreateMotionRefsButton_Click);
             // 
             // MotionRefsBox
             // 
@@ -123,10 +136,10 @@ namespace OGF_tool
             // MotionPage
             // 
             this.MotionPage.Controls.Add(this.MotionBox);
-            this.MotionPage.Location = new System.Drawing.Point(4, 49);
+            this.MotionPage.Location = new System.Drawing.Point(4, 25);
             this.MotionPage.Name = "MotionPage";
             this.MotionPage.Padding = new System.Windows.Forms.Padding(3);
-            this.MotionPage.Size = new System.Drawing.Size(395, 232);
+            this.MotionPage.Size = new System.Drawing.Size(395, 256);
             this.MotionPage.TabIndex = 4;
             this.MotionPage.Text = "Motions";
             this.MotionPage.UseVisualStyleBackColor = true;
@@ -140,32 +153,43 @@ namespace OGF_tool
             this.MotionBox.TabIndex = 2;
             this.MotionBox.Text = "";
             // 
-            // CustomDataPage
+            // UserDataPage
             // 
-            this.CustomDataPage.Controls.Add(this.CustomDataBox);
-            this.CustomDataPage.Location = new System.Drawing.Point(4, 49);
-            this.CustomDataPage.Name = "CustomDataPage";
-            this.CustomDataPage.Padding = new System.Windows.Forms.Padding(3);
-            this.CustomDataPage.Size = new System.Drawing.Size(395, 232);
-            this.CustomDataPage.TabIndex = 2;
-            this.CustomDataPage.Text = "Custom Data";
-            this.CustomDataPage.UseVisualStyleBackColor = true;
+            this.UserDataPage.Controls.Add(this.CreateUserdataButton);
+            this.UserDataPage.Controls.Add(this.UserDataBox);
+            this.UserDataPage.Location = new System.Drawing.Point(4, 25);
+            this.UserDataPage.Name = "UserDataPage";
+            this.UserDataPage.Padding = new System.Windows.Forms.Padding(3);
+            this.UserDataPage.Size = new System.Drawing.Size(395, 256);
+            this.UserDataPage.TabIndex = 2;
+            this.UserDataPage.Text = "UserData";
+            this.UserDataPage.UseVisualStyleBackColor = true;
             // 
-            // CustomDataBox
+            // CreateUserdataButton
             // 
-            this.CustomDataBox.Location = new System.Drawing.Point(0, 0);
-            this.CustomDataBox.Name = "CustomDataBox";
-            this.CustomDataBox.Size = new System.Drawing.Size(395, 256);
-            this.CustomDataBox.TabIndex = 0;
-            this.CustomDataBox.Text = "";
+            this.CreateUserdataButton.Location = new System.Drawing.Point(6, 6);
+            this.CreateUserdataButton.Name = "CreateUserdataButton";
+            this.CreateUserdataButton.Size = new System.Drawing.Size(383, 244);
+            this.CreateUserdataButton.TabIndex = 1;
+            this.CreateUserdataButton.Text = "Create UserData";
+            this.CreateUserdataButton.UseVisualStyleBackColor = true;
+            this.CreateUserdataButton.Click += new System.EventHandler(this.CreateUserdataButton_Click);
+            // 
+            // UserDataBox
+            // 
+            this.UserDataBox.Location = new System.Drawing.Point(0, 0);
+            this.UserDataBox.Name = "UserDataBox";
+            this.UserDataBox.Size = new System.Drawing.Size(395, 256);
+            this.UserDataBox.TabIndex = 0;
+            this.UserDataBox.Text = "";
             // 
             // BoneNamesPage
             // 
             this.BoneNamesPage.Controls.Add(this.BoneNamesBox);
-            this.BoneNamesPage.Location = new System.Drawing.Point(4, 49);
+            this.BoneNamesPage.Location = new System.Drawing.Point(4, 25);
             this.BoneNamesPage.Name = "BoneNamesPage";
             this.BoneNamesPage.Padding = new System.Windows.Forms.Padding(3);
-            this.BoneNamesPage.Size = new System.Drawing.Size(395, 232);
+            this.BoneNamesPage.Size = new System.Drawing.Size(395, 256);
             this.BoneNamesPage.TabIndex = 5;
             this.BoneNamesPage.Text = "Bone Names";
             this.BoneNamesPage.UseVisualStyleBackColor = true;
@@ -184,10 +208,10 @@ namespace OGF_tool
             // BoneParamsPage
             // 
             this.BoneParamsPage.AutoScroll = true;
-            this.BoneParamsPage.Location = new System.Drawing.Point(4, 49);
+            this.BoneParamsPage.Location = new System.Drawing.Point(4, 25);
             this.BoneParamsPage.Name = "BoneParamsPage";
             this.BoneParamsPage.Padding = new System.Windows.Forms.Padding(3);
-            this.BoneParamsPage.Size = new System.Drawing.Size(395, 232);
+            this.BoneParamsPage.Size = new System.Drawing.Size(395, 256);
             this.BoneParamsPage.TabIndex = 3;
             this.BoneParamsPage.Text = "Bone Params";
             this.BoneParamsPage.UseVisualStyleBackColor = true;
@@ -323,7 +347,7 @@ namespace OGF_tool
             this.TabControl.ResumeLayout(false);
             this.MotionRefsPage.ResumeLayout(false);
             this.MotionPage.ResumeLayout(false);
-            this.CustomDataPage.ResumeLayout(false);
+            this.UserDataPage.ResumeLayout(false);
             this.BoneNamesPage.ResumeLayout(false);
             this.MenuPanel.ResumeLayout(false);
             this.MenuPanel.PerformLayout();
@@ -340,8 +364,8 @@ namespace OGF_tool
         private System.Windows.Forms.TabPage TexturesPage;
         private System.Windows.Forms.TabPage MotionRefsPage;
         private System.Windows.Forms.RichTextBox MotionRefsBox;
-        private System.Windows.Forms.TabPage CustomDataPage;
-        private System.Windows.Forms.RichTextBox CustomDataBox;
+        private System.Windows.Forms.TabPage UserDataPage;
+        private System.Windows.Forms.RichTextBox UserDataBox;
         private System.Windows.Forms.MenuStrip MenuPanel;
         private System.Windows.Forms.ToolStripMenuItem FileMenuItem;
         private System.Windows.Forms.ToolStripMenuItem SaveMenuParam;
@@ -361,6 +385,8 @@ namespace OGF_tool
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
+        private System.Windows.Forms.Button CreateUserdataButton;
+        private System.Windows.Forms.Button CreateMotionRefsButton;
     }
 }
 
