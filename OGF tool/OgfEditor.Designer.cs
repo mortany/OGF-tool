@@ -342,7 +342,7 @@ namespace OGF_tool
             this.MaximizeBox = false;
             this.Name = "OGF_Editor";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "OGF Params Editor v1.1";
+            this.Text = "OGF Params Editor v1.2";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.TabControl.ResumeLayout(false);
             this.MotionRefsPage.ResumeLayout(false);
