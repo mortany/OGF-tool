@@ -18,7 +18,7 @@ namespace OGF_tool
 	{
 		// About file
 		byte m_version;
-		byte m_model_type;
+		byte m_model_type; // 3 - Animated, 10 - Rigid
 
 		// File sytem
 		public OGF_Children OGF_V = null;
@@ -324,9 +324,8 @@ namespace OGF_tool
 			box.Controls.Add(RotationLabel);
 		}
 
-		private void RecalcFormSize()
+		private void RecalcFormSize(int set_size)
         {
-			int set_size = 125;
 			Height = FormHeight;
 			MotionRefsBox.Height = BoxesHeight;
 			UserDataBox.Height = BoxesHeight;
@@ -336,21 +335,20 @@ namespace OGF_tool
 			CreateMotionRefsButton.Height = CreateButtonsHeight;
 			CreateUserdataButton.Height = CreateButtonsHeight;
 
-			//if (OGF_V.childs.Count <= 1) // Отключил маленький размер формы для нормального просмотра bone params
-			//{
-			//	Height -= set_size;
-			//	MotionRefsBox.Height -= set_size;
-			//	CustomDataBox.Height -= set_size;
-			//	BoneNamesBox.Height -= set_size;
-			//	MotionBox.Height -= set_size;
-			//	TabControl.Height -= set_size;
-			//	CreateMotionRefsButton.Height -= set_size;
-			//	CreateUserdataButton.Height -= set_size;
-			//}
-			//else
-
-			if (OGF_V.childs.Count >= 3)
-			{
+            if (OGF_V.childs.Count <= 1)
+            {
+				set_size = 50;
+				Height -= set_size;
+                MotionRefsBox.Height -= set_size;
+				UserDataBox.Height -= set_size;
+                BoneNamesBox.Height -= set_size;
+                MotionBox.Height -= set_size;
+                TabControl.Height -= set_size;
+                CreateMotionRefsButton.Height -= set_size;
+                CreateUserdataButton.Height -= set_size;
+            }
+            else
+            {
 				Height += set_size;
 				MotionRefsBox.Height += set_size;
 				UserDataBox.Height += set_size;
@@ -383,7 +381,7 @@ namespace OGF_tool
 			SaveMenuParam.Enabled = true;
 			saveAsToolStripMenuItem.Enabled = true;
 
-			RecalcFormSize();
+			RecalcFormSize(125);
 
 			for (int i = 0; i < OGF_V.childs.Count; i++)
 			{
@@ -425,17 +423,24 @@ namespace OGF_tool
 					OGF_V.refs.refs0.AddRange(MotionRefsBox.Lines);
 				}
 				else
+				{
 					OGF_V.refs.refs0 = null;
+					if (MotionBox.Text == "")
+						m_model_type = 10;
+				}
 			}
 
-			if (UserDataBox.Text != "" && OGF_V.usertdata != null)
+			if (OGF_V.usertdata != null)
 			{
 				OGF_V.usertdata.data = "";
 
-				for (int i = 0; i < UserDataBox.Lines.Count(); i++)
+				if (UserDataBox.Text != "")
 				{
-					string ext = i == UserDataBox.Lines.Count() - 1 ? "" : "\r\n";
-					OGF_V.usertdata.data += UserDataBox.Lines[i] + ext;
+					for (int i = 0; i < UserDataBox.Lines.Count(); i++)
+					{
+						string ext = i == UserDataBox.Lines.Count() - 1 ? "" : "\r\n";
+						OGF_V.usertdata.data += UserDataBox.Lines[i] + ext;
+					}
 				}
 			}
 		}
@@ -579,12 +584,21 @@ namespace OGF_tool
 
 					file_bytes.AddRange(temp);
 
-					file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_USERDATA));
-					file_bytes.AddRange(BitConverter.GetBytes(OGF_V.usertdata.chunk_size()));
+					if (OGF_V.usertdata.data == "")
+					{
+						fileStream.ReadBytes(4);
+						fileStream.ReadBytes(OGF_V.usertdata.old_size);
+						fileStream.ReadBytes(OGF_V.usertdata.old_size + 8);
+					}
+					else
+					{
+                        file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_USERDATA));
+                        file_bytes.AddRange(BitConverter.GetBytes(OGF_V.usertdata.chunk_size()));
 
-					file_bytes.AddRange(OGF_V.usertdata.data_all());
+                        file_bytes.AddRange(OGF_V.usertdata.data_all());
+                    }
 				}
-				else if (OGF_V.usertdata != null && OGF_V.usertdata.need_create)
+				else if (OGF_V.usertdata != null && OGF_V.usertdata.need_create && OGF_V.usertdata.data != "")
 				{
 					byte[] userdata = GetUserdataChunk(OGF_V.usertdata.data);
 					file_bytes.AddRange(userdata);
@@ -597,7 +611,7 @@ namespace OGF_tool
 					file_bytes.AddRange(temp);
 				}
 
-				if (OGF_V.refs != null)
+				if (OGF_V.refs != null && OGF_V.refs.refs0 != null)
 				{
 					if (OGF_V.refs.need_create)
 					{
@@ -723,6 +737,7 @@ namespace OGF_tool
 					OGF_V.usertdata = new UserData();
 					OGF_V.usertdata.pos = xr_loader.chunk_pos;
 					OGF_V.usertdata.data = xr_loader.read_stringZ();
+					OGF_V.usertdata.old_size = OGF_V.usertdata.data.Length + 1;
 				}
 				else
 					UserDataPage.Controls.Add(CreateUserdataButton);
@@ -797,7 +812,6 @@ namespace OGF_tool
 
 					BoneNamesBox.Clear();
 					TabControl.Controls.Add(BoneNamesPage);
-					TabControl.Controls.Add(BoneParamsPage);
 
 					uint count = xr_loader.ReadUInt32();
 					uint count_saved = count;
@@ -841,6 +855,8 @@ namespace OGF_tool
                 // Ik Data
                 if (xr_loader.find_chunk((int)OGF.OGF4_S_IKDATA, false, true))
                 {
+					TabControl.Controls.Add(BoneParamsPage);
+
 					OGF_V.ikdata.pos = xr_loader.chunk_pos;
 					OGF_V.ikdata.materials = new List<string>();
 					OGF_V.ikdata.mass = new List<float>();
@@ -1069,6 +1085,7 @@ namespace OGF_tool
 
 			switch (e.KeyData)
 			{
+				case Keys.F3: reloadToolStripMenuItem_Click(null, null); break;
 				case Keys.F4: loadToolStripMenuItem_Click(null, null); break;
 				case Keys.F5: saveToolStripMenuItem_Click(null, null); break;
 				case Keys.F6: saveAsToolStripMenuItem_Click(null, null); break;
@@ -1187,6 +1204,46 @@ namespace OGF_tool
 			MotionRefsPage.Controls.Add(MotionRefsBox);
 			OGF_V.refs = new MotionRefs();
 			OGF_V.refs.need_create = true;
+		}
+
+        private void reloadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+			string cur_fname = FILE_NAME;
+			Clear();
+			FILE_NAME = cur_fname;
+			OpenFile(FILE_NAME);
+			AfterLoad();
+		}
+
+        private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
+        {
+			switch (TabControl.Controls[TabControl.SelectedIndex].Name)
+			{
+
+				case "UserDataPage":
+					{
+						if (UserDataBox.Text == "")
+						{
+							UserDataPage.Controls.Clear();
+							UserDataPage.Controls.Add(CreateUserdataButton);
+							OGF_V.usertdata = null;
+						}
+						break;
+					}
+				case "MotionRefsPage":
+					{
+						if (MotionRefsBox.Text == "")
+						{
+							if (MotionBox.Text == "")
+								m_model_type = 10;
+
+							MotionRefsPage.Controls.Clear();
+							MotionRefsPage.Controls.Add(CreateMotionRefsButton);
+							OGF_V.refs = null;
+						}
+						break;
+					}
+			}
 		}
     }
 }

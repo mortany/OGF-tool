@@ -50,6 +50,7 @@ namespace OGF_tool
             this.SaveMenuParam = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.reloadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.oGFInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -88,6 +89,7 @@ namespace OGF_tool
             this.TabControl.Size = new System.Drawing.Size(403, 285);
             this.TabControl.SizeMode = System.Windows.Forms.TabSizeMode.FillToRight;
             this.TabControl.TabIndex = 7;
+            this.TabControl.SelectedIndexChanged += new System.EventHandler(this.TabControl_SelectedIndexChanged);
             this.TabControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
             // TexturesPage
@@ -236,6 +238,7 @@ namespace OGF_tool
             this.SaveMenuParam,
             this.saveAsToolStripMenuItem,
             this.toolStripSeparator1,
+            this.reloadToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.FileMenuItem.Name = "FileMenuItem";
             this.FileMenuItem.Size = new System.Drawing.Size(37, 20);
@@ -266,6 +269,13 @@ namespace OGF_tool
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(118, 6);
+            // 
+            // reloadToolStripMenuItem
+            // 
+            this.reloadToolStripMenuItem.Name = "reloadToolStripMenuItem";
+            this.reloadToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
+            this.reloadToolStripMenuItem.Text = "Reload";
+            this.reloadToolStripMenuItem.Click += new System.EventHandler(this.reloadToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
@@ -305,7 +315,7 @@ namespace OGF_tool
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.FileLabel,
             this.StatusFile});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 313);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 315);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(427, 22);
             this.statusStrip1.SizingGrip = false;
@@ -331,7 +341,7 @@ namespace OGF_tool
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(427, 335);
+            this.ClientSize = new System.Drawing.Size(427, 337);
             this.Controls.Add(this.BkpCheckBox);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.MenuPanel);
@@ -340,9 +350,11 @@ namespace OGF_tool
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.MenuPanel;
             this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(443, 800);
+            this.MinimumSize = new System.Drawing.Size(443, 251);
             this.Name = "OGF_Editor";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "OGF Params Editor v1.31";
+            this.Text = "OGF Params Editor v1.4";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.TabControl.ResumeLayout(false);
             this.MotionRefsPage.ResumeLayout(false);
@@ -387,6 +399,7 @@ namespace OGF_tool
         private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
         private System.Windows.Forms.Button CreateUserdataButton;
         private System.Windows.Forms.Button CreateMotionRefsButton;
+        private System.Windows.Forms.ToolStripMenuItem reloadToolStripMenuItem;
     }
 }
 

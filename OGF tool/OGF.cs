@@ -277,12 +277,14 @@ namespace OGF_tool
     public class UserData
     {
         public long pos;
+        public int old_size;
         public string data;
         public bool need_create;
 
         public UserData()
         {
             this.pos = 0;
+            this.old_size = 0;
             this.data = "";
             this.need_create = false;
         }
