@@ -129,19 +129,19 @@ namespace OGF_tool
 			box.Controls.Add(newLbl2);
 		}
 
-		private void CreateBoneGroupBox(int idx, string bone_name, string parent_bone_name, string material, float mass, Fvector center)
+		private void CreateBoneGroupBox(int idx, string bone_name, string parent_bone_name, string material, float mass, Fvector center, Fvector pos, Fvector rot)
 		{
 			var GroupBox = new GroupBox();
-			GroupBox.Location = new System.Drawing.Point(3, 3 + 155 * idx);
-			GroupBox.Size = new System.Drawing.Size(366, 153);
+			GroupBox.Location = new System.Drawing.Point(3, 3 + 205 * idx);
+			GroupBox.Size = new System.Drawing.Size(366, 203);
 			GroupBox.Text = "Bone id: [" + idx + "]";
 			GroupBox.Name = "BoneGrpBox_" + idx;
 
-			CreateBoneTextBox(idx, GroupBox, bone_name, parent_bone_name, material, mass, center);
+			CreateBoneTextBox(idx, GroupBox, bone_name, parent_bone_name, material, mass, center, pos, rot);
 			BoneParamsPage.Controls.Add(GroupBox);
 		}
 
-		private void CreateBoneTextBox(int idx, GroupBox box, string bone_name, string parent_bone_name, string material, float mass, Fvector center)
+		private void CreateBoneTextBox(int idx, GroupBox box, string bone_name, string parent_bone_name, string material, float mass, Fvector center, Fvector pos, Fvector rot)
 		{
 			var BoneNameTextBox = new TextBox();
 			BoneNameTextBox.Name = "boneBox_" + idx;
@@ -235,6 +235,72 @@ namespace OGF_tool
 			CenterMassLabel.Location = new System.Drawing.Point(6, 127);
 			CenterMassLabel.Text = "Center of Mass:";
 
+			var PositionX = new TextBox();
+			PositionX.Name = "PositionX_" + idx;
+			PositionX.Size = new System.Drawing.Size(84, 58);
+			PositionX.Location = new System.Drawing.Point(86, 151);
+			PositionX.Text = pos.x.ToString();
+			PositionX.Tag = "float";
+			PositionX.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			PositionX.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+
+			var PositionY = new TextBox();
+			PositionY.Name = "PositionY_" + idx;
+			PositionY.Size = new System.Drawing.Size(84, 58);
+			PositionY.Location = new System.Drawing.Point(182, 151);
+			PositionY.Text = pos.y.ToString();
+			PositionY.Tag = "float";
+			PositionY.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			PositionY.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+
+			var PositionZ = new TextBox();
+			PositionZ.Name = "PositionZ_" + idx;
+			PositionZ.Size = new System.Drawing.Size(84, 58);
+			PositionZ.Location = new System.Drawing.Point(277, 151);
+			PositionZ.Text = pos.z.ToString();
+			PositionZ.Tag = "float";
+			PositionZ.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			PositionZ.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+
+			var PositionLabel = new Label();
+			PositionLabel.Name = "PositionLabel_" + idx;
+			PositionLabel.Size = new System.Drawing.Size(100, 20);
+			PositionLabel.Location = new System.Drawing.Point(6, 153);
+			PositionLabel.Text = "Position:";
+
+			var RotationX = new TextBox();
+			RotationX.Name = "RotationX_" + idx;
+			RotationX.Size = new System.Drawing.Size(84, 58);
+			RotationX.Location = new System.Drawing.Point(86, 177);
+			RotationX.Text = rot.x.ToString();
+			RotationX.Tag = "float";
+			RotationX.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			RotationX.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+
+			var RotationY = new TextBox();
+			RotationY.Name = "RotationY_" + idx;
+			RotationY.Size = new System.Drawing.Size(84, 58);
+			RotationY.Location = new System.Drawing.Point(182, 177);
+			RotationY.Text = rot.y.ToString();
+			RotationY.Tag = "float";
+			RotationY.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			RotationY.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+
+			var RotationZ = new TextBox();
+			RotationZ.Name = "RotationZ_" + idx;
+			RotationZ.Size = new System.Drawing.Size(84, 58);
+			RotationZ.Location = new System.Drawing.Point(277, 177);
+			RotationZ.Text = rot.z.ToString();
+			RotationZ.Tag = "float";
+			RotationZ.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			RotationZ.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+
+			var RotationLabel = new Label();
+			RotationLabel.Name = "RotationLabel_" + idx;
+			RotationLabel.Size = new System.Drawing.Size(100, 20);
+			RotationLabel.Location = new System.Drawing.Point(6, 179);
+			RotationLabel.Text = "Rotation:";
+
 			box.Controls.Add(BoneNameTextBox);
 			box.Controls.Add(ParentBoneNameTextBox);
 			box.Controls.Add(MaterialTextBox);
@@ -242,12 +308,20 @@ namespace OGF_tool
 			box.Controls.Add(CenterMassTextBoxX);
 			box.Controls.Add(CenterMassTextBoxY);
 			box.Controls.Add(CenterMassTextBoxZ);
+			box.Controls.Add(PositionX);
+			box.Controls.Add(PositionY);
+			box.Controls.Add(PositionZ);
+			box.Controls.Add(RotationX);
+			box.Controls.Add(RotationY);
+			box.Controls.Add(RotationZ);
 
 			box.Controls.Add(BoneNameLabel);
 			box.Controls.Add(ParentBoneNameLabel);
 			box.Controls.Add(MaterialLabel);
 			box.Controls.Add(MassLabel);
 			box.Controls.Add(CenterMassLabel);
+			box.Controls.Add(PositionLabel);
+			box.Controls.Add(RotationLabel);
 		}
 
 		private void RecalcFormSize()
@@ -328,7 +402,7 @@ namespace OGF_tool
 
 			for (int i = 0; i < OGF_V.bones.bones.Count; i++)
 			{
-				CreateBoneGroupBox(i, OGF_V.bones.bones[i], OGF_V.bones.parent_bones[i], OGF_V.ikdata.materials[i], OGF_V.ikdata.mass[i], OGF_V.ikdata.center_mass[i]);
+				CreateBoneGroupBox(i, OGF_V.bones.bones[i], OGF_V.bones.parent_bones[i], OGF_V.ikdata.materials[i], OGF_V.ikdata.mass[i], OGF_V.ikdata.center_mass[i], OGF_V.ikdata.position[i], OGF_V.ikdata.rotation[i]);
 			}
 
 			MotionRefsBox.Clear();
@@ -364,20 +438,6 @@ namespace OGF_tool
 					OGF_V.usertdata.data += UserDataBox.Lines[i] + ext;
 				}
 			}
-		}
-
-		public byte[] ReadAllBytes(BinaryReader reader)
-		{
-			const int bufferSize = 4096;
-			using (var ms = new MemoryStream())
-			{
-				byte[] buffer = new byte[bufferSize];
-				int count;
-				while ((count = reader.Read(buffer, 0, buffer.Length)) != 0)
-					ms.Write(buffer, 0, count);
-				return ms.ToArray();
-			}
-
 		}
 
 		public byte[] GetUserdataChunk(string data)
@@ -772,6 +832,8 @@ namespace OGF_tool
 					OGF_V.ikdata.mass = new List<float>();
 					OGF_V.ikdata.version = new List<uint>();
 					OGF_V.ikdata.center_mass = new List<Fvector>();
+					OGF_V.ikdata.position = new List<Fvector>();
+					OGF_V.ikdata.rotation = new List<Fvector>();
 					OGF_V.ikdata.bytes_1 = new List<List<byte[]>>();
 					OGF_V.ikdata.old_size = 0;
 
@@ -815,13 +877,18 @@ namespace OGF_tool
 							}
                         }
 
-						temp_byte = xr_loader.ReadBytes(12);    // vXYZ
-						bytes_1.Add(temp_byte);    // vT
-						temp_byte = xr_loader.ReadBytes(12);
-						bytes_1.Add(temp_byte);
+						Fvector rotation = new Fvector();
+						rotation.x = xr_loader.ReadFloat();
+						rotation.y = xr_loader.ReadFloat();
+						rotation.z = xr_loader.ReadFloat();
+
+						Fvector position = new Fvector();
+						position.x = xr_loader.ReadFloat();
+						position.y = xr_loader.ReadFloat();
+						position.z = xr_loader.ReadFloat();
+
 						float mass = xr_loader.ReadFloat();
 
-						float x, y, z;
 						Fvector center = new Fvector();
 						center.x = xr_loader.ReadFloat();
 						center.y = xr_loader.ReadFloat();
@@ -834,6 +901,8 @@ namespace OGF_tool
 						OGF_V.ikdata.version.Add(version);
 						OGF_V.ikdata.center_mass.Add(center);
 						OGF_V.ikdata.bytes_1.Add(bytes_1);
+						OGF_V.ikdata.position.Add(position);
+						OGF_V.ikdata.rotation.Add(rotation);
 					}
                 }
 			}
@@ -908,6 +977,12 @@ namespace OGF_tool
 									case "CenterBoxX": curBox.Text = OGF_V.ikdata.center_mass[idx].x.ToString(); break;
 									case "CenterBoxY": curBox.Text = OGF_V.ikdata.center_mass[idx].y.ToString(); break;
 									case "CenterBoxZ": curBox.Text = OGF_V.ikdata.center_mass[idx].z.ToString(); break;
+									case "PositionX": curBox.Text = OGF_V.ikdata.position[idx].x.ToString(); break;
+									case "PositionY": curBox.Text = OGF_V.ikdata.position[idx].y.ToString(); break;
+									case "PositionZ": curBox.Text = OGF_V.ikdata.position[idx].z.ToString(); break;
+									case "RotationX": curBox.Text = OGF_V.ikdata.rotation[idx].x.ToString(); break;
+									case "RotationY": curBox.Text = OGF_V.ikdata.rotation[idx].y.ToString(); break;
+									case "RotationZ": curBox.Text = OGF_V.ikdata.rotation[idx].z.ToString(); break;
 								}
 							}
 						}
@@ -915,6 +990,7 @@ namespace OGF_tool
 					break;
 			}
 
+			Fvector vec = new Fvector();
 			switch (currentField)
 			{
 				case "boneBox":
@@ -945,9 +1021,15 @@ namespace OGF_tool
 					break;
 				case "MaterialBox": OGF_V.ikdata.materials[idx] = curBox.Text; break;
 				case "MassBox": OGF_V.ikdata.mass[idx] = Convert.ToSingle(curBox.Text); break;
-				case "CenterBoxX": Fvector vec = new Fvector(); vec.x = Convert.ToSingle(curBox.Text); vec.y = OGF_V.ikdata.center_mass[idx].y; vec.z = OGF_V.ikdata.center_mass[idx].z; OGF_V.ikdata.center_mass[idx] = vec; break;
-				case "CenterBoxY": vec = new Fvector(); vec.x = OGF_V.ikdata.center_mass[idx].x; vec.y = Convert.ToSingle(curBox.Text); vec.z = OGF_V.ikdata.center_mass[idx].z; OGF_V.ikdata.center_mass[idx] = vec; break;
-				case "CenterBoxZ": vec = new Fvector(); vec.x = OGF_V.ikdata.center_mass[idx].x; vec.y = OGF_V.ikdata.center_mass[idx].y; vec.z = Convert.ToSingle(curBox.Text); OGF_V.ikdata.center_mass[idx] = vec; break;
+				case "CenterBoxX": vec.x = Convert.ToSingle(curBox.Text); vec.y = OGF_V.ikdata.center_mass[idx].y; vec.z = OGF_V.ikdata.center_mass[idx].z; OGF_V.ikdata.center_mass[idx] = vec; break;
+				case "CenterBoxY": vec.x = OGF_V.ikdata.center_mass[idx].x; vec.y = Convert.ToSingle(curBox.Text); vec.z = OGF_V.ikdata.center_mass[idx].z; OGF_V.ikdata.center_mass[idx] = vec; break;
+				case "CenterBoxZ": vec.x = OGF_V.ikdata.center_mass[idx].x; vec.y = OGF_V.ikdata.center_mass[idx].y; vec.z = Convert.ToSingle(curBox.Text); OGF_V.ikdata.center_mass[idx] = vec; break;
+				case "PositionX": vec.x = Convert.ToSingle(curBox.Text); vec.y = OGF_V.ikdata.position[idx].y; vec.z = OGF_V.ikdata.position[idx].z; OGF_V.ikdata.position[idx] = vec; break;
+				case "PositionY": vec.x = OGF_V.ikdata.position[idx].x; vec.y = Convert.ToSingle(curBox.Text); vec.z = OGF_V.ikdata.position[idx].z; OGF_V.ikdata.position[idx] = vec; break;
+				case "PositionZ": vec.x = OGF_V.ikdata.position[idx].x; vec.y = OGF_V.ikdata.position[idx].y; vec.z = Convert.ToSingle(curBox.Text); OGF_V.ikdata.position[idx] = vec; break;
+				case "RotationX": vec.x = Convert.ToSingle(curBox.Text); vec.y = OGF_V.ikdata.rotation[idx].y; vec.z = OGF_V.ikdata.rotation[idx].z; OGF_V.ikdata.rotation[idx] = vec; break;
+				case "RotationY": vec.x = OGF_V.ikdata.rotation[idx].x; vec.y = Convert.ToSingle(curBox.Text); vec.z = OGF_V.ikdata.rotation[idx].z; OGF_V.ikdata.rotation[idx] = vec; break;
+				case "RotationZ": vec.x = OGF_V.ikdata.rotation[idx].x; vec.y = OGF_V.ikdata.rotation[idx].y; vec.z = Convert.ToSingle(curBox.Text); OGF_V.ikdata.rotation[idx] = vec; break;
 			}
 
 			bKeyIsDown = false;

@@ -362,6 +362,8 @@ namespace OGF_tool
         public List<float> mass;
         public List<uint> version;
         public List<Fvector> center_mass;
+        public List<Fvector> position;
+        public List<Fvector> rotation;
         public List<List<byte[]>> bytes_1;
 
         public uint chunk_size()
@@ -404,6 +406,15 @@ namespace OGF_tool
                 temp.Add(0);
                 for (int j = 0; j < bytes_1[i].Count; j++)
                     temp.AddRange(bytes_1[i][j]);
+
+                temp.AddRange(BitConverter.GetBytes(rotation[i].x));
+                temp.AddRange(BitConverter.GetBytes(rotation[i].y));
+                temp.AddRange(BitConverter.GetBytes(rotation[i].z));
+
+                temp.AddRange(BitConverter.GetBytes(position[i].x));
+                temp.AddRange(BitConverter.GetBytes(position[i].y));
+                temp.AddRange(BitConverter.GetBytes(position[i].z));
+
                 temp.AddRange(BitConverter.GetBytes(mass[i]));
 
                 temp.AddRange(BitConverter.GetBytes(center_mass[i].x));
