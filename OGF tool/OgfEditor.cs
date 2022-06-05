@@ -63,7 +63,7 @@ namespace OGF_tool
 			openFileDialog1.Filter = "OGF file|*.ogf";
 			saveFileDialog1.Filter = "OGF file|*.ogf|Object file|*.object|Bones file|*.bones|Skl file|*.skl|Skls file|*.skls";
 
-			number_mask = @"^[0-9.]*$";
+			number_mask = @"^-[0-9.]*$";
 			System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
 			oGFInfoToolStripMenuItem.Enabled = false;
@@ -957,29 +957,11 @@ namespace OGF_tool
 							if (curBox.Text.Length == 0)
 								return;
 
-							while (curBox.Text.Length >= 8)
-							{
-								if (curBox.SelectionStart < 1)
-									curBox.SelectionStart = curBox.Text.Length;
-
-								int temp = curBox.SelectionStart;
-								curBox.Text = curBox.Text.Remove(curBox.Text.Length - 1, 1);
-								curBox.SelectionStart = temp;
-							}
-
+							int temp = curBox.SelectionStart;
 							string mask = number_mask;
-							Match match = Regex.Match(curBox.Text, mask);
-							if (!match.Success)
-							{
-								if (curBox.SelectionStart < 1)
-									curBox.SelectionStart = curBox.Text.Length;
+							Regex.Match(curBox.Text, mask);
 
-								int temp = curBox.SelectionStart;
-								curBox.Text = curBox.Text.Remove(curBox.SelectionStart - 1, 1);
-								curBox.SelectionStart = temp - 1;
-							}
-
-							try
+                            try
 							{
 								Convert.ToSingle(curBox.Text);
 							}
@@ -998,6 +980,11 @@ namespace OGF_tool
 									case "RotationY": curBox.Text = OGF_V.ikdata.rotation[idx].y.ToString(); break;
 									case "RotationZ": curBox.Text = OGF_V.ikdata.rotation[idx].z.ToString(); break;
 								}
+
+								if (curBox.SelectionStart < 1)
+									curBox.SelectionStart = curBox.Text.Length;
+
+								curBox.SelectionStart = temp - 1;
 							}
 						}
 					}
