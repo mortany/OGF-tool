@@ -792,6 +792,7 @@ namespace OGF_tool
 					OGF_V.bones.bones = new List<string>();
 					OGF_V.bones.parent_bones = new List<string>();
 					OGF_V.bones.fobb = new List<byte[]>();
+					OGF_V.bones.bone_childs = new List<List<int>>();
 					OGF_V.bones.old_size = 0;
 
 					BoneNamesBox.Clear();
@@ -819,6 +820,19 @@ namespace OGF_tool
 						OGF_V.bones.fobb.Add(obb);
 
 						OGF_V.bones.old_size += bone_name.Length + 1 + parent_name.Length + 1 + 60;
+					}
+
+					for (int i = 0; i < OGF_V.bones.bones.Count; i++)
+                    {
+						List<int> childs = new List<int>();
+						for (int j = 0; j < OGF_V.bones.parent_bones.Count; j++)
+                        {
+							if (OGF_V.bones.parent_bones[j] == OGF_V.bones.bones[i])
+                            {
+								childs.Add(j);
+							}
+                        }
+						OGF_V.bones.bone_childs.Add(childs);
 					}
 				}
 
@@ -999,14 +1013,17 @@ namespace OGF_tool
 						OGF_V.bones.bones[idx] = curBox.Text;
 
 						for (int i = 0; i < OGF_V.bones.parent_bones.Count; i++)
-						{
-							if (OGF_V.bones.parent_bones[i] == old_name && OGF_V.bones.parent_bones[i] != "")
-							{
-								var MainGroup = BoneParamsPage.Controls[i];
-								OGF_V.bones.parent_bones[i] = curBox.Text;
-								MainGroup.Controls[1].Text = OGF_V.bones.parent_bones[i];
+                        {
+							for (int j = 0; j < OGF_V.bones.bone_childs[idx].Count; j++)
+                            {
+								if (OGF_V.bones.bone_childs[idx][j] == i)
+								{
+									var MainGroup = BoneParamsPage.Controls[i];
+									OGF_V.bones.parent_bones[i] = curBox.Text;
+									MainGroup.Controls[1].Text = OGF_V.bones.parent_bones[i];
+								}
 							}
-						}
+                        }
 
 						BoneNamesBox.Clear();
 						BoneNamesBox.Text += $"Bones count : {OGF_V.bones.bones.Count}\n\n";

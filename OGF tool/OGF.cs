@@ -311,6 +311,7 @@ namespace OGF_tool
         public List<string> bones;
         public List<string> parent_bones;
         public List<byte[]> fobb;
+        public List<List<int>> bone_childs;
 
         public uint chunk_size()
         {
