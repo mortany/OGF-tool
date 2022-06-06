@@ -30,12 +30,6 @@ namespace OGF_tool
 		public bool bKeyIsDown = false;
 		string number_mask = "";
 
-		// Elements Size
-		int FormHeight = 0;
-		int BoxesHeight = 0;
-		int TabControlHeight = 0;
-		int CreateButtonsHeight = 0;
-
 		[DllImport("converter.dll")]
 		private static extern int CSharpStartAgent(string path, string out_path, int mode, int convert_to_mode, string motion_list);
 
@@ -54,11 +48,6 @@ namespace OGF_tool
 		public OGF_Editor()
 		{
 			InitializeComponent();
-
-			FormHeight = Height;
-			BoxesHeight = MotionRefsBox.Height;
-			TabControlHeight = TabControl.Height;
-			CreateButtonsHeight = CreateMotionRefsButton.Height;
 
 			openFileDialog1.Filter = "OGF file|*.ogf";
 			saveFileDialog1.Filter = "OGF file|*.ogf|Object file|*.object|Bones file|*.bones|Skl file|*.skl|Skls file|*.skls";
@@ -324,42 +313,6 @@ namespace OGF_tool
 			box.Controls.Add(RotationLabel);
 		}
 
-		private void RecalcFormSize(int set_size)
-        {
-			Height = FormHeight;
-			MotionRefsBox.Height = BoxesHeight;
-			UserDataBox.Height = BoxesHeight;
-			BoneNamesBox.Height = BoxesHeight;
-			MotionBox.Height = BoxesHeight;
-			TabControl.Height = TabControlHeight;
-			CreateMotionRefsButton.Height = CreateButtonsHeight;
-			CreateUserdataButton.Height = CreateButtonsHeight;
-
-            if (OGF_V.childs.Count <= 1)
-            {
-				set_size = 50;
-				Height -= set_size;
-                MotionRefsBox.Height -= set_size;
-				UserDataBox.Height -= set_size;
-                BoneNamesBox.Height -= set_size;
-                MotionBox.Height -= set_size;
-                TabControl.Height -= set_size;
-                CreateMotionRefsButton.Height -= set_size;
-                CreateUserdataButton.Height -= set_size;
-            }
-            else
-            {
-				Height += set_size;
-				MotionRefsBox.Height += set_size;
-				UserDataBox.Height += set_size;
-				BoneNamesBox.Height += set_size;
-				MotionBox.Height += set_size;
-				TabControl.Height += set_size;
-				CreateMotionRefsButton.Height += set_size;
-				CreateUserdataButton.Height += set_size;
-			}
-		}
-
 		private void Clear()
 		{
 			FILE_NAME = "";
@@ -380,8 +333,6 @@ namespace OGF_tool
 			viewToolStripMenuItem.Enabled = true;
 			SaveMenuParam.Enabled = true;
 			saveAsToolStripMenuItem.Enabled = true;
-
-			RecalcFormSize(125);
 
 			for (int i = 0; i < OGF_V.childs.Count; i++)
 			{

@@ -75,6 +75,7 @@ namespace OGF_tool
             // 
             // TabControl
             // 
+            this.TabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
             this.TabControl.Appearance = System.Windows.Forms.TabAppearance.Buttons;
             this.TabControl.Controls.Add(this.TexturesPage);
             this.TabControl.Controls.Add(this.MotionRefsPage);
@@ -117,6 +118,7 @@ namespace OGF_tool
             // 
             // CreateMotionRefsButton
             // 
+            this.CreateMotionRefsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
             this.CreateMotionRefsButton.Location = new System.Drawing.Point(6, 6);
             this.CreateMotionRefsButton.Name = "CreateMotionRefsButton";
             this.CreateMotionRefsButton.Size = new System.Drawing.Size(383, 244);
@@ -127,6 +129,7 @@ namespace OGF_tool
             // 
             // MotionRefsBox
             // 
+            this.MotionRefsBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
             this.MotionRefsBox.DetectUrls = false;
             this.MotionRefsBox.Location = new System.Drawing.Point(0, 0);
             this.MotionRefsBox.Name = "MotionRefsBox";
@@ -148,6 +151,7 @@ namespace OGF_tool
             // 
             // MotionBox
             // 
+            this.MotionBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
             this.MotionBox.Location = new System.Drawing.Point(0, 0);
             this.MotionBox.Name = "MotionBox";
             this.MotionBox.ReadOnly = true;
@@ -169,6 +173,7 @@ namespace OGF_tool
             // 
             // CreateUserdataButton
             // 
+            this.CreateUserdataButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
             this.CreateUserdataButton.Location = new System.Drawing.Point(6, 6);
             this.CreateUserdataButton.Name = "CreateUserdataButton";
             this.CreateUserdataButton.Size = new System.Drawing.Size(383, 244);
@@ -179,6 +184,7 @@ namespace OGF_tool
             // 
             // UserDataBox
             // 
+            this.UserDataBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
             this.UserDataBox.Location = new System.Drawing.Point(0, 0);
             this.UserDataBox.Name = "UserDataBox";
             this.UserDataBox.Size = new System.Drawing.Size(395, 256);
@@ -198,6 +204,7 @@ namespace OGF_tool
             // 
             // BoneNamesBox
             // 
+            this.BoneNamesBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
             this.BoneNamesBox.DetectUrls = false;
             this.BoneNamesBox.Location = new System.Drawing.Point(0, 0);
             this.BoneNamesBox.Name = "BoneNamesBox";
@@ -346,11 +353,10 @@ namespace OGF_tool
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.MenuPanel);
             this.Controls.Add(this.TabControl);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.MenuPanel;
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(443, 800);
+            this.MaximumSize = new System.Drawing.Size(443, 880);
             this.MinimumSize = new System.Drawing.Size(443, 251);
             this.Name = "OGF_Editor";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
