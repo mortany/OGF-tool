@@ -30,9 +30,9 @@ namespace OGF_tool
             System.DateTime dt_c = new System.DateTime(1970, 1, 1).AddSeconds(init_descr.m_creation_time);
             System.DateTime dt_m = new System.DateTime(1970, 1, 1).AddSeconds(init_descr.m_modified_time);
 
-            ExportTimeLabel.Text = dt_e.ToShortDateString() + " " + dt_e.ToShortTimeString();
-            CreationTimeLabel.Text = dt_c.ToShortDateString() + " " + dt_c.ToShortTimeString();
-            ModifedTimeLabel.Text = dt_m.ToShortDateString() + " " + dt_m.ToShortTimeString();
+            ExportTimeDate.Value = dt_e;
+            CreationTimeDate.Value = dt_c;
+            ModifedTimeDate.Value = dt_m;
         }
 
         private void CloseForm(object sender, FormClosingEventArgs e)
@@ -44,9 +44,9 @@ namespace OGF_tool
             descr.m_owner_name = CreatorTextBox.Text;
             descr.m_export_modif_name_tool = EditorTextBox.Text;
 
-            descr.m_export_time = 14;
-            descr.m_creation_time = 15;
-            descr.m_modified_time = 16;
+            descr.m_export_time = Convert.ToUInt32(ExportTimeDate.Value.Subtract(new DateTime(1970, 1, 1)).TotalSeconds);
+            descr.m_creation_time = Convert.ToUInt32(CreationTimeDate.Value.Subtract(new DateTime(1970, 1, 1)).TotalSeconds);
+            descr.m_modified_time = Convert.ToUInt32(ModifedTimeDate.Value.Subtract(new DateTime(1970, 1, 1)).TotalSeconds);
             res = true;
         }
     }

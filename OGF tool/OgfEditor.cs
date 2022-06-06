@@ -23,6 +23,7 @@ namespace OGF_tool
 		// File sytem
 		public OGF_Children OGF_V = null;
 		public byte[] Current_OGF = null;
+		public bool IsModelBroken = false;
 		public List<byte> file_bytes = new List<byte>();
 		public string FILE_NAME = "";
 
@@ -362,6 +363,8 @@ namespace OGF_tool
 
 			if (OGF_V.usertdata != null)
 				UserDataBox.Text = OGF_V.usertdata.data;
+
+			IsModelBroken = CatchBrokenModel();
 		}
 
 		private void CopyParams()
@@ -396,15 +399,15 @@ namespace OGF_tool
 			}
 		}
 
-		public byte[] GetUserdataChunk(string data)
+		public byte[] GetUserdataChunk()
         {
-			byte[] chunk = null;
+			byte[] chunk;
 
 			var xr_loader = new XRayLoader();
 			using (var fileStream = new BinaryWriter(File.Create("userdata.chunk")))
 			{
 				xr_loader.open_chunk(fileStream, (int)OGF.OGF4_S_USERDATA);
-				xr_loader.write_stringZ(fileStream, data);
+				xr_loader.write_stringZ(fileStream, OGF_V.usertdata.data);
 				xr_loader.close_chunk(fileStream);
 			}
 
@@ -414,17 +417,17 @@ namespace OGF_tool
 			return chunk;
         }
 
-		public byte[] GetMotionRefsChunk(List<string> data)
+		public byte[] GetMotionRefsChunk()
 		{
-			byte[] chunk = null;
+			byte[] chunk;
 
 			var xr_loader = new XRayLoader();
 			using (var fileStream = new BinaryWriter(File.Create("motion_refs.chunk")))
 			{
 				xr_loader.open_chunk(fileStream, (int)OGF.OGF4_S_MOTION_REFS2);
-				xr_loader.write_u32(fileStream, (uint)data.Count);
-				for (int i = 0; i < data.Count; i++)
-					xr_loader.write_stringZ(fileStream, data[i]);
+				xr_loader.write_u32(fileStream, (uint)OGF_V.refs.refs0.Count);
+				for (int i = 0; i < OGF_V.refs.refs0.Count; i++)
+					xr_loader.write_stringZ(fileStream, OGF_V.refs.refs0[i]);
 				xr_loader.close_chunk(fileStream);
 			}
 
@@ -434,11 +437,82 @@ namespace OGF_tool
 			return chunk;
 		}
 
+		public byte[] GetDescriptionChunk()
+		{
+			List<byte> file = new List<byte>();
+			byte[] chunk;
+
+			using (var fileStream = new BinaryReader(new MemoryStream(Current_OGF)))
+			{
+				byte[] temp = fileStream.ReadBytes(8);
+
+				fileStream.ReadBytes(2);
+				fileStream.ReadBytes(2);
+				fileStream.ReadBytes(40);
+
+				temp = fileStream.ReadBytes((int)(OGF_V.descr.pos - fileStream.BaseStream.Position));
+				file.AddRange(temp);
+
+				file.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_DESC));
+				file.AddRange(BitConverter.GetBytes(OGF_V.descr.chunk_size()));
+				file.AddRange(OGF_V.descr.data());
+			}
+
+			using (var fileStream = new BinaryWriter(File.Create("description.chunk")))
+			{
+				byte[] data = file.ToArray();
+				fileStream.Write(data, 0, data.Length);
+			}
+
+			chunk = File.ReadAllBytes("description.chunk");
+			File.Delete("description.chunk");
+
+			return chunk;
+		}
+
+		private bool CatchBrokenModel()
+		{
+			if (Current_OGF == null) return false;
+
+			try
+			{
+				using (var fileStream = new BinaryReader(new MemoryStream(Current_OGF)))
+				{
+					fileStream.ReadBytes(8);
+					fileStream.ReadBytes(2);
+					fileStream.ReadBytes((int)(OGF_V.descr.pos - fileStream.BaseStream.Position));
+					fileStream.ReadBytes(OGF_V.descr.old_size + 8);
+					fileStream.ReadUInt32();
+					fileStream.ReadUInt32();
+
+					foreach (var ch in OGF_V.childs)
+					{
+						fileStream.ReadBytes((int)(ch.parent_pos - fileStream.BaseStream.Position));
+						fileStream.ReadUInt32();
+						fileStream.ReadUInt32();
+						fileStream.ReadBytes((int)(ch.pos - fileStream.BaseStream.Position));
+						fileStream.BaseStream.Position += ch.old_size + 8;
+					}
+				}
+			}
+			catch (Exception)
+			{
+				return true;
+			}
+
+			return false;
+		}
+
 		private void SaveFile(string filename)
 		{
 			file_bytes.Clear();
 
 			if (Current_OGF == null) return;
+
+			bool remove_motions_chunk = false;
+
+			if (OGF_V.refs != null && OGF_V.refs.refs0 != null && OGF_V.refs.need_create && MotionBox.Text != "" && MessageBox.Show("New motion refs chunk will remove built-in motions, continue?", "OGF Editor", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+				remove_motions_chunk = true;
 
 			using (var fileStream = new BinaryReader(new MemoryStream(Current_OGF)))
 			{
@@ -450,20 +524,25 @@ namespace OGF_tool
 				file_bytes.Add(m_version);
 				file_bytes.Add(m_model_type);
 
-                temp = fileStream.ReadBytes((int)(OGF_V.descr.pos - fileStream.BaseStream.Position));
-                file_bytes.AddRange(temp);
+				temp = fileStream.ReadBytes(42);
+				file_bytes.AddRange(temp);
 
-                OGF_V.descr.m_modified_time = Convert.ToUInt32(DateTime.Now.Subtract(new DateTime(1970, 1, 1)).TotalSeconds);
-				if (OGF_V.descr.m_creation_time == 0)
-					OGF_V.descr.m_creation_time = OGF_V.descr.m_modified_time;
-				if (OGF_V.descr.m_export_time == 0)
-					OGF_V.descr.m_export_time = OGF_V.descr.m_modified_time;
+				if (!IsModelBroken)
+				{
+					temp = fileStream.ReadBytes((int)(OGF_V.descr.pos - fileStream.BaseStream.Position));
+					file_bytes.AddRange(temp);
 
-				file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_DESC));
-				file_bytes.AddRange(BitConverter.GetBytes(OGF_V.descr.chunk_size()));
-				file_bytes.AddRange(OGF_V.descr.data());
+					file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_DESC));
+					file_bytes.AddRange(BitConverter.GetBytes(OGF_V.descr.chunk_size()));
+					file_bytes.AddRange(OGF_V.descr.data());
 
-				fileStream.ReadBytes(OGF_V.descr.old_size + 8);
+					fileStream.ReadBytes(OGF_V.descr.old_size + 8);
+				}
+				else
+                {
+					fileStream.ReadBytes((int)(OGF_V.pos - fileStream.BaseStream.Position));
+					file_bytes.AddRange(GetDescriptionChunk());
+				}
 
 				uint chld_section = fileStream.ReadUInt32();
 				uint new_size = fileStream.ReadUInt32();
@@ -526,67 +605,91 @@ namespace OGF_tool
 					fileStream.ReadBytes(OGF_V.ikdata.old_size + 8);
 				}
 
-				if (OGF_V.usertdata != null && !OGF_V.usertdata.need_create)
+				if (OGF_V.usertdata != null)
 				{
-					if (OGF_V.usertdata.pos > 0)
-						temp = fileStream.ReadBytes((int)(OGF_V.usertdata.pos - fileStream.BaseStream.Position));
-					else
-						temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
-
-					file_bytes.AddRange(temp);
-
-					if (OGF_V.usertdata.data == "")
+					if (OGF_V.usertdata.need_create)
 					{
-						fileStream.ReadBytes(4);
-						fileStream.ReadBytes(OGF_V.usertdata.old_size);
-						fileStream.ReadBytes(OGF_V.usertdata.old_size + 8);
-					}
-					else
-					{
-                        file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_USERDATA));
-                        file_bytes.AddRange(BitConverter.GetBytes(OGF_V.usertdata.chunk_size()));
-
-                        file_bytes.AddRange(OGF_V.usertdata.data_all());
-                    }
-				}
-				else if (OGF_V.usertdata != null && OGF_V.usertdata.need_create && OGF_V.usertdata.data != "")
-				{
-					byte[] userdata = GetUserdataChunk(OGF_V.usertdata.data);
-					file_bytes.AddRange(userdata);
-
-					if (OGF_V.refs != null && OGF_V.refs.pos > 0)
-						temp = fileStream.ReadBytes((int)(OGF_V.refs.pos - fileStream.BaseStream.Position));
-					else
-						temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
-
-					file_bytes.AddRange(temp);
-				}
-
-				if (OGF_V.refs != null && OGF_V.refs.refs0 != null)
-				{
-					if (OGF_V.refs.need_create)
-					{
-						byte[] motionrefs = GetMotionRefsChunk(OGF_V.refs.refs0);
-						file_bytes.AddRange(motionrefs);
-					}
-					else
-					{
-						if (OGF_V.refs.refs0.Count() > 1)
+						if (OGF_V.usertdata.data != "")
 						{
-							file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_MOTION_REFS2));
-							file_bytes.AddRange(BitConverter.GetBytes(OGF_V.refs.chunk_size()));
-							file_bytes.AddRange(OGF_V.refs.count());
+							byte[] userdata = GetUserdataChunk();
+							file_bytes.AddRange(userdata);
+						}
+					}
+					else
+					{
+						if (OGF_V.usertdata.pos > 0)
+							temp = fileStream.ReadBytes((int)(OGF_V.usertdata.pos - fileStream.BaseStream.Position));
+						else
+							temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
+
+						file_bytes.AddRange(temp);
+
+						if (OGF_V.usertdata.data == "")
+						{
+							fileStream.ReadBytes(4);
+							fileStream.ReadBytes(OGF_V.usertdata.old_size);
+							fileStream.ReadBytes(OGF_V.usertdata.old_size + 8);
 						}
 						else
 						{
-							file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_MOTION_REFS));
-							file_bytes.AddRange(BitConverter.GetBytes(OGF_V.refs.chunk_size()));
-						}
+							file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_USERDATA));
+							file_bytes.AddRange(BitConverter.GetBytes(OGF_V.usertdata.chunk_size()));
 
-						file_bytes.AddRange(OGF_V.refs.data());
+							file_bytes.AddRange(OGF_V.usertdata.data_all());
+						}
 					}
 				}
-            }
+				else if (OGF_V.refs != null)
+                {
+					if (OGF_V.refs.pos > 0)
+						temp = fileStream.ReadBytes((int)(OGF_V.refs.pos - fileStream.BaseStream.Position));
+					else if (!remove_motions_chunk)
+						temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
+
+					file_bytes.AddRange(temp);
+				}
+
+				if (OGF_V.refs != null)
+				{
+					if (OGF_V.refs.refs0 != null)
+					{
+						if (OGF_V.refs.need_create)
+						{
+							if (MotionBox.Text == "" || remove_motions_chunk)
+							{
+								byte[] motionrefs = GetMotionRefsChunk();
+								file_bytes.AddRange(motionrefs);
+							}
+						}
+						else
+						{
+							if (OGF_V.refs.refs0.Count() > 1 || !OGF_V.refs.v3)
+							{
+								file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_MOTION_REFS2));
+								file_bytes.AddRange(BitConverter.GetBytes(OGF_V.refs.chunk_size()));
+								file_bytes.AddRange(OGF_V.refs.count());
+							}
+							else
+							{
+								file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_MOTION_REFS));
+								file_bytes.AddRange(BitConverter.GetBytes(OGF_V.refs.chunk_size()));
+							}
+
+							file_bytes.AddRange(OGF_V.refs.data());
+						}
+					}
+
+					fileStream.ReadBytes(4);
+					fileStream.ReadBytes(OGF_V.refs.old_size);
+					fileStream.ReadBytes(OGF_V.refs.old_size + 8);
+				}
+
+				if (!remove_motions_chunk)
+				{
+					temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
+					file_bytes.AddRange(temp);
+				}
+			}
 
 			if (BkpCheckBox.Checked)
 			{
@@ -709,13 +812,24 @@ namespace OGF_tool
 					OGF_V.refs.refs0 = new List<string>();
 
 					if (v3)
-						OGF_V.refs.refs0.Add(xr_loader.read_stringZ());
+					{
+						OGF_V.refs.v3 = true;
+						string refs = xr_loader.read_stringZ();
+						OGF_V.refs.refs0.Add(refs);
+						OGF_V.refs.old_size = refs.Length + 1;
+					}
 					else
 					{
 						uint count = xr_loader.ReadUInt32();
 
+						OGF_V.refs.old_size = 4;
+
 						for (int i = 0; i < count; i++)
-							OGF_V.refs.refs0.Add(xr_loader.read_stringZ());
+						{
+							string refs = xr_loader.read_stringZ();
+							OGF_V.refs.refs0.Add(refs);
+							OGF_V.refs.old_size += refs.Length + 1;
+						}
 					}
 				}
 				else
@@ -1012,7 +1126,7 @@ namespace OGF_tool
 
 			CopyParams();
 			SaveFile(FILE_NAME);
-			AutoClosingMessageBox.Show("Saved!", "", 500, MessageBoxIcon.Information);
+			AutoClosingMessageBox.Show(IsModelBroken ? "Repaired and Saved!" : "Saved!", "", IsModelBroken ? 700 : 500, MessageBoxIcon.Information);
 		}
 
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1056,6 +1170,9 @@ namespace OGF_tool
 				OGF_V.descr.m_export_tool = Info.descr.m_export_tool;
 				OGF_V.descr.m_owner_name = Info.descr.m_owner_name;
 				OGF_V.descr.m_export_modif_name_tool = Info.descr.m_export_modif_name_tool;
+				OGF_V.descr.m_creation_time = Info.descr.m_creation_time;
+				OGF_V.descr.m_export_time = Info.descr.m_export_time;
+				OGF_V.descr.m_modified_time = Info.descr.m_modified_time;
 			}
 
 			System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
@@ -1115,7 +1232,7 @@ namespace OGF_tool
 				RunConverter(FILE_NAME, Filename, 0, 2);
 			else if (format == ".skls")
 				RunConverter(FILE_NAME, Filename, 0, 3);
-			AutoClosingMessageBox.Show("Saved!", "", 500, MessageBoxIcon.Information);
+			AutoClosingMessageBox.Show(IsModelBroken ? "Repaired and Saved!" : "Saved!", "", IsModelBroken ? 700 : 500, MessageBoxIcon.Information);
 		}
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1168,6 +1285,8 @@ namespace OGF_tool
 
         private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
+			if (TabControl.SelectedIndex < 0) return;
+
 			switch (TabControl.Controls[TabControl.SelectedIndex].Name)
 			{
 

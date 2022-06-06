@@ -241,12 +241,16 @@ namespace OGF_tool
         public long pos;
         public List<string> refs0;
         public bool need_create;
+        public bool v3;
+        public int old_size;
 
         public MotionRefs()
         {
             this.pos = 0;
+            this.old_size = 0;
             this.refs0 = null;
             this.need_create = false;
+            this.v3 = false;
         }
 
         public uint chunk_size()

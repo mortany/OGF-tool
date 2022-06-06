@@ -43,37 +43,37 @@
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
-            this.ExportTimeLabel = new System.Windows.Forms.Label();
-            this.CreationTimeLabel = new System.Windows.Forms.Label();
-            this.ModifedTimeLabel = new System.Windows.Forms.Label();
+            this.ExportTimeDate = new System.Windows.Forms.DateTimePicker();
+            this.CreationTimeDate = new System.Windows.Forms.DateTimePicker();
+            this.ModifedTimeDate = new System.Windows.Forms.DateTimePicker();
             this.SuspendLayout();
             // 
             // SourceTextBox
             // 
-            this.SourceTextBox.Location = new System.Drawing.Point(81, 59);
+            this.SourceTextBox.Location = new System.Drawing.Point(89, 59);
             this.SourceTextBox.Name = "SourceTextBox";
-            this.SourceTextBox.Size = new System.Drawing.Size(229, 20);
+            this.SourceTextBox.Size = new System.Drawing.Size(257, 20);
             this.SourceTextBox.TabIndex = 0;
             // 
             // ConverterTextBox
             // 
-            this.ConverterTextBox.Location = new System.Drawing.Point(81, 85);
+            this.ConverterTextBox.Location = new System.Drawing.Point(89, 85);
             this.ConverterTextBox.Name = "ConverterTextBox";
-            this.ConverterTextBox.Size = new System.Drawing.Size(229, 20);
+            this.ConverterTextBox.Size = new System.Drawing.Size(257, 20);
             this.ConverterTextBox.TabIndex = 2;
             // 
             // CreatorTextBox
             // 
-            this.CreatorTextBox.Location = new System.Drawing.Point(81, 111);
+            this.CreatorTextBox.Location = new System.Drawing.Point(89, 111);
             this.CreatorTextBox.Name = "CreatorTextBox";
-            this.CreatorTextBox.Size = new System.Drawing.Size(229, 20);
+            this.CreatorTextBox.Size = new System.Drawing.Size(257, 20);
             this.CreatorTextBox.TabIndex = 3;
             // 
             // EditorTextBox
             // 
-            this.EditorTextBox.Location = new System.Drawing.Point(81, 137);
+            this.EditorTextBox.Location = new System.Drawing.Point(89, 137);
             this.EditorTextBox.Name = "EditorTextBox";
-            this.EditorTextBox.Size = new System.Drawing.Size(229, 20);
+            this.EditorTextBox.Size = new System.Drawing.Size(257, 20);
             this.EditorTextBox.TabIndex = 4;
             // 
             // OgfVersTextLabel
@@ -175,41 +175,41 @@
             this.label7.TabIndex = 17;
             this.label7.Text = "Modifed time:";
             // 
-            // ExportTimeLabel
+            // ExportTimeDate
             // 
-            this.ExportTimeLabel.AutoSize = true;
-            this.ExportTimeLabel.Location = new System.Drawing.Point(72, 168);
-            this.ExportTimeLabel.Name = "ExportTimeLabel";
-            this.ExportTimeLabel.Size = new System.Drawing.Size(10, 13);
-            this.ExportTimeLabel.TabIndex = 18;
-            this.ExportTimeLabel.Text = "-";
+            this.ExportTimeDate.Location = new System.Drawing.Point(89, 163);
+            this.ExportTimeDate.MaxDate = new System.DateTime(2100, 12, 31, 0, 0, 0, 0);
+            this.ExportTimeDate.MinDate = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
+            this.ExportTimeDate.Name = "ExportTimeDate";
+            this.ExportTimeDate.Size = new System.Drawing.Size(126, 20);
+            this.ExportTimeDate.TabIndex = 21;
             // 
-            // CreationTimeLabel
+            // CreationTimeDate
             // 
-            this.CreationTimeLabel.AutoSize = true;
-            this.CreationTimeLabel.Location = new System.Drawing.Point(80, 191);
-            this.CreationTimeLabel.Name = "CreationTimeLabel";
-            this.CreationTimeLabel.Size = new System.Drawing.Size(10, 13);
-            this.CreationTimeLabel.TabIndex = 19;
-            this.CreationTimeLabel.Text = "-";
+            this.CreationTimeDate.Location = new System.Drawing.Point(89, 188);
+            this.CreationTimeDate.MaxDate = new System.DateTime(2100, 12, 31, 0, 0, 0, 0);
+            this.CreationTimeDate.MinDate = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
+            this.CreationTimeDate.Name = "CreationTimeDate";
+            this.CreationTimeDate.Size = new System.Drawing.Size(126, 20);
+            this.CreationTimeDate.TabIndex = 22;
             // 
-            // ModifedTimeLabel
+            // ModifedTimeDate
             // 
-            this.ModifedTimeLabel.AutoSize = true;
-            this.ModifedTimeLabel.Location = new System.Drawing.Point(80, 217);
-            this.ModifedTimeLabel.Name = "ModifedTimeLabel";
-            this.ModifedTimeLabel.Size = new System.Drawing.Size(10, 13);
-            this.ModifedTimeLabel.TabIndex = 20;
-            this.ModifedTimeLabel.Text = "-";
+            this.ModifedTimeDate.Location = new System.Drawing.Point(89, 214);
+            this.ModifedTimeDate.MaxDate = new System.DateTime(2100, 12, 31, 0, 0, 0, 0);
+            this.ModifedTimeDate.MinDate = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
+            this.ModifedTimeDate.Name = "ModifedTimeDate";
+            this.ModifedTimeDate.Size = new System.Drawing.Size(126, 20);
+            this.ModifedTimeDate.TabIndex = 23;
             // 
             // OgfInfo
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(322, 238);
-            this.Controls.Add(this.ModifedTimeLabel);
-            this.Controls.Add(this.CreationTimeLabel);
-            this.Controls.Add(this.ExportTimeLabel);
+            this.ClientSize = new System.Drawing.Size(358, 238);
+            this.Controls.Add(this.ModifedTimeDate);
+            this.Controls.Add(this.CreationTimeDate);
+            this.Controls.Add(this.ExportTimeDate);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label5);
@@ -252,8 +252,8 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.Label ExportTimeLabel;
-        private System.Windows.Forms.Label CreationTimeLabel;
-        private System.Windows.Forms.Label ModifedTimeLabel;
+        private System.Windows.Forms.DateTimePicker ExportTimeDate;
+        private System.Windows.Forms.DateTimePicker CreationTimeDate;
+        private System.Windows.Forms.DateTimePicker ModifedTimeDate;
     }
 }
