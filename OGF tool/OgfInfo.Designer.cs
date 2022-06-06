@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OgfInfo));
             this.SourceTextBox = new System.Windows.Forms.TextBox();
             this.ConverterTextBox = new System.Windows.Forms.TextBox();
             this.CreatorTextBox = new System.Windows.Forms.TextBox();
@@ -226,6 +227,7 @@
             this.Controls.Add(this.ConverterTextBox);
             this.Controls.Add(this.SourceTextBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "OgfInfo";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Ogf Info:";
