@@ -33,14 +33,15 @@ namespace OGF_tool
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.TabControl = new System.Windows.Forms.TabControl();
             this.TexturesPage = new System.Windows.Forms.TabPage();
+            this.UserDataPage = new System.Windows.Forms.TabPage();
+            this.CreateUserdataButton = new System.Windows.Forms.Button();
+            this.UserDataBox = new System.Windows.Forms.RichTextBox();
             this.MotionRefsPage = new System.Windows.Forms.TabPage();
             this.CreateMotionRefsButton = new System.Windows.Forms.Button();
             this.MotionRefsBox = new System.Windows.Forms.RichTextBox();
             this.MotionPage = new System.Windows.Forms.TabPage();
+            this.chbxDeleteMotions = new System.Windows.Forms.CheckBox();
             this.MotionBox = new System.Windows.Forms.RichTextBox();
-            this.UserDataPage = new System.Windows.Forms.TabPage();
-            this.CreateUserdataButton = new System.Windows.Forms.Button();
-            this.UserDataBox = new System.Windows.Forms.RichTextBox();
             this.BoneNamesPage = new System.Windows.Forms.TabPage();
             this.BoneNamesBox = new System.Windows.Forms.RichTextBox();
             this.BoneParamsPage = new System.Windows.Forms.TabPage();
@@ -59,12 +60,11 @@ namespace OGF_tool
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.BkpCheckBox = new System.Windows.Forms.CheckBox();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.chbxDeleteMotions = new System.Windows.Forms.CheckBox();
             this.BrokenModelLabel = new System.Windows.Forms.Label();
             this.TabControl.SuspendLayout();
+            this.UserDataPage.SuspendLayout();
             this.MotionRefsPage.SuspendLayout();
             this.MotionPage.SuspendLayout();
-            this.UserDataPage.SuspendLayout();
             this.BoneNamesPage.SuspendLayout();
             this.MenuPanel.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -107,6 +107,42 @@ namespace OGF_tool
             this.TexturesPage.TabIndex = 0;
             this.TexturesPage.Text = "Textures";
             this.TexturesPage.UseVisualStyleBackColor = true;
+            // 
+            // UserDataPage
+            // 
+            this.UserDataPage.Controls.Add(this.CreateUserdataButton);
+            this.UserDataPage.Controls.Add(this.UserDataBox);
+            this.UserDataPage.Location = new System.Drawing.Point(4, 25);
+            this.UserDataPage.Name = "UserDataPage";
+            this.UserDataPage.Padding = new System.Windows.Forms.Padding(3);
+            this.UserDataPage.Size = new System.Drawing.Size(395, 256);
+            this.UserDataPage.TabIndex = 2;
+            this.UserDataPage.Text = "UserData";
+            this.UserDataPage.UseVisualStyleBackColor = true;
+            // 
+            // CreateUserdataButton
+            // 
+            this.CreateUserdataButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.CreateUserdataButton.Location = new System.Drawing.Point(6, 6);
+            this.CreateUserdataButton.Name = "CreateUserdataButton";
+            this.CreateUserdataButton.Size = new System.Drawing.Size(383, 244);
+            this.CreateUserdataButton.TabIndex = 1;
+            this.CreateUserdataButton.Text = "Create UserData";
+            this.CreateUserdataButton.UseVisualStyleBackColor = true;
+            this.CreateUserdataButton.Click += new System.EventHandler(this.CreateUserdataButton_Click);
+            // 
+            // UserDataBox
+            // 
+            this.UserDataBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.UserDataBox.Location = new System.Drawing.Point(0, 0);
+            this.UserDataBox.Name = "UserDataBox";
+            this.UserDataBox.Size = new System.Drawing.Size(395, 256);
+            this.UserDataBox.TabIndex = 0;
+            this.UserDataBox.Text = "";
             // 
             // MotionRefsPage
             // 
@@ -158,6 +194,17 @@ namespace OGF_tool
             this.MotionPage.Text = "Motions";
             this.MotionPage.UseVisualStyleBackColor = true;
             // 
+            // chbxDeleteMotions
+            // 
+            this.chbxDeleteMotions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.chbxDeleteMotions.AutoSize = true;
+            this.chbxDeleteMotions.Location = new System.Drawing.Point(282, 233);
+            this.chbxDeleteMotions.Name = "chbxDeleteMotions";
+            this.chbxDeleteMotions.Size = new System.Drawing.Size(90, 17);
+            this.chbxDeleteMotions.TabIndex = 3;
+            this.chbxDeleteMotions.Text = "Delete chunk";
+            this.chbxDeleteMotions.UseVisualStyleBackColor = true;
+            // 
             // MotionBox
             // 
             this.MotionBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -169,42 +216,6 @@ namespace OGF_tool
             this.MotionBox.Size = new System.Drawing.Size(395, 256);
             this.MotionBox.TabIndex = 2;
             this.MotionBox.Text = "";
-            // 
-            // UserDataPage
-            // 
-            this.UserDataPage.Controls.Add(this.CreateUserdataButton);
-            this.UserDataPage.Controls.Add(this.UserDataBox);
-            this.UserDataPage.Location = new System.Drawing.Point(4, 25);
-            this.UserDataPage.Name = "UserDataPage";
-            this.UserDataPage.Padding = new System.Windows.Forms.Padding(3);
-            this.UserDataPage.Size = new System.Drawing.Size(395, 256);
-            this.UserDataPage.TabIndex = 2;
-            this.UserDataPage.Text = "UserData";
-            this.UserDataPage.UseVisualStyleBackColor = true;
-            // 
-            // CreateUserdataButton
-            // 
-            this.CreateUserdataButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.CreateUserdataButton.Location = new System.Drawing.Point(6, 6);
-            this.CreateUserdataButton.Name = "CreateUserdataButton";
-            this.CreateUserdataButton.Size = new System.Drawing.Size(383, 244);
-            this.CreateUserdataButton.TabIndex = 1;
-            this.CreateUserdataButton.Text = "Create UserData";
-            this.CreateUserdataButton.UseVisualStyleBackColor = true;
-            this.CreateUserdataButton.Click += new System.EventHandler(this.CreateUserdataButton_Click);
-            // 
-            // UserDataBox
-            // 
-            this.UserDataBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.UserDataBox.Location = new System.Drawing.Point(0, 0);
-            this.UserDataBox.Name = "UserDataBox";
-            this.UserDataBox.Size = new System.Drawing.Size(395, 256);
-            this.UserDataBox.TabIndex = 0;
-            this.UserDataBox.Text = "";
             // 
             // BoneNamesPage
             // 
@@ -364,27 +375,16 @@ namespace OGF_tool
             // 
             this.saveFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.saveFileDialog1_FileOk);
             // 
-            // chbxDeleteMotions
-            // 
-            this.chbxDeleteMotions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.chbxDeleteMotions.AutoSize = true;
-            this.chbxDeleteMotions.Location = new System.Drawing.Point(282, 233);
-            this.chbxDeleteMotions.Name = "chbxDeleteMotions";
-            this.chbxDeleteMotions.Size = new System.Drawing.Size(90, 17);
-            this.chbxDeleteMotions.TabIndex = 3;
-            this.chbxDeleteMotions.Text = "Delete chunk";
-            this.chbxDeleteMotions.UseVisualStyleBackColor = true;
-            // 
             // BrokenModelLabel
             // 
             this.BrokenModelLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.BrokenModelLabel.AutoSize = true;
             this.BrokenModelLabel.Location = new System.Drawing.Point(172, 4);
             this.BrokenModelLabel.Name = "BrokenModelLabel";
             this.BrokenModelLabel.Size = new System.Drawing.Size(72, 13);
             this.BrokenModelLabel.TabIndex = 32;
             this.BrokenModelLabel.Text = "Broken model";
+            this.BrokenModelLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // OGF_Editor
             // 
@@ -399,17 +399,17 @@ namespace OGF_tool
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.MenuPanel;
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(443, 880);
+            this.MaximumSize = new System.Drawing.Size(550, 880);
             this.MinimumSize = new System.Drawing.Size(443, 251);
             this.Name = "OGF_Editor";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "OGF Params Editor v1.5";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.TabControl.ResumeLayout(false);
+            this.UserDataPage.ResumeLayout(false);
             this.MotionRefsPage.ResumeLayout(false);
             this.MotionPage.ResumeLayout(false);
             this.MotionPage.PerformLayout();
-            this.UserDataPage.ResumeLayout(false);
             this.BoneNamesPage.ResumeLayout(false);
             this.MenuPanel.ResumeLayout(false);
             this.MenuPanel.PerformLayout();

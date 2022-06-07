@@ -787,28 +787,38 @@ namespace OGF_tool
 				TabControl.Controls.Add(UserDataPage);
 				UserDataPage.Controls.Clear();
 
+				UserDataPage.Controls.Add(UserDataBox);
+				UserDataPage.Controls.Add(CreateUserdataButton);
+				CreateUserdataButton.Visible = false;
+				UserDataBox.Visible = false;
+
 				if (xr_loader.find_chunk((int)OGF.OGF4_S_USERDATA, false, true))
 				{
-					UserDataPage.Controls.Add(UserDataBox);
+					UserDataBox.Visible = true;
 					OGF_V.usertdata = new UserData();
 					OGF_V.usertdata.pos = xr_loader.chunk_pos;
 					OGF_V.usertdata.data = xr_loader.read_stringZ();
 					OGF_V.usertdata.old_size = OGF_V.usertdata.data.Length + 1;
 				}
 				else
-					UserDataPage.Controls.Add(CreateUserdataButton);
+					CreateUserdataButton.Visible = true;
 
 				xr_loader.SetStream(r.BaseStream);
 
 				// Motion Refs
 				TabControl.Controls.Add(MotionRefsPage);
 				MotionRefsPage.Controls.Clear();
+
+				MotionRefsPage.Controls.Add(MotionRefsBox);
+				MotionRefsPage.Controls.Add(CreateMotionRefsButton);
+				CreateMotionRefsButton.Visible = false;
+				MotionRefsBox.Visible = false;
+
 				bool v3 = xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS, false, true);
 
 				if (v3 || xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS2, false, true))
 				{
-					MotionRefsPage.Controls.Add(MotionRefsBox);
-
+					MotionRefsBox.Visible = true;
 					OGF_V.refs = new MotionRefs();
 					OGF_V.refs.pos = xr_loader.chunk_pos;
 					OGF_V.refs.refs0 = new List<string>();
@@ -835,7 +845,7 @@ namespace OGF_tool
 					}
 				}
 				else
-					MotionRefsPage.Controls.Add(CreateMotionRefsButton);
+					CreateMotionRefsButton.Visible = true;
 
 				xr_loader.SetStream(r.BaseStream);
 
@@ -1261,8 +1271,8 @@ namespace OGF_tool
 
         private void CreateUserdataButton_Click(object sender, EventArgs e)
         {
-			UserDataPage.Controls.Clear();
-			UserDataPage.Controls.Add(UserDataBox);
+			CreateUserdataButton.Visible = false;
+			UserDataBox.Visible = true;
 			OGF_V.usertdata = new UserData();
 			OGF_V.usertdata.need_create = true;
 		}
@@ -1270,8 +1280,8 @@ namespace OGF_tool
         private void CreateMotionRefsButton_Click(object sender, EventArgs e)
         {
 			m_model_type = 3;
-			MotionRefsPage.Controls.Clear();
-			MotionRefsPage.Controls.Add(MotionRefsBox);
+			CreateMotionRefsButton.Visible = false;
+			MotionRefsBox.Visible = true;
 			OGF_V.refs = new MotionRefs();
 			OGF_V.refs.need_create = true;
 		}
@@ -1296,8 +1306,8 @@ namespace OGF_tool
 					{
 						if (UserDataBox.Text == "")
 						{
-							UserDataPage.Controls.Clear();
-							UserDataPage.Controls.Add(CreateUserdataButton);
+							CreateUserdataButton.Visible = true;
+							UserDataBox.Visible = false;
 							OGF_V.usertdata = null;
 						}
 						break;
@@ -1309,8 +1319,8 @@ namespace OGF_tool
 							if (MotionBox.Text == "")
 								m_model_type = 10;
 
-							MotionRefsPage.Controls.Clear();
-							MotionRefsPage.Controls.Add(CreateMotionRefsButton);
+							CreateMotionRefsButton.Visible = true;
+							MotionRefsBox.Visible = false;
 							OGF_V.refs = null;
 						}
 						break;
