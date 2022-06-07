@@ -71,6 +71,7 @@ namespace OGF_tool
 			else
             {
 				TabControl.Controls.Clear();
+				BrokenModelLabel.Visible = false;
 			}
 		}
 
@@ -78,9 +79,10 @@ namespace OGF_tool
 		{
 			var GroupBox = new GroupBox();
 			GroupBox.Location = new System.Drawing.Point(3, 3 + 126 * idx);
-			GroupBox.Size = new System.Drawing.Size(366, 126);
+			GroupBox.Size = new System.Drawing.Size(385, 126);
 			GroupBox.Text = "Set: [" + idx + "]";
 			GroupBox.Name = "TextureGrpBox_" + idx;
+			GroupBox.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
 			CreateTextureBoxes(idx, GroupBox);
 			CreateTextureLabels(idx, GroupBox);
 			TexturesPage.Controls.Add(GroupBox);
@@ -90,15 +92,17 @@ namespace OGF_tool
 		{
 			var newTextBox = new TextBox();
 			newTextBox.Name = "textureBox_" + idx;
-			newTextBox.Size = new System.Drawing.Size(355, 23);
+			newTextBox.Size = new System.Drawing.Size(373, 23);
 			newTextBox.Location = new System.Drawing.Point(6, 39);
 			newTextBox.TextChanged += new System.EventHandler(this.TextBoxFilter);
+			newTextBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
 
 			var newTextBox2 = new TextBox();
 			newTextBox2.Name = "shaderBox_" + idx;
-			newTextBox2.Size = new System.Drawing.Size(355, 23);
+			newTextBox2.Size = new System.Drawing.Size(373, 23);
 			newTextBox2.Location = new System.Drawing.Point(6, 88);
 			newTextBox2.TextChanged += new System.EventHandler(this.TextBoxFilter);
+			newTextBox2.Anchor = AnchorStyles.Left | AnchorStyles.Right;
 			box.Controls.Add(newTextBox);
 			box.Controls.Add(newTextBox2);
 		}
@@ -123,9 +127,10 @@ namespace OGF_tool
 		{
 			var GroupBox = new GroupBox();
 			GroupBox.Location = new System.Drawing.Point(3, 3 + 205 * idx);
-			GroupBox.Size = new System.Drawing.Size(366, 203);
+			GroupBox.Size = new System.Drawing.Size(385, 203);
 			GroupBox.Text = "Bone id: [" + idx + "]";
 			GroupBox.Name = "BoneGrpBox_" + idx;
+			GroupBox.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
 
 			CreateBoneTextBox(idx, GroupBox, bone_name, parent_bone_name, material, mass, center, pos, rot);
 			BoneParamsPage.Controls.Add(GroupBox);
@@ -135,12 +140,13 @@ namespace OGF_tool
 		{
 			var BoneNameTextBox = new TextBox();
 			BoneNameTextBox.Name = "boneBox_" + idx;
-			BoneNameTextBox.Size = new System.Drawing.Size(275, 58);
+			BoneNameTextBox.Size = new System.Drawing.Size(290, 58);
 			BoneNameTextBox.Location = new System.Drawing.Point(86, 18);
 			BoneNameTextBox.Text = bone_name;
 			BoneNameTextBox.Tag = "string";
 			BoneNameTextBox.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
 			BoneNameTextBox.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+			BoneNameTextBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
 
 			var BoneNameLabel = new Label();
 			BoneNameLabel.Name = "boneLabel_" + idx;
@@ -150,11 +156,12 @@ namespace OGF_tool
 
 			var ParentBoneNameTextBox = new TextBox();
 			ParentBoneNameTextBox.Name = "ParentboneBox_" + idx;
-			ParentBoneNameTextBox.Size = new System.Drawing.Size(275, 58);
+			ParentBoneNameTextBox.Size = new System.Drawing.Size(290, 58);
 			ParentBoneNameTextBox.Location = new System.Drawing.Point(86, 45);
 			ParentBoneNameTextBox.Text = parent_bone_name;
 			ParentBoneNameTextBox.Tag = "string";
 			ParentBoneNameTextBox.ReadOnly = true;
+			ParentBoneNameTextBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
 
 			var ParentBoneNameLabel = new Label();
 			ParentBoneNameLabel.Name = "ParentboneLabel_" + idx;
@@ -164,12 +171,13 @@ namespace OGF_tool
 
 			var MaterialTextBox = new TextBox();
 			MaterialTextBox.Name = "MaterialBox_" + idx;
-			MaterialTextBox.Size = new System.Drawing.Size(275, 58);
+			MaterialTextBox.Size = new System.Drawing.Size(290, 58);
 			MaterialTextBox.Location = new System.Drawing.Point(86, 72);
 			MaterialTextBox.Text = material;
 			MaterialTextBox.Tag = "string";
 			MaterialTextBox.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
 			MaterialTextBox.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+			MaterialTextBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
 
 			var MaterialLabel = new Label();
 			MaterialLabel.Name = "MaterialLabel_" + idx;
@@ -179,7 +187,7 @@ namespace OGF_tool
 
 			var MassTextBox = new TextBox();
 			MassTextBox.Name = "MassBox_" + idx;
-			MassTextBox.Size = new System.Drawing.Size(275, 58);
+			MassTextBox.Size = new System.Drawing.Size(84, 58);
 			MassTextBox.Location = new System.Drawing.Point(86, 99);
 			MassTextBox.Text = mass.ToString();
 			MassTextBox.Tag = "float";
@@ -365,6 +373,11 @@ namespace OGF_tool
 				UserDataBox.Text = OGF_V.usertdata.data;
 
 			IsModelBroken = CatchBrokenModel();
+
+			if (IsModelBroken)
+				BrokenModelLabel.Visible = true;
+			else
+				BrokenModelLabel.Visible = false;
 		}
 
 		private void CopyParams()
@@ -439,35 +452,24 @@ namespace OGF_tool
 
 		public byte[] GetDescriptionChunk()
 		{
-			List<byte> file = new List<byte>();
-			byte[] chunk;
+			List<byte> chunk = new List<byte>();
 
 			using (var fileStream = new BinaryReader(new MemoryStream(Current_OGF)))
 			{
-				byte[] temp = fileStream.ReadBytes(8);
-
+				fileStream.ReadBytes(8);
 				fileStream.ReadBytes(2);
 				fileStream.ReadBytes(2);
 				fileStream.ReadBytes(40);
 
-				temp = fileStream.ReadBytes((int)(OGF_V.descr.pos - fileStream.BaseStream.Position));
-				file.AddRange(temp);
+				byte[] temp = fileStream.ReadBytes((int)(OGF_V.descr.pos - fileStream.BaseStream.Position));
+				chunk.AddRange(temp);
 
-				file.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_DESC));
-				file.AddRange(BitConverter.GetBytes(OGF_V.descr.chunk_size()));
-				file.AddRange(OGF_V.descr.data());
+				chunk.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_DESC));
+				chunk.AddRange(BitConverter.GetBytes(OGF_V.descr.chunk_size()));
+				chunk.AddRange(OGF_V.descr.data());
 			}
 
-			using (var fileStream = new BinaryWriter(File.Create("description.chunk")))
-			{
-				byte[] data = file.ToArray();
-				fileStream.Write(data, 0, data.Length);
-			}
-
-			chunk = File.ReadAllBytes("description.chunk");
-			File.Delete("description.chunk");
-
-			return chunk;
+			return chunk.ToArray();
 		}
 
 		private bool CatchBrokenModel()
@@ -509,9 +511,9 @@ namespace OGF_tool
 
 			if (Current_OGF == null) return;
 
-			bool remove_motions_chunk = false;
+			bool remove_motions_chunk = chbxDeleteMotions.Checked;
 
-			if (OGF_V.refs != null && OGF_V.refs.refs0 != null && OGF_V.refs.need_create && MotionBox.Text != "" && MessageBox.Show("New motion refs chunk will remove built-in motions, continue?", "OGF Editor", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+			if (!remove_motions_chunk && OGF_V.refs != null && OGF_V.refs.refs0 != null && OGF_V.refs.need_create && MotionBox.Text != "" && MessageBox.Show("New motion refs chunk will remove built-in motions, continue?", "OGF Editor", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
 				remove_motions_chunk = true;
 
 			using (var fileStream = new BinaryReader(new MemoryStream(Current_OGF)))

@@ -51,6 +51,7 @@
             // 
             // SourceTextBox
             // 
+            this.SourceTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.SourceTextBox.Location = new System.Drawing.Point(89, 59);
             this.SourceTextBox.Name = "SourceTextBox";
             this.SourceTextBox.Size = new System.Drawing.Size(257, 20);
@@ -58,6 +59,7 @@
             // 
             // ConverterTextBox
             // 
+            this.ConverterTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.ConverterTextBox.Location = new System.Drawing.Point(89, 85);
             this.ConverterTextBox.Name = "ConverterTextBox";
             this.ConverterTextBox.Size = new System.Drawing.Size(257, 20);
@@ -65,6 +67,7 @@
             // 
             // CreatorTextBox
             // 
+            this.CreatorTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.CreatorTextBox.Location = new System.Drawing.Point(89, 111);
             this.CreatorTextBox.Name = "CreatorTextBox";
             this.CreatorTextBox.Size = new System.Drawing.Size(257, 20);
@@ -72,6 +75,7 @@
             // 
             // EditorTextBox
             // 
+            this.EditorTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.EditorTextBox.Location = new System.Drawing.Point(89, 137);
             this.EditorTextBox.Name = "EditorTextBox";
             this.EditorTextBox.Size = new System.Drawing.Size(257, 20);
@@ -226,8 +230,10 @@
             this.Controls.Add(this.CreatorTextBox);
             this.Controls.Add(this.ConverterTextBox);
             this.Controls.Add(this.SourceTextBox);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(500, 277);
+            this.MinimumSize = new System.Drawing.Size(374, 277);
             this.Name = "OgfInfo";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Ogf Info:";

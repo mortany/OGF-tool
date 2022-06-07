@@ -59,6 +59,8 @@ namespace OGF_tool
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.BkpCheckBox = new System.Windows.Forms.CheckBox();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.chbxDeleteMotions = new System.Windows.Forms.CheckBox();
+            this.BrokenModelLabel = new System.Windows.Forms.Label();
             this.TabControl.SuspendLayout();
             this.MotionRefsPage.SuspendLayout();
             this.MotionPage.SuspendLayout();
@@ -75,12 +77,14 @@ namespace OGF_tool
             // 
             // TabControl
             // 
-            this.TabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+            this.TabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.TabControl.Appearance = System.Windows.Forms.TabAppearance.Buttons;
             this.TabControl.Controls.Add(this.TexturesPage);
+            this.TabControl.Controls.Add(this.UserDataPage);
             this.TabControl.Controls.Add(this.MotionRefsPage);
             this.TabControl.Controls.Add(this.MotionPage);
-            this.TabControl.Controls.Add(this.UserDataPage);
             this.TabControl.Controls.Add(this.BoneNamesPage);
             this.TabControl.Controls.Add(this.BoneParamsPage);
             this.TabControl.Location = new System.Drawing.Point(12, 27);
@@ -118,7 +122,9 @@ namespace OGF_tool
             // 
             // CreateMotionRefsButton
             // 
-            this.CreateMotionRefsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+            this.CreateMotionRefsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.CreateMotionRefsButton.Location = new System.Drawing.Point(6, 6);
             this.CreateMotionRefsButton.Name = "CreateMotionRefsButton";
             this.CreateMotionRefsButton.Size = new System.Drawing.Size(383, 244);
@@ -129,7 +135,9 @@ namespace OGF_tool
             // 
             // MotionRefsBox
             // 
-            this.MotionRefsBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+            this.MotionRefsBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.MotionRefsBox.DetectUrls = false;
             this.MotionRefsBox.Location = new System.Drawing.Point(0, 0);
             this.MotionRefsBox.Name = "MotionRefsBox";
@@ -140,6 +148,7 @@ namespace OGF_tool
             // 
             // MotionPage
             // 
+            this.MotionPage.Controls.Add(this.chbxDeleteMotions);
             this.MotionPage.Controls.Add(this.MotionBox);
             this.MotionPage.Location = new System.Drawing.Point(4, 25);
             this.MotionPage.Name = "MotionPage";
@@ -151,7 +160,9 @@ namespace OGF_tool
             // 
             // MotionBox
             // 
-            this.MotionBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+            this.MotionBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.MotionBox.Location = new System.Drawing.Point(0, 0);
             this.MotionBox.Name = "MotionBox";
             this.MotionBox.ReadOnly = true;
@@ -173,7 +184,9 @@ namespace OGF_tool
             // 
             // CreateUserdataButton
             // 
-            this.CreateUserdataButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+            this.CreateUserdataButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.CreateUserdataButton.Location = new System.Drawing.Point(6, 6);
             this.CreateUserdataButton.Name = "CreateUserdataButton";
             this.CreateUserdataButton.Size = new System.Drawing.Size(383, 244);
@@ -184,7 +197,9 @@ namespace OGF_tool
             // 
             // UserDataBox
             // 
-            this.UserDataBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+            this.UserDataBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.UserDataBox.Location = new System.Drawing.Point(0, 0);
             this.UserDataBox.Name = "UserDataBox";
             this.UserDataBox.Size = new System.Drawing.Size(395, 256);
@@ -204,7 +219,9 @@ namespace OGF_tool
             // 
             // BoneNamesBox
             // 
-            this.BoneNamesBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
+            this.BoneNamesBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.BoneNamesBox.DetectUrls = false;
             this.BoneNamesBox.Location = new System.Drawing.Point(0, 0);
             this.BoneNamesBox.Name = "BoneNamesBox";
@@ -227,15 +244,18 @@ namespace OGF_tool
             // 
             // MenuPanel
             // 
+            this.MenuPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.MenuPanel.Dock = System.Windows.Forms.DockStyle.None;
             this.MenuPanel.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.FileMenuItem,
             this.oGFInfoToolStripMenuItem,
             this.viewToolStripMenuItem});
             this.MenuPanel.Location = new System.Drawing.Point(0, 0);
             this.MenuPanel.Name = "MenuPanel";
-            this.MenuPanel.Size = new System.Drawing.Size(427, 24);
+            this.MenuPanel.Size = new System.Drawing.Size(155, 24);
             this.MenuPanel.TabIndex = 8;
-            this.MenuPanel.Text = "menuStrip1";
+            this.MenuPanel.Text = "Broken model";
             this.MenuPanel.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
             // FileMenuItem
@@ -325,12 +345,12 @@ namespace OGF_tool
             this.statusStrip1.Location = new System.Drawing.Point(0, 315);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(427, 22);
-            this.statusStrip1.SizingGrip = false;
             this.statusStrip1.TabIndex = 30;
             this.statusStrip1.Text = "statusStrip1";
             // 
             // BkpCheckBox
             // 
+            this.BkpCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.BkpCheckBox.AutoSize = true;
             this.BkpCheckBox.Location = new System.Drawing.Point(319, 4);
             this.BkpCheckBox.Name = "BkpCheckBox";
@@ -344,11 +364,34 @@ namespace OGF_tool
             // 
             this.saveFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.saveFileDialog1_FileOk);
             // 
+            // chbxDeleteMotions
+            // 
+            this.chbxDeleteMotions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.chbxDeleteMotions.AutoSize = true;
+            this.chbxDeleteMotions.Location = new System.Drawing.Point(282, 233);
+            this.chbxDeleteMotions.Name = "chbxDeleteMotions";
+            this.chbxDeleteMotions.Size = new System.Drawing.Size(90, 17);
+            this.chbxDeleteMotions.TabIndex = 3;
+            this.chbxDeleteMotions.Text = "Delete chunk";
+            this.chbxDeleteMotions.UseVisualStyleBackColor = true;
+            // 
+            // BrokenModelLabel
+            // 
+            this.BrokenModelLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.BrokenModelLabel.AutoSize = true;
+            this.BrokenModelLabel.Location = new System.Drawing.Point(172, 4);
+            this.BrokenModelLabel.Name = "BrokenModelLabel";
+            this.BrokenModelLabel.Size = new System.Drawing.Size(72, 13);
+            this.BrokenModelLabel.TabIndex = 32;
+            this.BrokenModelLabel.Text = "Broken model";
+            // 
             // OGF_Editor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(427, 337);
+            this.Controls.Add(this.BrokenModelLabel);
             this.Controls.Add(this.BkpCheckBox);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.MenuPanel);
@@ -365,6 +408,7 @@ namespace OGF_tool
             this.TabControl.ResumeLayout(false);
             this.MotionRefsPage.ResumeLayout(false);
             this.MotionPage.ResumeLayout(false);
+            this.MotionPage.PerformLayout();
             this.UserDataPage.ResumeLayout(false);
             this.BoneNamesPage.ResumeLayout(false);
             this.MenuPanel.ResumeLayout(false);
@@ -406,6 +450,8 @@ namespace OGF_tool
         private System.Windows.Forms.Button CreateUserdataButton;
         private System.Windows.Forms.Button CreateMotionRefsButton;
         private System.Windows.Forms.ToolStripMenuItem reloadToolStripMenuItem;
+        private System.Windows.Forms.CheckBox chbxDeleteMotions;
+        private System.Windows.Forms.Label BrokenModelLabel;
     }
 }
 
