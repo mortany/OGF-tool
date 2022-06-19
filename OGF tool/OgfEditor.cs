@@ -1358,7 +1358,8 @@ namespace OGF_tool
 					}
 				case "MotionPage":
 					{
-						MotionToolsMenuItem.Enabled = true;
+						if (Current_OMF != null)
+							MotionToolsMenuItem.Enabled = true;
 						break;
 					}
 			}
@@ -1374,6 +1375,7 @@ namespace OGF_tool
 			AppendOMFButton.Visible = false;
 			MotionBox.Visible = true;
 			OGF_V.delete_motions = false;
+			MotionToolsMenuItem.Enabled = true;
 
 			var xr_loader = new XRayLoader();
 
