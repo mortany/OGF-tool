@@ -63,9 +63,11 @@ namespace OGF_tool
 			if (Environment.GetCommandLineArgs().Length > 1)
 			{
 				Clear();
-				OpenFile(Environment.GetCommandLineArgs()[1]);
-				FILE_NAME = Environment.GetCommandLineArgs()[1];
-				AfterLoad();
+				if (OpenFile(Environment.GetCommandLineArgs()[1]))
+				{
+					FILE_NAME = Environment.GetCommandLineArgs()[1];
+					AfterLoad();
+				}
 			}
 			else
             {
@@ -710,7 +712,7 @@ namespace OGF_tool
 			}
 		}
 
-		private void OpenFile(string filename)
+		private bool OpenFile(string filename)
 		{
 			var xr_loader = new XRayLoader();
 
@@ -729,7 +731,11 @@ namespace OGF_tool
 				m_version = xr_loader.ReadByte();
 				m_model_type = xr_loader.ReadByte();
 
-				if (!xr_loader.find_chunk((int)OGF.OGF4_S_DESC, false, true)) return;
+				if (!xr_loader.find_chunk((int)OGF.OGF4_S_DESC, false, true))
+				{
+					MessageBox.Show("Unsupported OGF format!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					return false;
+				}
 
 				OGF_V.descr = new Description();
 
@@ -747,7 +753,11 @@ namespace OGF_tool
 
 				xr_loader.SetStream(r.BaseStream);
 
-				if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_CHILDREN, false, true))) return;
+				if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_CHILDREN, false, true)))
+				{
+					MessageBox.Show("Unsupported OGF format!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					return false;
+				}
 
 				TabControl.Controls.Add(TexturesPage);
 
@@ -1026,6 +1036,7 @@ namespace OGF_tool
 					}
                 }
 			}
+			return true;
 		}
 
 		private void TextBoxKeyDown(object sender, KeyEventArgs e)
@@ -1162,9 +1173,11 @@ namespace OGF_tool
 			if (res == DialogResult.OK)
 			{
 				Clear();
-				FILE_NAME = openOGFDialog.FileName;
-				OpenFile(FILE_NAME);
-				AfterLoad();
+				if (OpenFile(openOGFDialog.FileName))
+				{
+					FILE_NAME = openOGFDialog.FileName;
+					AfterLoad();
+				}
 			}
 		}
 
@@ -1310,9 +1323,11 @@ namespace OGF_tool
         {
 			string cur_fname = FILE_NAME;
 			Clear();
-			FILE_NAME = cur_fname;
-			OpenFile(FILE_NAME);
-			AfterLoad();
+			if (OpenFile(cur_fname))
+			{
+				FILE_NAME = cur_fname;
+				AfterLoad();
+			}
 		}
 
         private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
