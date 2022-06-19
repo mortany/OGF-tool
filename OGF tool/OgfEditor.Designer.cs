@@ -57,6 +57,7 @@ namespace OGF_tool
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MotionToolsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteChunkToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editImOMFEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.replaceMotionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.FileLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.StatusFile = new System.Windows.Forms.ToolStripStatusLabel();
@@ -64,7 +65,6 @@ namespace OGF_tool
             this.BkpCheckBox = new System.Windows.Forms.CheckBox();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.openOMFDialog = new System.Windows.Forms.OpenFileDialog();
-            this.editImOMFEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openProgramDialog = new System.Windows.Forms.OpenFileDialog();
             this.TabControl.SuspendLayout();
             this.UserDataPage.SuspendLayout();
@@ -356,14 +356,21 @@ namespace OGF_tool
             // deleteChunkToolStripMenuItem
             // 
             this.deleteChunkToolStripMenuItem.Name = "deleteChunkToolStripMenuItem";
-            this.deleteChunkToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteChunkToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.deleteChunkToolStripMenuItem.Text = "Delete motions";
             this.deleteChunkToolStripMenuItem.Click += new System.EventHandler(this.deleteChunkToolStripMenuItem_Click);
+            // 
+            // editImOMFEditorToolStripMenuItem
+            // 
+            this.editImOMFEditorToolStripMenuItem.Name = "editImOMFEditorToolStripMenuItem";
+            this.editImOMFEditorToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.editImOMFEditorToolStripMenuItem.Text = "Edit in OMF Editor";
+            this.editImOMFEditorToolStripMenuItem.Click += new System.EventHandler(this.editImOMFEditorToolStripMenuItem_Click);
             // 
             // replaceMotionsToolStripMenuItem
             // 
             this.replaceMotionsToolStripMenuItem.Name = "replaceMotionsToolStripMenuItem";
-            this.replaceMotionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.replaceMotionsToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.replaceMotionsToolStripMenuItem.Text = "Replace motions";
             this.replaceMotionsToolStripMenuItem.Click += new System.EventHandler(this.AppendOMFButton_Click);
             // 
@@ -413,13 +420,6 @@ namespace OGF_tool
             this.openOMFDialog.Filter = "OMF file|*.omf";
             this.openOMFDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.AppendMotion);
             // 
-            // editImOMFEditorToolStripMenuItem
-            // 
-            this.editImOMFEditorToolStripMenuItem.Name = "editImOMFEditorToolStripMenuItem";
-            this.editImOMFEditorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.editImOMFEditorToolStripMenuItem.Text = "Edit in OMF Editor";
-            this.editImOMFEditorToolStripMenuItem.Click += new System.EventHandler(this.editImOMFEditorToolStripMenuItem_Click);
-            // 
             // openProgramDialog
             // 
             this.openProgramDialog.Filter = "Program|*.exe";
@@ -440,7 +440,7 @@ namespace OGF_tool
             this.MinimumSize = new System.Drawing.Size(443, 251);
             this.Name = "OGF_Editor";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "OGF Params Editor v1.5";
+            this.Text = "OGF Params Editor v1.6";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.TabControl.ResumeLayout(false);
             this.UserDataPage.ResumeLayout(false);
