@@ -376,6 +376,13 @@ namespace OGF_tool
 				UserDataBox.Text = OGF_V.usertdata.data;
 
 			IsModelBroken = CatchBrokenModel();
+
+			if (IsModelBroken)
+            {
+				OGF_V.descr.m_export_time = 0;
+				OGF_V.descr.m_creation_time = 0;
+				OGF_V.descr.m_modified_time = 0;
+			}
 		}
 
 		private void CopyParams()
@@ -743,13 +750,13 @@ namespace OGF_tool
 
 				OGF_V.descr.m_source = xr_loader.read_stringZ();
 				OGF_V.descr.m_export_tool = xr_loader.read_stringZ();
-				OGF_V.descr.m_export_time = xr_loader.ReadUInt32();
+				OGF_V.descr.m_export_time = xr_loader.ReadInt64();
 				OGF_V.descr.m_owner_name = xr_loader.read_stringZ();
-				OGF_V.descr.m_creation_time = xr_loader.ReadUInt32();
+				OGF_V.descr.m_creation_time = xr_loader.ReadInt64();
 				OGF_V.descr.m_export_modif_name_tool = xr_loader.read_stringZ();
-				OGF_V.descr.m_modified_time = xr_loader.ReadUInt32();
+				OGF_V.descr.m_modified_time = xr_loader.ReadInt64();
 
-				OGF_V.descr.old_size = OGF_V.descr.m_source.Length + 1 + OGF_V.descr.m_export_tool.Length + 1 + 4 + OGF_V.descr.m_owner_name.Length + 1 + 4 + OGF_V.descr.m_export_modif_name_tool.Length + 1 + 4;
+				OGF_V.descr.old_size = OGF_V.descr.m_source.Length + 1 + OGF_V.descr.m_export_tool.Length + 1 + 8 + OGF_V.descr.m_owner_name.Length + 1 + 8 + OGF_V.descr.m_export_modif_name_tool.Length + 1 + 8;
 
 				xr_loader.SetStream(r.BaseStream);
 
@@ -1497,6 +1504,9 @@ namespace OGF_tool
 			openOMFDialog.FileName = "";
 
 			File.Delete(Filename);
+
+			if (Directory.Exists(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp"))
+				Directory.Delete(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp", true);
 		}
 
 		private string GetOmfEditorPath()

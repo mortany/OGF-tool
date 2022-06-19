@@ -442,11 +442,11 @@ namespace OGF_tool
 
         public string m_source;
         public string m_export_tool;
-        public uint m_export_time;
+        public long m_export_time;
         public string m_owner_name;
-        public uint m_creation_time;
+        public long m_creation_time;
         public string m_export_modif_name_tool;
-        public uint m_modified_time;
+        public long m_modified_time;
 
         public Description()
         {
@@ -478,11 +478,11 @@ namespace OGF_tool
             uint size = 0;
             size += (uint)m_source.Length + 1;
             size += (uint)m_export_tool.Length + 1;
-            size += 4;
+            size += 8;
             size += (uint)m_owner_name.Length + 1;
-            size += 4;
+            size += 8;
             size += (uint)m_export_modif_name_tool.Length + 1;
-            size += 4;
+            size += 8;
             return size;
         }
     }
