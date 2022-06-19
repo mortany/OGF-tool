@@ -459,20 +459,9 @@ namespace OGF_tool
 		{
 			List<byte> chunk = new List<byte>();
 
-			using (var fileStream = new BinaryReader(new MemoryStream(Current_OGF)))
-			{
-				fileStream.ReadBytes(8);
-				fileStream.ReadBytes(2);
-				fileStream.ReadBytes(2);
-				fileStream.ReadBytes(40);
-
-				byte[] temp = fileStream.ReadBytes((int)(OGF_V.descr.pos - fileStream.BaseStream.Position));
-				chunk.AddRange(temp);
-
-				chunk.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_DESC));
-				chunk.AddRange(BitConverter.GetBytes(OGF_V.descr.chunk_size()));
-				chunk.AddRange(OGF_V.descr.data());
-			}
+			chunk.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_DESC));
+			chunk.AddRange(BitConverter.GetBytes(OGF_V.descr.chunk_size()));
+			chunk.AddRange(OGF_V.descr.data());
 
 			return chunk.ToArray();
 		}
@@ -523,7 +512,9 @@ namespace OGF_tool
 
 			using (var fileStream = new BinaryReader(new MemoryStream(Current_OGF)))
 			{
-				byte[] temp = fileStream.ReadBytes(8);
+				fileStream.ReadBytes(4);
+				byte[] temp = fileStream.ReadBytes(4);
+				file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_HEADER));
 				file_bytes.AddRange(temp);
 
 				fileStream.ReadBytes(2);
@@ -536,9 +527,6 @@ namespace OGF_tool
 
 				if (!IsModelBroken)
 				{
-					temp = fileStream.ReadBytes((int)(OGF_V.descr.pos - fileStream.BaseStream.Position));
-					file_bytes.AddRange(temp);
-
 					file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_DESC));
 					file_bytes.AddRange(BitConverter.GetBytes(OGF_V.descr.chunk_size()));
 					file_bytes.AddRange(OGF_V.descr.data());
