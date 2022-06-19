@@ -23,6 +23,7 @@ namespace OGF_tool
 		// File sytem
 		public OGF_Children OGF_V = null;
 		public byte[] Current_OGF = null;
+		public byte[] Current_OMF = null;
 		public bool IsModelBroken = false;
 		public List<byte> file_bytes = new List<byte>();
 		public string FILE_NAME = "";
@@ -50,9 +51,6 @@ namespace OGF_tool
 		{
 			InitializeComponent();
 
-			openFileDialog1.Filter = "OGF file|*.ogf";
-			saveFileDialog1.Filter = "OGF file|*.ogf|Object file|*.object|Bones file|*.bones|Skl file|*.skl|Skls file|*.skls";
-
 			number_mask = @"^-[0-9.]*$";
 			System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
@@ -60,6 +58,7 @@ namespace OGF_tool
 			viewToolStripMenuItem.Enabled = false;
 			SaveMenuParam.Enabled = false;
 			saveAsToolStripMenuItem.Enabled = false;
+			MotionToolsMenuItem.Enabled = false;
 
 			if (Environment.GetCommandLineArgs().Length > 1)
 			{
@@ -71,8 +70,10 @@ namespace OGF_tool
 			else
             {
 				TabControl.Controls.Clear();
-				BrokenModelLabel.Visible = false;
 			}
+
+			if (Directory.Exists(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp"))
+				Directory.Delete(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp", true);
 		}
 
 		private void CreateTextureGroupBox(int idx)
@@ -373,11 +374,6 @@ namespace OGF_tool
 				UserDataBox.Text = OGF_V.usertdata.data;
 
 			IsModelBroken = CatchBrokenModel();
-
-			if (IsModelBroken)
-				BrokenModelLabel.Visible = true;
-			else
-				BrokenModelLabel.Visible = false;
 		}
 
 		private void CopyParams()
@@ -511,7 +507,7 @@ namespace OGF_tool
 
 			if (Current_OGF == null) return;
 
-			bool remove_motions_chunk = chbxDeleteMotions.Checked;
+			bool remove_motions_chunk = OGF_V.delete_motions;
 
 			if (!remove_motions_chunk && OGF_V.refs != null && OGF_V.refs.refs0 != null && OGF_V.refs.need_create && MotionBox.Text != "" && MessageBox.Show("New motion refs chunk will remove built-in motions, continue?", "OGF Editor", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
 				remove_motions_chunk = true;
@@ -688,8 +684,8 @@ namespace OGF_tool
 
 				if (!remove_motions_chunk)
 				{
-					temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
-					file_bytes.AddRange(temp);
+					if (Current_OMF != null)
+						file_bytes.AddRange(Current_OMF);
 				}
 			}
 
@@ -849,11 +845,23 @@ namespace OGF_tool
 
 				xr_loader.SetStream(r.BaseStream);
 
+				MotionBox.Clear();
+				TabControl.Controls.Add(MotionPage);
+				Current_OMF = null;
+
 				//Motions
+				if (xr_loader.find_chunk((int)OGF.OGF4_S_MOTIONS, false, true))
+				{
+					xr_loader.reader.BaseStream.Position -= 8;
+					Current_OMF = xr_loader.ReadBytes((int)xr_loader.reader.BaseStream.Length - (int)xr_loader.reader.BaseStream.Position);
+				}
+
+				xr_loader.SetStream(r.BaseStream);
+
 				if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_S_MOTIONS, false, true)))
 				{
-					MotionBox.Clear();
-					TabControl.Controls.Add(MotionPage);
+					AppendOMFButton.Visible = false;
+					MotionBox.Visible = true;
 
 					id = 0;
 
@@ -873,6 +881,11 @@ namespace OGF_tool
 						id++;
 						xr_loader.SetStream(temp);
 					}
+				}
+				else
+				{
+					MotionBox.Visible = false;
+					AppendOMFButton.Visible = true;
 				}
 
 				xr_loader.SetStream(r.BaseStream);
@@ -1143,13 +1156,13 @@ namespace OGF_tool
 
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
         {
-			openFileDialog1.FileName = "";
-			DialogResult res = openFileDialog1.ShowDialog();
+			openOGFDialog.FileName = "";
+			DialogResult res = openOGFDialog.ShowDialog();
 
 			if (res == DialogResult.OK)
 			{
 				Clear();
-				FILE_NAME = openFileDialog1.FileName;
+				FILE_NAME = openOGFDialog.FileName;
 				OpenFile(FILE_NAME);
 				AfterLoad();
 			}
@@ -1244,6 +1257,13 @@ namespace OGF_tool
 				RunConverter(FILE_NAME, Filename, 0, 2);
 			else if (format == ".skls")
 				RunConverter(FILE_NAME, Filename, 0, 3);
+			else if (format == ".omf")
+			{
+				using (var fileStream = new FileStream(Filename, FileMode.OpenOrCreate))
+				{
+					fileStream.Write(Current_OMF, 0, Current_OMF.Length);
+				}
+			}
 			AutoClosingMessageBox.Show(IsModelBroken ? "Repaired and Saved!" : "Saved!", "", IsModelBroken ? 700 : 500, MessageBoxIcon.Information);
 		}
 
@@ -1298,6 +1318,7 @@ namespace OGF_tool
         private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
 			if (TabControl.SelectedIndex < 0) return;
+			MotionToolsMenuItem.Enabled = false;
 
 			switch (TabControl.Controls[TabControl.SelectedIndex].Name)
 			{
@@ -1325,7 +1346,167 @@ namespace OGF_tool
 						}
 						break;
 					}
+				case "MotionPage":
+					{
+						MotionToolsMenuItem.Enabled = true;
+						break;
+					}
 			}
+		}
+
+        private void AppendOMFButton_Click(object sender, EventArgs e)
+        {
+			openOMFDialog.ShowDialog();
+        }
+
+		private void AppendMotion(object sender, CancelEventArgs e)
+		{
+			AppendOMFButton.Visible = false;
+			MotionBox.Visible = true;
+			OGF_V.delete_motions = false;
+
+			var xr_loader = new XRayLoader();
+
+			Current_OMF = File.ReadAllBytes(openOMFDialog.FileName);
+			MotionBox.Clear();
+			m_model_type = 3;
+
+			using (var r = new BinaryReader(new MemoryStream(Current_OMF)))
+			{
+				xr_loader.SetStream(r.BaseStream);
+
+				if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_S_MOTIONS, false, true)))
+				{
+					int id = 0;
+
+					while (true)
+					{
+						if (!xr_loader.find_chunk(id)) break;
+
+						Stream temp = xr_loader.reader.BaseStream;
+
+						if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk(id, false, true))) break;
+
+						if (id == 0)
+							MotionBox.Text += $"Motions count : {xr_loader.ReadUInt32()}\n";
+						else
+							MotionBox.Text += $"\n{id}. {xr_loader.read_stringZ()}";
+
+						id++;
+						xr_loader.SetStream(temp);
+					}
+				}
+			}
+		}
+
+        private void deleteChunkToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+			OGF_V.delete_motions = !OGF_V.delete_motions;
+			if (OGF_V.delete_motions)
+            {
+				deleteChunkToolStripMenuItem.Text = "Return last motions";
+				MotionBox.Visible = false;
+				AppendOMFButton.Visible = true;
+				replaceMotionsToolStripMenuItem.Enabled = false;
+				editImOMFEditorToolStripMenuItem.Enabled = false;
+
+				MotionBox.Clear();
+				m_model_type = 3;
+			}
+			else
+            {
+				deleteChunkToolStripMenuItem.Text = "Delete motions";
+				MotionBox.Visible = true;
+				AppendOMFButton.Visible = false;
+				replaceMotionsToolStripMenuItem.Enabled = true;
+				editImOMFEditorToolStripMenuItem.Enabled = true;
+
+				var xr_loader = new XRayLoader();
+
+				using (var r = new BinaryReader(new MemoryStream(Current_OMF)))
+				{
+					xr_loader.SetStream(r.BaseStream);
+
+					if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_S_MOTIONS, false, true)))
+					{
+						int id = 0;
+
+						while (true)
+						{
+							if (!xr_loader.find_chunk(id)) break;
+
+							Stream temp = xr_loader.reader.BaseStream;
+
+							if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk(id, false, true))) break;
+
+							if (id == 0)
+								MotionBox.Text += $"Motions count : {xr_loader.ReadUInt32()}\n";
+							else
+								MotionBox.Text += $"\n{id}. {xr_loader.read_stringZ()}";
+
+							id++;
+							xr_loader.SetStream(temp);
+						}
+					}
+				}
+			}
+        }
+
+		private void editImOMFEditorToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (!Directory.Exists(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp"))
+				Directory.CreateDirectory(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp");
+
+			string Filename = Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + $"\\temp\\{StatusFile.Text}_temp.omf";
+			string OmfEditor = GetOmfEditorPath();
+
+			if (OmfEditor == null)
+            {
+				MessageBox.Show("Please, set OMF Editor path!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+            }
+
+			using (var fileStream = new FileStream(Filename, FileMode.OpenOrCreate))
+			{
+				fileStream.Write(Current_OMF, 0, Current_OMF.Length);
+			}
+
+			System.Diagnostics.Process proc = new System.Diagnostics.Process();
+			proc.StartInfo.FileName = OmfEditor;
+			proc.StartInfo.Arguments += $"\"{Filename}\"";
+			proc.Start();
+			proc.WaitForExit();
+
+			openOMFDialog.FileName = Filename;
+			AppendMotion(null, null);
+			openOMFDialog.FileName = "";
+
+			File.Delete(Filename);
+		}
+
+		private string GetOmfEditorPath()
+        {
+			string file_path = Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\Settings.ini";
+			string omf_editor_path = null;
+
+			if (File.Exists(file_path))
+			{
+				IniFile file = new IniFile(file_path);
+				omf_editor_path = file.Read("omf_editor", "settings");
+			}
+			else
+            {
+				MessageBox.Show("Please, open OMF Editor path", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+				if (openProgramDialog.ShowDialog() == DialogResult.OK)
+				{
+					omf_editor_path = openProgramDialog.FileName;
+					File.WriteAllText(file_path, $"[settings]\nomf_editor = {omf_editor_path}");
+				}
+				else
+					File.Delete(file_path);
+			}
+
+			return omf_editor_path;
 		}
     }
 }

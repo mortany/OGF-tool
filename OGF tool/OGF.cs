@@ -229,6 +229,8 @@ namespace OGF_tool
 
         public Description descr = null;
 
+        public bool delete_motions = false;
+
         public OGF_Children()
         {
 

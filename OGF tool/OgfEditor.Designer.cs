@@ -30,7 +30,7 @@ namespace OGF_tool
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OGF_Editor));
-            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.openOGFDialog = new System.Windows.Forms.OpenFileDialog();
             this.TabControl = new System.Windows.Forms.TabControl();
             this.TexturesPage = new System.Windows.Forms.TabPage();
             this.UserDataPage = new System.Windows.Forms.TabPage();
@@ -40,7 +40,7 @@ namespace OGF_tool
             this.CreateMotionRefsButton = new System.Windows.Forms.Button();
             this.MotionRefsBox = new System.Windows.Forms.RichTextBox();
             this.MotionPage = new System.Windows.Forms.TabPage();
-            this.chbxDeleteMotions = new System.Windows.Forms.CheckBox();
+            this.AppendOMFButton = new System.Windows.Forms.Button();
             this.MotionBox = new System.Windows.Forms.RichTextBox();
             this.BoneNamesPage = new System.Windows.Forms.TabPage();
             this.BoneNamesBox = new System.Windows.Forms.RichTextBox();
@@ -55,12 +55,17 @@ namespace OGF_tool
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.oGFInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MotionToolsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteChunkToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.replaceMotionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.FileLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.StatusFile = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.BkpCheckBox = new System.Windows.Forms.CheckBox();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.BrokenModelLabel = new System.Windows.Forms.Label();
+            this.openOMFDialog = new System.Windows.Forms.OpenFileDialog();
+            this.editImOMFEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openProgramDialog = new System.Windows.Forms.OpenFileDialog();
             this.TabControl.SuspendLayout();
             this.UserDataPage.SuspendLayout();
             this.MotionRefsPage.SuspendLayout();
@@ -70,10 +75,9 @@ namespace OGF_tool
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // openFileDialog1
+            // openOGFDialog
             // 
-            this.openFileDialog1.FileName = "openFileDialog1";
-            this.openFileDialog1.Filter = "OGF |*.ogf";
+            this.openOGFDialog.Filter = "OGF |*.ogf";
             // 
             // TabControl
             // 
@@ -184,7 +188,7 @@ namespace OGF_tool
             // 
             // MotionPage
             // 
-            this.MotionPage.Controls.Add(this.chbxDeleteMotions);
+            this.MotionPage.Controls.Add(this.AppendOMFButton);
             this.MotionPage.Controls.Add(this.MotionBox);
             this.MotionPage.Location = new System.Drawing.Point(4, 25);
             this.MotionPage.Name = "MotionPage";
@@ -194,16 +198,18 @@ namespace OGF_tool
             this.MotionPage.Text = "Motions";
             this.MotionPage.UseVisualStyleBackColor = true;
             // 
-            // chbxDeleteMotions
+            // AppendOMFButton
             // 
-            this.chbxDeleteMotions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.chbxDeleteMotions.AutoSize = true;
-            this.chbxDeleteMotions.Location = new System.Drawing.Point(282, 233);
-            this.chbxDeleteMotions.Name = "chbxDeleteMotions";
-            this.chbxDeleteMotions.Size = new System.Drawing.Size(90, 17);
-            this.chbxDeleteMotions.TabIndex = 3;
-            this.chbxDeleteMotions.Text = "Delete chunk";
-            this.chbxDeleteMotions.UseVisualStyleBackColor = true;
+            this.AppendOMFButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.AppendOMFButton.Location = new System.Drawing.Point(6, 6);
+            this.AppendOMFButton.Name = "AppendOMFButton";
+            this.AppendOMFButton.Size = new System.Drawing.Size(383, 244);
+            this.AppendOMFButton.TabIndex = 4;
+            this.AppendOMFButton.Text = "Append OMF";
+            this.AppendOMFButton.UseVisualStyleBackColor = true;
+            this.AppendOMFButton.Click += new System.EventHandler(this.AppendOMFButton_Click);
             // 
             // MotionBox
             // 
@@ -261,10 +267,11 @@ namespace OGF_tool
             this.MenuPanel.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.FileMenuItem,
             this.oGFInfoToolStripMenuItem,
-            this.viewToolStripMenuItem});
+            this.viewToolStripMenuItem,
+            this.MotionToolsMenuItem});
             this.MenuPanel.Location = new System.Drawing.Point(0, 0);
             this.MenuPanel.Name = "MenuPanel";
-            this.MenuPanel.Size = new System.Drawing.Size(155, 24);
+            this.MenuPanel.Size = new System.Drawing.Size(240, 24);
             this.MenuPanel.TabIndex = 8;
             this.MenuPanel.Text = "Broken model";
             this.MenuPanel.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
@@ -336,6 +343,30 @@ namespace OGF_tool
             this.viewToolStripMenuItem.Text = "View";
             this.viewToolStripMenuItem.Click += new System.EventHandler(this.viewToolStripMenuItem_Click);
             // 
+            // MotionToolsMenuItem
+            // 
+            this.MotionToolsMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.deleteChunkToolStripMenuItem,
+            this.editImOMFEditorToolStripMenuItem,
+            this.replaceMotionsToolStripMenuItem});
+            this.MotionToolsMenuItem.Name = "MotionToolsMenuItem";
+            this.MotionToolsMenuItem.Size = new System.Drawing.Size(87, 20);
+            this.MotionToolsMenuItem.Text = "Motion tools";
+            // 
+            // deleteChunkToolStripMenuItem
+            // 
+            this.deleteChunkToolStripMenuItem.Name = "deleteChunkToolStripMenuItem";
+            this.deleteChunkToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteChunkToolStripMenuItem.Text = "Delete motions";
+            this.deleteChunkToolStripMenuItem.Click += new System.EventHandler(this.deleteChunkToolStripMenuItem_Click);
+            // 
+            // replaceMotionsToolStripMenuItem
+            // 
+            this.replaceMotionsToolStripMenuItem.Name = "replaceMotionsToolStripMenuItem";
+            this.replaceMotionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.replaceMotionsToolStripMenuItem.Text = "Replace motions";
+            this.replaceMotionsToolStripMenuItem.Click += new System.EventHandler(this.AppendOMFButton_Click);
+            // 
             // FileLabel
             // 
             this.FileLabel.Name = "FileLabel";
@@ -373,28 +404,34 @@ namespace OGF_tool
             // 
             // saveFileDialog1
             // 
+            this.saveFileDialog1.Filter = "OGF file|*.ogf|Object file|*.object|Bones file|*.bones|Skl file|*.skl|Skls file|*" +
+    ".skls|OMF file|*.omf";
             this.saveFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.saveFileDialog1_FileOk);
             // 
-            // BrokenModelLabel
+            // openOMFDialog
             // 
-            this.BrokenModelLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.BrokenModelLabel.Location = new System.Drawing.Point(172, 4);
-            this.BrokenModelLabel.Name = "BrokenModelLabel";
-            this.BrokenModelLabel.Size = new System.Drawing.Size(72, 13);
-            this.BrokenModelLabel.TabIndex = 32;
-            this.BrokenModelLabel.Text = "Broken model";
-            this.BrokenModelLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.openOMFDialog.Filter = "OMF file|*.omf";
+            this.openOMFDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.AppendMotion);
+            // 
+            // editImOMFEditorToolStripMenuItem
+            // 
+            this.editImOMFEditorToolStripMenuItem.Name = "editImOMFEditorToolStripMenuItem";
+            this.editImOMFEditorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.editImOMFEditorToolStripMenuItem.Text = "Edit in OMF Editor";
+            this.editImOMFEditorToolStripMenuItem.Click += new System.EventHandler(this.editImOMFEditorToolStripMenuItem_Click);
+            // 
+            // openProgramDialog
+            // 
+            this.openProgramDialog.Filter = "Program|*.exe";
             // 
             // OGF_Editor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(427, 337);
-            this.Controls.Add(this.BrokenModelLabel);
+            this.Controls.Add(this.MenuPanel);
             this.Controls.Add(this.BkpCheckBox);
             this.Controls.Add(this.statusStrip1);
-            this.Controls.Add(this.MenuPanel);
             this.Controls.Add(this.TabControl);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.MenuPanel;
@@ -409,7 +446,6 @@ namespace OGF_tool
             this.UserDataPage.ResumeLayout(false);
             this.MotionRefsPage.ResumeLayout(false);
             this.MotionPage.ResumeLayout(false);
-            this.MotionPage.PerformLayout();
             this.BoneNamesPage.ResumeLayout(false);
             this.MenuPanel.ResumeLayout(false);
             this.MenuPanel.PerformLayout();
@@ -421,7 +457,7 @@ namespace OGF_tool
         }
 
         #endregion
-        private System.Windows.Forms.OpenFileDialog openFileDialog1;
+        private System.Windows.Forms.OpenFileDialog openOGFDialog;
         private System.Windows.Forms.TabControl TabControl;
         private System.Windows.Forms.TabPage TexturesPage;
         private System.Windows.Forms.TabPage MotionRefsPage;
@@ -450,8 +486,13 @@ namespace OGF_tool
         private System.Windows.Forms.Button CreateUserdataButton;
         private System.Windows.Forms.Button CreateMotionRefsButton;
         private System.Windows.Forms.ToolStripMenuItem reloadToolStripMenuItem;
-        private System.Windows.Forms.CheckBox chbxDeleteMotions;
-        private System.Windows.Forms.Label BrokenModelLabel;
+        private System.Windows.Forms.Button AppendOMFButton;
+        private System.Windows.Forms.OpenFileDialog openOMFDialog;
+        private System.Windows.Forms.ToolStripMenuItem MotionToolsMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem deleteChunkToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem replaceMotionsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem editImOMFEditorToolStripMenuItem;
+        private System.Windows.Forms.OpenFileDialog openProgramDialog;
     }
 }
 
