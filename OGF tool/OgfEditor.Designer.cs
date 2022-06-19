@@ -440,7 +440,7 @@ namespace OGF_tool
             this.MinimumSize = new System.Drawing.Size(443, 251);
             this.Name = "OGF_Editor";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "OGF Params Editor v1.6";
+            this.Text = "OGF Params Editor v1.7";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.TabControl.ResumeLayout(false);
             this.UserDataPage.ResumeLayout(false);
