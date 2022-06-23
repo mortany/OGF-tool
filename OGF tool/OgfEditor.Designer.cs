@@ -274,7 +274,7 @@ namespace OGF_tool
             this.viewToolStripMenuItem});
             this.MenuPanel.Location = new System.Drawing.Point(0, 4);
             this.MenuPanel.Name = "MenuPanel";
-            this.MenuPanel.Size = new System.Drawing.Size(300, 24);
+            this.MenuPanel.Size = new System.Drawing.Size(288, 24);
             this.MenuPanel.TabIndex = 8;
             this.MenuPanel.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
@@ -403,7 +403,7 @@ namespace OGF_tool
             // 
             this.BkpCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.BkpCheckBox.AutoSize = true;
-            this.BkpCheckBox.Location = new System.Drawing.Point(319, 4);
+            this.BkpCheckBox.Location = new System.Drawing.Point(315, 7);
             this.BkpCheckBox.Name = "BkpCheckBox";
             this.BkpCheckBox.Size = new System.Drawing.Size(96, 17);
             this.BkpCheckBox.TabIndex = 31;
