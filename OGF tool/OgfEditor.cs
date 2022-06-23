@@ -1499,9 +1499,41 @@ namespace OGF_tool
 				Directory.Delete(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp", true);
 		}
 
+		private void openSkeletonInObjectEditorToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (!Directory.Exists(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp"))
+				Directory.CreateDirectory(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp");
+
+			string Filename = Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + $"\\temp\\{StatusFile.Text}_temp.ogf";
+			string ObjectName = Filename.Substring(0, Filename.LastIndexOf('.'));
+			ObjectName = ObjectName.Substring(0, ObjectName.LastIndexOf('.')) + ".object";
+
+			string ObjectEditor = GetObjectEditorPath();
+
+			if (ObjectEditor == null)
+			{
+				MessageBox.Show("Please, set Object Editor path!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+			}
+
+			File.Copy(FILE_NAME, Filename);
+			CopyParams();
+			SaveFile(Filename);
+			RunConverter(Filename, ObjectName, 0, 0);
+
+            System.Diagnostics.Process proc = new System.Diagnostics.Process();
+            proc.StartInfo.FileName = ObjectEditor;
+            proc.StartInfo.Arguments += $"\"{ObjectName}\" skeleton_only";
+            proc.Start();
+			proc.WaitForExit();
+
+			if (Directory.Exists(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp"))
+                Directory.Delete(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp", true);
+        }
+
 		private string GetOmfEditorPath()
         {
-			string file_path = Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\Settings.ini";
+			string file_path = Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\OmfEditor.ini";
 			string omf_editor_path = null;
 
 			if (File.Exists(file_path))
@@ -1523,5 +1555,30 @@ namespace OGF_tool
 
 			return omf_editor_path;
 		}
-    }
+
+		private string GetObjectEditorPath()
+		{
+			string file_path = Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\ObjectEditor.ini";
+			string object_editor_path = null;
+
+			if (File.Exists(file_path))
+			{
+				IniFile file = new IniFile(file_path);
+				object_editor_path = file.Read("object_editor", "settings");
+			}
+			else
+			{
+				MessageBox.Show("Please, open Object Editor path", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+				if (openProgramDialog.ShowDialog() == DialogResult.OK)
+				{
+					object_editor_path = openProgramDialog.FileName;
+					File.WriteAllText(file_path, $"[settings]\nobject_editor = {object_editor_path}");
+				}
+				else
+					File.Delete(file_path);
+			}
+
+			return object_editor_path;
+		}
+	}
 }
