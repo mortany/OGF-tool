@@ -1214,6 +1214,11 @@ namespace OGF_tool
 		private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
 			saveFileDialog1.FileName = "";
+
+			saveFileDialog1.Filter = "OGF file|*.ogf|Object file|*.object|Bones file|*.bones";
+			if (Current_OMF != null)
+				saveFileDialog1.Filter += "|Skl file|*.skl|Skls file|*.skls|OMF file|*.omf";
+
 			saveFileDialog1.ShowDialog();
 		}
 
