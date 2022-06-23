@@ -1523,7 +1523,7 @@ namespace OGF_tool
 
             System.Diagnostics.Process proc = new System.Diagnostics.Process();
             proc.StartInfo.FileName = ObjectEditor;
-            proc.StartInfo.Arguments += $"\"{ObjectName}\" skeleton_only";
+            proc.StartInfo.Arguments += $"\"{ObjectName}\" skeleton_only \"{FILE_NAME}\"";
             proc.Start();
 			proc.WaitForExit();
 
