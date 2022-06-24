@@ -1547,6 +1547,12 @@ namespace OGF_tool
 			{
 				IniFile file = new IniFile(file_path);
 				omf_editor_path = file.Read("omf_editor", "settings");
+
+				if (!File.Exists(omf_editor_path))
+				{
+					File.Delete(file_path);
+					return GetOmfEditorPath();
+				}
 			}
 			else
             {
@@ -1572,6 +1578,12 @@ namespace OGF_tool
 			{
 				IniFile file = new IniFile(file_path);
 				object_editor_path = file.Read("object_editor", "settings");
+
+				if (!File.Exists(object_editor_path))
+				{
+					File.Delete(file_path);
+					return GetObjectEditorPath();
+				}
 			}
 			else
 			{
