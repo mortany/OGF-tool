@@ -58,7 +58,7 @@ namespace OGF_tool
 			viewToolStripMenuItem.Enabled = false;
 			SaveMenuParam.Enabled = false;
 			saveAsToolStripMenuItem.Enabled = false;
-			MotionToolsMenuItem.Enabled = false;
+			motionToolsToolStripMenuItem.Enabled = false;
 
 			if (Environment.GetCommandLineArgs().Length > 1)
 			{
@@ -1333,7 +1333,7 @@ namespace OGF_tool
         private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
 			if (TabControl.SelectedIndex < 0) return;
-			MotionToolsMenuItem.Enabled = false;
+			motionToolsToolStripMenuItem.Enabled = false;
 
 			switch (TabControl.Controls[TabControl.SelectedIndex].Name)
 			{
@@ -1364,7 +1364,7 @@ namespace OGF_tool
 				case "MotionPage":
 					{
 						if (Current_OMF != null)
-							MotionToolsMenuItem.Enabled = true;
+							motionToolsToolStripMenuItem.Enabled = true;
 						break;
 					}
 			}
@@ -1380,7 +1380,7 @@ namespace OGF_tool
 			AppendOMFButton.Visible = false;
 			MotionBox.Visible = true;
 			OGF_V.delete_motions = false;
-			MotionToolsMenuItem.Enabled = true;
+			motionToolsToolStripMenuItem.Enabled = true;
 
 			var xr_loader = new XRayLoader();
 
@@ -1421,22 +1421,22 @@ namespace OGF_tool
 			OGF_V.delete_motions = !OGF_V.delete_motions;
 			if (OGF_V.delete_motions)
             {
-				deleteChunkToolStripMenuItem.Text = "Return last motions";
+				deleteMotionsToolStripMenuItem.Text = "Return last motions";
 				MotionBox.Visible = false;
 				AppendOMFButton.Visible = true;
-				replaceMotionsToolStripMenuItem.Enabled = false;
-				editImOMFEditorToolStripMenuItem.Enabled = false;
+				replaceMotionsToolStripMenuItem1.Enabled = false;
+				editInOMFEditorToolStripMenuItem.Enabled = false;
 
 				MotionBox.Clear();
 				m_model_type = 3;
 			}
 			else
             {
-				deleteChunkToolStripMenuItem.Text = "Delete motions";
+				deleteMotionsToolStripMenuItem.Text = "Delete motions";
 				MotionBox.Visible = true;
 				AppendOMFButton.Visible = false;
-				replaceMotionsToolStripMenuItem.Enabled = true;
-				editImOMFEditorToolStripMenuItem.Enabled = true;
+				replaceMotionsToolStripMenuItem1.Enabled = true;
+				editInOMFEditorToolStripMenuItem.Enabled = true;
 
 				var xr_loader = new XRayLoader();
 
