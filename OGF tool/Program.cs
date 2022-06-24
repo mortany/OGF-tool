@@ -56,40 +56,44 @@ namespace OGF_tool
 
     class IniFile   // revision 11
     {
-        string Path;
-        string EXE = Assembly.GetExecutingAssembly().GetName().Name;
+        private string Path;
+        private string EXE = Assembly.GetExecutingAssembly().GetName().Name;
 
         [DllImport("kernel32", CharSet = CharSet.Unicode)]
-        static extern long WritePrivateProfileString(string Section, string Key, string Value, string FilePath);
+        private static extern long WritePrivateProfileString(string Section, string Key, string Value, string FilePath);
 
         [DllImport("kernel32", CharSet = CharSet.Unicode)]
-        static extern int GetPrivateProfileString(string Section, string Key, string Default, StringBuilder RetVal, int Size, string FilePath);
+        private static extern int GetPrivateProfileString(string Section, string Key, string Default, StringBuilder RetVal, int Size, string FilePath);
 
         public IniFile(string IniPath = null)
         {
-            Path = new FileInfo(IniPath ?? EXE + ".ini").FullName;
+            string file_name = (IniPath ?? EXE + ".ini");
+            if (!File.Exists(file_name))
+                File.Create(file_name);
+
+            Path = new FileInfo(file_name).FullName;
         }
 
         public string Read(string Key, string Section = null)
         {
             var RetVal = new StringBuilder(255);
-            GetPrivateProfileString(Section ?? EXE, Key, "", RetVal, 255, Path);
+            GetPrivateProfileString(Section ?? this.EXE, Key, "", RetVal, 255, this.Path);
             return RetVal.ToString();
         }
 
         public void Write(string Key, string Value, string Section = null)
         {
-            WritePrivateProfileString(Section ?? EXE, Key, Value, Path);
+            WritePrivateProfileString(Section ?? this.EXE, Key, Value, this.Path);
         }
 
         public void DeleteKey(string Key, string Section = null)
         {
-            Write(Key, null, Section ?? EXE);
+            Write(Key, null, Section ?? this.EXE);
         }
 
         public void DeleteSection(string Section = null)
         {
-            Write(null, null, Section ?? EXE);
+            Write(null, null, Section ?? this.EXE);
         }
 
         public bool KeyExists(string Key, string Section = null)

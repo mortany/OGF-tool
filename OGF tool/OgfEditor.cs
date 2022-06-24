@@ -27,6 +27,7 @@ namespace OGF_tool
 		public bool IsModelBroken = false;
 		public List<byte> file_bytes = new List<byte>();
 		public string FILE_NAME = "";
+		IniFile Settings = null;
 
 		// Input
 		public bool bKeyIsDown = false;
@@ -60,6 +61,9 @@ namespace OGF_tool
 			saveAsToolStripMenuItem.Enabled = false;
 			motionToolsToolStripMenuItem.Enabled = false;
 			openSkeletonInObjectEditorToolStripMenuItem.Enabled = false;
+
+			string file_path = Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\Settings.ini";
+			Settings = new IniFile(file_path);
 
 			if (Environment.GetCommandLineArgs().Length > 1)
 			{
@@ -1540,30 +1544,15 @@ namespace OGF_tool
 
 		private string GetOmfEditorPath()
         {
-			string file_path = Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\OmfEditor.ini";
-			string omf_editor_path = null;
-
-			if (File.Exists(file_path))
+			string omf_editor_path = Settings.Read("omf_editor", "settings");
+			if (!File.Exists(omf_editor_path))
 			{
-				IniFile file = new IniFile(file_path);
-				omf_editor_path = file.Read("omf_editor", "settings");
-
-				if (!File.Exists(omf_editor_path))
-				{
-					File.Delete(file_path);
-					return GetOmfEditorPath();
-				}
-			}
-			else
-            {
 				MessageBox.Show("Please, open OMF Editor path", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
 				if (openProgramDialog.ShowDialog() == DialogResult.OK)
 				{
 					omf_editor_path = openProgramDialog.FileName;
-					File.WriteAllText(file_path, $"[settings]\nomf_editor = {omf_editor_path}");
+					Settings.Write("omf_editor", omf_editor_path, "settings");
 				}
-				else
-					File.Delete(file_path);
 			}
 
 			return omf_editor_path;
@@ -1571,30 +1560,15 @@ namespace OGF_tool
 
 		private string GetObjectEditorPath()
 		{
-			string file_path = Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\ObjectEditor.ini";
-			string object_editor_path = null;
-
-			if (File.Exists(file_path))
-			{
-				IniFile file = new IniFile(file_path);
-				object_editor_path = file.Read("object_editor", "settings");
-
-				if (!File.Exists(object_editor_path))
-				{
-					File.Delete(file_path);
-					return GetObjectEditorPath();
-				}
-			}
-			else
+			string object_editor_path = Settings.Read("object_editor", "settings");
+			if (!File.Exists(object_editor_path))
 			{
 				MessageBox.Show("Please, open Object Editor path", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
 				if (openProgramDialog.ShowDialog() == DialogResult.OK)
 				{
 					object_editor_path = openProgramDialog.FileName;
-					File.WriteAllText(file_path, $"[settings]\nobject_editor = {object_editor_path}");
+					Settings.Write("object_editor", object_editor_path, "settings");
 				}
-				else
-					File.Delete(file_path);
 			}
 
 			return object_editor_path;
