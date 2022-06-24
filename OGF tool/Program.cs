@@ -56,7 +56,7 @@ namespace OGF_tool
 
     class IniFile   // revision 11
     {
-        private string Path;
+        private FileInfo Ini;
         private string EXE = Assembly.GetExecutingAssembly().GetName().Name;
 
         [DllImport("kernel32", CharSet = CharSet.Unicode)]
@@ -68,22 +68,41 @@ namespace OGF_tool
         public IniFile(string IniPath = null)
         {
             string file_name = (IniPath ?? EXE + ".ini");
-            if (!File.Exists(file_name))
-                File.Create(file_name);
+            Ini = new FileInfo(file_name);
+            if (!Ini.Exists)
+                Ini.Create();
+        }
 
-            Path = new FileInfo(file_name).FullName;
+        public IniFile(string IniPath = null, string init_write = null)
+        {
+            string file_name = (IniPath ?? EXE + ".ini");
+            Ini = new FileInfo(file_name);
+            if (!Ini.Exists)
+            {
+                if (init_write != null)
+                    File.WriteAllText(file_name, init_write);
+                else
+                    Ini.Create();
+            }
         }
 
         public string Read(string Key, string Section = null)
         {
             var RetVal = new StringBuilder(255);
-            GetPrivateProfileString(Section ?? this.EXE, Key, "", RetVal, 255, this.Path);
+            GetPrivateProfileString(Section ?? this.EXE, Key, "", RetVal, 255, this.Ini.FullName);
             return RetVal.ToString();
+        }
+
+        public string ReadDef(string Key, string Section = null, string def = null)
+        {
+            var RetVal = new StringBuilder(255);
+            GetPrivateProfileString(Section ?? this.EXE, Key, "", RetVal, 255, this.Ini.FullName);
+            return RetVal.ToString() != "" ? RetVal.ToString() : def;
         }
 
         public void Write(string Key, string Value, string Section = null)
         {
-            WritePrivateProfileString(Section ?? this.EXE, Key, Value, this.Path);
+            WritePrivateProfileString(Section ?? this.EXE, Key, Value, this.Ini.FullName);
         }
 
         public void DeleteKey(string Key, string Section = null)
