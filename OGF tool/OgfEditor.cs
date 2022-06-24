@@ -59,6 +59,7 @@ namespace OGF_tool
 			SaveMenuParam.Enabled = false;
 			saveAsToolStripMenuItem.Enabled = false;
 			motionToolsToolStripMenuItem.Enabled = false;
+			openSkeletonInObjectEditorToolStripMenuItem.Enabled = false;
 
 			if (Environment.GetCommandLineArgs().Length > 1)
 			{
@@ -345,6 +346,7 @@ namespace OGF_tool
 			viewToolStripMenuItem.Enabled = true;
 			SaveMenuParam.Enabled = true;
 			saveAsToolStripMenuItem.Enabled = true;
+			openSkeletonInObjectEditorToolStripMenuItem.Enabled = true;
 
 			for (int i = 0; i < OGF_V.childs.Count; i++)
 			{
@@ -1585,5 +1587,5 @@ namespace OGF_tool
 
 			return object_editor_path;
 		}
-	}
+    }
 }
