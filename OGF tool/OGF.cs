@@ -454,7 +454,7 @@ namespace OGF_tool
             this.old_size = 0;
         }
 
-        public byte[] data()
+        public byte[] data(bool four_byte)
         {
             List<byte> temp = new List<byte>();
 
@@ -462,27 +462,37 @@ namespace OGF_tool
             temp.Add(0);
             temp.AddRange(Encoding.ASCII.GetBytes(m_export_tool));
             temp.Add(0);
-            temp.AddRange(BitConverter.GetBytes(m_export_time));
+            if (!four_byte)
+                temp.AddRange(BitConverter.GetBytes(m_export_time));
+            else
+                temp.AddRange(BitConverter.GetBytes((uint)m_export_time));
             temp.AddRange(Encoding.ASCII.GetBytes(m_owner_name));
             temp.Add(0);
-            temp.AddRange(BitConverter.GetBytes(m_creation_time));
+            if (!four_byte)
+                temp.AddRange(BitConverter.GetBytes(m_creation_time));
+            else
+                temp.AddRange(BitConverter.GetBytes((uint)m_creation_time));
             temp.AddRange(Encoding.ASCII.GetBytes(m_export_modif_name_tool));
             temp.Add(0);
-            temp.AddRange(BitConverter.GetBytes(m_modified_time));
+            if (!four_byte)
+                temp.AddRange(BitConverter.GetBytes(m_modified_time));
+            else
+                temp.AddRange(BitConverter.GetBytes((uint)m_modified_time));
 
             return temp.ToArray();
         }
 
-        public uint chunk_size()
+        public uint chunk_size(bool four_byte)
         {
+            uint time_size = (uint)(four_byte ? 4 : 8);
             uint size = 0;
             size += (uint)m_source.Length + 1;
             size += (uint)m_export_tool.Length + 1;
-            size += 8;
+            size += time_size;
             size += (uint)m_owner_name.Length + 1;
-            size += 8;
+            size += time_size;
             size += (uint)m_export_modif_name_tool.Length + 1;
-            size += 8;
+            size += time_size;
             return size;
         }
     }

@@ -25,6 +25,7 @@ namespace OGF_tool
 		public byte[] Current_OGF = null;
 		public byte[] Current_OMF = null;
 		public bool IsModelBroken = false;
+		public bool IsModelDescr4byte = false;
 		public List<byte> file_bytes = new List<byte>();
 		public string FILE_NAME = "";
 		IniFile Settings = null;
@@ -385,6 +386,13 @@ namespace OGF_tool
 
 			if (IsModelBroken)
             {
+				IsModelDescr4byte = CatchDescr4ByteModel();
+				if (IsModelDescr4byte)
+					IsModelBroken = false;
+			}
+
+			if (IsModelBroken)
+            {
 				OGF_V.descr.m_export_time = 0;
 				OGF_V.descr.m_creation_time = 0;
 				OGF_V.descr.m_modified_time = 0;
@@ -466,8 +474,8 @@ namespace OGF_tool
 			List<byte> chunk = new List<byte>();
 
 			chunk.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_DESC));
-			chunk.AddRange(BitConverter.GetBytes(OGF_V.descr.chunk_size()));
-			chunk.AddRange(OGF_V.descr.data());
+			chunk.AddRange(BitConverter.GetBytes(OGF_V.descr.chunk_size(false)));
+			chunk.AddRange(OGF_V.descr.data(false));
 
 			return chunk.ToArray();
 		}
@@ -505,6 +513,91 @@ namespace OGF_tool
 			return false;
 		}
 
+		private bool CatchDescr4ByteModel()
+		{
+			if (Current_OGF == null) return false;
+
+			string source = "";
+			string export_tool = "";
+			uint export_time = 0;
+			string owner_name = "";
+			uint creation_time = 0;
+			string export_modif_name_tool = "";
+			uint modified_time = 0;
+
+			int descr_old_size = 0;
+
+			try
+			{
+				var xr_loader = new XRayLoader();
+
+				long descr_pos = 0;
+
+				using (var r = new BinaryReader(new MemoryStream(Current_OGF)))
+				{
+					xr_loader.SetStream(r.BaseStream);
+
+					xr_loader.find_chunk((int)OGF.OGF4_HEADER);
+
+					xr_loader.ReadByte();
+					xr_loader.ReadByte();
+
+					if (!xr_loader.find_chunk((int)OGF.OGF4_S_DESC, false, true))
+						return false;
+
+					descr_pos = xr_loader.chunk_pos;
+
+					source = xr_loader.read_stringZ();
+					export_tool = xr_loader.read_stringZ();
+					export_time = xr_loader.ReadUInt32();
+					owner_name = xr_loader.read_stringZ();
+					creation_time = xr_loader.ReadUInt32();
+					export_modif_name_tool = xr_loader.read_stringZ();
+					modified_time = xr_loader.ReadUInt32();
+
+					descr_old_size = source.Length + 1 + export_tool.Length + 1 + 4 + owner_name.Length + 1 + 4 + export_modif_name_tool.Length + 1 + 4;
+
+					xr_loader.SetStream(r.BaseStream);
+				}
+
+
+				using (var fileStream = new BinaryReader(new MemoryStream(Current_OGF)))
+				{
+					fileStream.ReadBytes(8);
+					fileStream.ReadBytes(2);
+					fileStream.ReadBytes((int)(descr_pos - fileStream.BaseStream.Position));
+					fileStream.ReadBytes((int)descr_old_size + 8);
+					fileStream.ReadUInt32();
+					fileStream.ReadUInt32();
+
+					foreach (var ch in OGF_V.childs)
+					{
+						fileStream.ReadBytes((int)(ch.parent_pos - fileStream.BaseStream.Position));
+						fileStream.ReadUInt32();
+						fileStream.ReadUInt32();
+						fileStream.ReadBytes((int)(ch.pos - fileStream.BaseStream.Position));
+						fileStream.BaseStream.Position += ch.old_size + 8;
+					}
+				}
+			}
+			catch (Exception)
+			{
+				return false;
+			}
+
+			OGF_V.descr.m_source = source;
+			OGF_V.descr.m_export_tool = export_tool;
+			OGF_V.descr.m_export_time = export_time;
+			OGF_V.descr.m_owner_name = owner_name;
+			OGF_V.descr.m_creation_time = creation_time;
+			OGF_V.descr.m_export_modif_name_tool = export_modif_name_tool;
+			OGF_V.descr.m_modified_time = modified_time;
+
+			OGF_V.descr.old_size = descr_old_size;
+
+			return true;
+		}
+
 		private void SaveFile(string filename)
 		{
 			file_bytes.Clear();
@@ -534,8 +627,8 @@ namespace OGF_tool
 				if (!IsModelBroken)
 				{
 					file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_DESC));
-					file_bytes.AddRange(BitConverter.GetBytes(OGF_V.descr.chunk_size()));
-					file_bytes.AddRange(OGF_V.descr.data());
+					file_bytes.AddRange(BitConverter.GetBytes(OGF_V.descr.chunk_size(IsModelDescr4byte)));
+					file_bytes.AddRange(OGF_V.descr.data(IsModelDescr4byte));
 
 					fileStream.ReadBytes(OGF_V.descr.old_size + 8);
 				}
