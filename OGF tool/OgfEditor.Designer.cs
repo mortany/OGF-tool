@@ -273,7 +273,7 @@ namespace OGF_tool
             this.viewToolStripMenuItem});
             this.MenuPanel.Location = new System.Drawing.Point(0, 4);
             this.MenuPanel.Name = "MenuPanel";
-            this.MenuPanel.Size = new System.Drawing.Size(288, 24);
+            this.MenuPanel.Size = new System.Drawing.Size(201, 24);
             this.MenuPanel.TabIndex = 8;
             this.MenuPanel.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
@@ -359,21 +359,21 @@ namespace OGF_tool
             // deleteMotionsToolStripMenuItem
             // 
             this.deleteMotionsToolStripMenuItem.Name = "deleteMotionsToolStripMenuItem";
-            this.deleteMotionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteMotionsToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.deleteMotionsToolStripMenuItem.Text = "Delete motions";
             this.deleteMotionsToolStripMenuItem.Click += new System.EventHandler(this.deleteChunkToolStripMenuItem_Click);
             // 
             // editInOMFEditorToolStripMenuItem
             // 
             this.editInOMFEditorToolStripMenuItem.Name = "editInOMFEditorToolStripMenuItem";
-            this.editInOMFEditorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.editInOMFEditorToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.editInOMFEditorToolStripMenuItem.Text = "Edit in OMF Editor";
             this.editInOMFEditorToolStripMenuItem.Click += new System.EventHandler(this.editImOMFEditorToolStripMenuItem_Click);
             // 
             // replaceMotionsToolStripMenuItem1
             // 
             this.replaceMotionsToolStripMenuItem1.Name = "replaceMotionsToolStripMenuItem1";
-            this.replaceMotionsToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.replaceMotionsToolStripMenuItem1.Size = new System.Drawing.Size(170, 22);
             this.replaceMotionsToolStripMenuItem1.Text = "Replace motions";
             this.replaceMotionsToolStripMenuItem1.Click += new System.EventHandler(this.AppendOMFButton_Click);
             // 
@@ -457,7 +457,7 @@ namespace OGF_tool
             this.MinimumSize = new System.Drawing.Size(443, 251);
             this.Name = "OGF_Editor";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "OGF Params Editor v1.8";
+            this.Text = "OGF Params Editor";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.TabControl.ResumeLayout(false);
             this.UserDataPage.ResumeLayout(false);
