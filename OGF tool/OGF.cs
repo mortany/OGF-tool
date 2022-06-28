@@ -176,22 +176,21 @@ namespace OGF_tool
 
         public string read_stringZ()
         {
-            List<char> str = new List<char>();
+            string str = "";
 
             while (reader.BaseStream.Position < reader.BaseStream.Length)
             {
-                byte one = reader.ReadByte();
-                if (one != 0)
+                byte[] one = { reader.ReadByte() };
+                if (one[0] != 0)
                 {
-                    str.Add((char)one);
+                    str += Encoding.Default.GetString(one);
                 }
                 else
                 {
                     break;
                 }
             }
-
-            return new string(str.ToArray());
+            return str;
         }
 
         public void write_stringZ(BinaryWriter w, string str)
@@ -272,7 +271,7 @@ namespace OGF_tool
 
             foreach (var str in refs0)
             {
-                temp.AddRange(Encoding.ASCII.GetBytes(str));
+                temp.AddRange(Encoding.Default.GetBytes(str));
                 temp.Add(0);
             }
 
@@ -299,7 +298,7 @@ namespace OGF_tool
         {
             List<byte> temp = new List<byte>();
 
-            temp.AddRange(Encoding.ASCII.GetBytes(data));
+            temp.AddRange(Encoding.Default.GetBytes(data));
             temp.Add(0);
 
             return temp.ToArray();
@@ -344,9 +343,9 @@ namespace OGF_tool
 
             for (int i = 0; i < bones.Count; i++)
             {
-                temp.AddRange(Encoding.ASCII.GetBytes(bones[i]));       // bone name
+                temp.AddRange(Encoding.Default.GetBytes(bones[i]));       // bone name
                 temp.Add(0);
-                temp.AddRange(Encoding.ASCII.GetBytes(parent_bones[i]));// parent bone name
+                temp.AddRange(Encoding.Default.GetBytes(parent_bones[i]));// parent bone name
                 temp.Add(0);
                 temp.AddRange(fobb[i]);                                 // obb
             }
@@ -411,7 +410,7 @@ namespace OGF_tool
             for (int i = 0; i < materials.Count; i++)
             {
                 temp.AddRange(BitConverter.GetBytes(version[i]));
-                temp.AddRange(Encoding.ASCII.GetBytes(materials[i]));
+                temp.AddRange(Encoding.Default.GetBytes(materials[i]));
                 temp.Add(0);
                 for (int j = 0; j < bytes_1[i].Count; j++)
                     temp.AddRange(bytes_1[i][j]);
@@ -458,21 +457,21 @@ namespace OGF_tool
         {
             List<byte> temp = new List<byte>();
 
-            temp.AddRange(Encoding.ASCII.GetBytes(m_source));
+            temp.AddRange(Encoding.Default.GetBytes(m_source));
             temp.Add(0);
-            temp.AddRange(Encoding.ASCII.GetBytes(m_export_tool));
+            temp.AddRange(Encoding.Default.GetBytes(m_export_tool));
             temp.Add(0);
             if (!four_byte)
                 temp.AddRange(BitConverter.GetBytes(m_export_time));
             else
                 temp.AddRange(BitConverter.GetBytes((uint)m_export_time));
-            temp.AddRange(Encoding.ASCII.GetBytes(m_owner_name));
+            temp.AddRange(Encoding.Default.GetBytes(m_owner_name));
             temp.Add(0);
             if (!four_byte)
                 temp.AddRange(BitConverter.GetBytes(m_creation_time));
             else
                 temp.AddRange(BitConverter.GetBytes((uint)m_creation_time));
-            temp.AddRange(Encoding.ASCII.GetBytes(m_export_modif_name_tool));
+            temp.AddRange(Encoding.Default.GetBytes(m_export_modif_name_tool));
             temp.Add(0);
             if (!four_byte)
                 temp.AddRange(BitConverter.GetBytes(m_modified_time));
@@ -532,20 +531,9 @@ namespace OGF_tool
             temp.AddRange(BitConverter.GetBytes(2));
             temp.AddRange(BitConverter.GetBytes(m_texture.Length + m_shader.Length + 2));
 
-            foreach (char c in m_texture)
-            {
-                byte b = (byte)c;
-                temp.Add(b);
-            }
-
+            temp.AddRange(Encoding.Default.GetBytes(m_texture));
             temp.Add(0);
-
-            foreach (char c in m_shader)
-            {
-                byte b = (byte)c;
-                temp.Add(b);
-            }
-
+            temp.AddRange(Encoding.Default.GetBytes(m_shader));
             temp.Add(0);
 
             return temp.ToArray();
