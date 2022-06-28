@@ -195,13 +195,12 @@ namespace OGF_tool
 
         public void write_stringZ(BinaryWriter w, string str)
         {
-            foreach (char c in str)
-            {
-                byte b = (byte)c;
-                w.Write(b);
-            }
+            List<byte> temp = new List<byte>();
 
-            w.Write((byte)0);
+            temp.AddRange(Encoding.Default.GetBytes(str));
+            temp.Add(0);
+
+            w.Write(temp.ToArray());
         }
 
         public void write_u32(BinaryWriter w, uint num)
