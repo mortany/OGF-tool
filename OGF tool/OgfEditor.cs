@@ -84,253 +84,6 @@ namespace OGF_tool
 				Directory.Delete(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp", true);
 		}
 
-		private void CreateTextureGroupBox(int idx)
-		{
-			var GroupBox = new GroupBox();
-			GroupBox.Location = new System.Drawing.Point(3, 3 + 126 * idx);
-			GroupBox.Size = new System.Drawing.Size(385, 126);
-			GroupBox.Text = "Set: [" + idx + "]";
-			GroupBox.Name = "TextureGrpBox_" + idx;
-			GroupBox.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
-			CreateTextureBoxes(idx, GroupBox);
-			CreateTextureLabels(idx, GroupBox);
-			TexturesPage.Controls.Add(GroupBox);
-		}
-
-		private void CreateTextureBoxes(int idx, GroupBox box)
-		{
-			var newTextBox = new TextBox();
-			newTextBox.Name = "textureBox_" + idx;
-			newTextBox.Size = new System.Drawing.Size(373, 23);
-			newTextBox.Location = new System.Drawing.Point(6, 39);
-			newTextBox.TextChanged += new System.EventHandler(this.TextBoxFilter);
-			newTextBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-
-			var newTextBox2 = new TextBox();
-			newTextBox2.Name = "shaderBox_" + idx;
-			newTextBox2.Size = new System.Drawing.Size(373, 23);
-			newTextBox2.Location = new System.Drawing.Point(6, 88);
-			newTextBox2.TextChanged += new System.EventHandler(this.TextBoxFilter);
-			newTextBox2.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-			box.Controls.Add(newTextBox);
-			box.Controls.Add(newTextBox2);
-		}
-
-		private void CreateTextureLabels(int idx, GroupBox box)
-		{
-			var newLbl = new Label();
-			newLbl.Name = "textureLbl_" + idx;
-			newLbl.Text = "Texture Path:";
-			newLbl.Location = new System.Drawing.Point(6, 21);
-
-			var newLbl2 = new Label();
-			newLbl2.Name = "shaderLbl_" + idx;
-			newLbl2.Text = "Shader Name:";
-			newLbl2.Location = new System.Drawing.Point(6, 70);
-
-			box.Controls.Add(newLbl);
-			box.Controls.Add(newLbl2);
-		}
-
-		private void CreateBoneGroupBox(int idx, string bone_name, string parent_bone_name, string material, float mass, Fvector center, Fvector pos, Fvector rot)
-		{
-			var GroupBox = new GroupBox();
-			GroupBox.Location = new System.Drawing.Point(3, 3 + 205 * idx);
-			GroupBox.Size = new System.Drawing.Size(385, 203);
-			GroupBox.Text = "Bone id: [" + idx + "]";
-			GroupBox.Name = "BoneGrpBox_" + idx;
-			GroupBox.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
-
-			CreateBoneTextBox(idx, GroupBox, bone_name, parent_bone_name, material, mass, center, pos, rot);
-			BoneParamsPage.Controls.Add(GroupBox);
-		}
-
-		private void CreateBoneTextBox(int idx, GroupBox box, string bone_name, string parent_bone_name, string material, float mass, Fvector center, Fvector pos, Fvector rot)
-		{
-			var BoneNameTextBox = new TextBox();
-			BoneNameTextBox.Name = "boneBox_" + idx;
-			BoneNameTextBox.Size = new System.Drawing.Size(290, 58);
-			BoneNameTextBox.Location = new System.Drawing.Point(86, 18);
-			BoneNameTextBox.Text = bone_name;
-			BoneNameTextBox.Tag = "string";
-			BoneNameTextBox.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			BoneNameTextBox.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
-			BoneNameTextBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-
-			var BoneNameLabel = new Label();
-			BoneNameLabel.Name = "boneLabel_" + idx;
-			BoneNameLabel.Size = new System.Drawing.Size(100, 20);
-			BoneNameLabel.Location = new System.Drawing.Point(6, 20);
-			BoneNameLabel.Text = "Bone Name:";
-
-			var ParentBoneNameTextBox = new TextBox();
-			ParentBoneNameTextBox.Name = "ParentboneBox_" + idx;
-			ParentBoneNameTextBox.Size = new System.Drawing.Size(290, 58);
-			ParentBoneNameTextBox.Location = new System.Drawing.Point(86, 45);
-			ParentBoneNameTextBox.Text = parent_bone_name;
-			ParentBoneNameTextBox.Tag = "string";
-			ParentBoneNameTextBox.ReadOnly = true;
-			ParentBoneNameTextBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-
-			var ParentBoneNameLabel = new Label();
-			ParentBoneNameLabel.Name = "ParentboneLabel_" + idx;
-			ParentBoneNameLabel.Size = new System.Drawing.Size(100, 20);
-			ParentBoneNameLabel.Location = new System.Drawing.Point(6, 47);
-			ParentBoneNameLabel.Text = "Parent Bone:";
-
-			var MaterialTextBox = new TextBox();
-			MaterialTextBox.Name = "MaterialBox_" + idx;
-			MaterialTextBox.Size = new System.Drawing.Size(290, 58);
-			MaterialTextBox.Location = new System.Drawing.Point(86, 72);
-			MaterialTextBox.Text = material;
-			MaterialTextBox.Tag = "string";
-			MaterialTextBox.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			MaterialTextBox.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
-			MaterialTextBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-
-			var MaterialLabel = new Label();
-			MaterialLabel.Name = "MaterialLabel_" + idx;
-			MaterialLabel.Size = new System.Drawing.Size(100, 20);
-			MaterialLabel.Location = new System.Drawing.Point(6, 74);
-			MaterialLabel.Text = "Material:";
-
-			var MassTextBox = new TextBox();
-			MassTextBox.Name = "MassBox_" + idx;
-			MassTextBox.Size = new System.Drawing.Size(84, 58);
-			MassTextBox.Location = new System.Drawing.Point(86, 99);
-			MassTextBox.Text = mass.ToString();
-			MassTextBox.Tag = "float";
-			MassTextBox.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			MassTextBox.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
-
-			var MassLabel = new Label();
-			MassLabel.Name = "MassLabel_" + idx;
-			MassLabel.Size = new System.Drawing.Size(100, 20);
-			MassLabel.Location = new System.Drawing.Point(6, 101);
-			MassLabel.Text = "Mass:";
-
-			var CenterMassTextBoxX = new TextBox();
-			CenterMassTextBoxX.Name = "CenterBoxX_" + idx;
-			CenterMassTextBoxX.Size = new System.Drawing.Size(84, 58);
-			CenterMassTextBoxX.Location = new System.Drawing.Point(86, 125);
-			CenterMassTextBoxX.Text = center.x.ToString();
-			CenterMassTextBoxX.Tag = "float";
-			CenterMassTextBoxX.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			CenterMassTextBoxX.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
-
-			var CenterMassTextBoxY = new TextBox();
-			CenterMassTextBoxY.Name = "CenterBoxY_" + idx;
-			CenterMassTextBoxY.Size = new System.Drawing.Size(84, 58);
-			CenterMassTextBoxY.Location = new System.Drawing.Point(182, 125);
-			CenterMassTextBoxY.Text = center.y.ToString();
-			CenterMassTextBoxY.Tag = "float";
-			CenterMassTextBoxY.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			CenterMassTextBoxY.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
-
-			var CenterMassTextBoxZ = new TextBox();
-			CenterMassTextBoxZ.Name = "CenterBoxZ_" + idx;
-			CenterMassTextBoxZ.Size = new System.Drawing.Size(84, 58);
-			CenterMassTextBoxZ.Location = new System.Drawing.Point(277, 125);
-			CenterMassTextBoxZ.Text = center.z.ToString();
-			CenterMassTextBoxZ.Tag = "float";
-			CenterMassTextBoxZ.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			CenterMassTextBoxZ.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
-
-			var CenterMassLabel = new Label();
-			CenterMassLabel.Name = "CenterMassLabel_" + idx;
-			CenterMassLabel.Size = new System.Drawing.Size(100, 20);
-			CenterMassLabel.Location = new System.Drawing.Point(6, 127);
-			CenterMassLabel.Text = "Center of Mass:";
-
-			var PositionX = new TextBox();
-			PositionX.Name = "PositionX_" + idx;
-			PositionX.Size = new System.Drawing.Size(84, 58);
-			PositionX.Location = new System.Drawing.Point(86, 151);
-			PositionX.Text = pos.x.ToString();
-			PositionX.Tag = "float";
-			PositionX.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			PositionX.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
-
-			var PositionY = new TextBox();
-			PositionY.Name = "PositionY_" + idx;
-			PositionY.Size = new System.Drawing.Size(84, 58);
-			PositionY.Location = new System.Drawing.Point(182, 151);
-			PositionY.Text = pos.y.ToString();
-			PositionY.Tag = "float";
-			PositionY.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			PositionY.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
-
-			var PositionZ = new TextBox();
-			PositionZ.Name = "PositionZ_" + idx;
-			PositionZ.Size = new System.Drawing.Size(84, 58);
-			PositionZ.Location = new System.Drawing.Point(277, 151);
-			PositionZ.Text = pos.z.ToString();
-			PositionZ.Tag = "float";
-			PositionZ.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			PositionZ.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
-
-			var PositionLabel = new Label();
-			PositionLabel.Name = "PositionLabel_" + idx;
-			PositionLabel.Size = new System.Drawing.Size(100, 20);
-			PositionLabel.Location = new System.Drawing.Point(6, 153);
-			PositionLabel.Text = "Position:";
-
-			var RotationX = new TextBox();
-			RotationX.Name = "RotationX_" + idx;
-			RotationX.Size = new System.Drawing.Size(84, 58);
-			RotationX.Location = new System.Drawing.Point(86, 177);
-			RotationX.Text = rot.x.ToString();
-			RotationX.Tag = "float";
-			RotationX.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			RotationX.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
-
-			var RotationY = new TextBox();
-			RotationY.Name = "RotationY_" + idx;
-			RotationY.Size = new System.Drawing.Size(84, 58);
-			RotationY.Location = new System.Drawing.Point(182, 177);
-			RotationY.Text = rot.y.ToString();
-			RotationY.Tag = "float";
-			RotationY.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			RotationY.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
-
-			var RotationZ = new TextBox();
-			RotationZ.Name = "RotationZ_" + idx;
-			RotationZ.Size = new System.Drawing.Size(84, 58);
-			RotationZ.Location = new System.Drawing.Point(277, 177);
-			RotationZ.Text = rot.z.ToString();
-			RotationZ.Tag = "float";
-			RotationZ.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			RotationZ.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
-
-			var RotationLabel = new Label();
-			RotationLabel.Name = "RotationLabel_" + idx;
-			RotationLabel.Size = new System.Drawing.Size(100, 20);
-			RotationLabel.Location = new System.Drawing.Point(6, 179);
-			RotationLabel.Text = "Rotation:";
-
-			box.Controls.Add(BoneNameTextBox);
-			box.Controls.Add(ParentBoneNameTextBox);
-			box.Controls.Add(MaterialTextBox);
-			box.Controls.Add(MassTextBox);
-			box.Controls.Add(CenterMassTextBoxX);
-			box.Controls.Add(CenterMassTextBoxY);
-			box.Controls.Add(CenterMassTextBoxZ);
-			box.Controls.Add(PositionX);
-			box.Controls.Add(PositionY);
-			box.Controls.Add(PositionZ);
-			box.Controls.Add(RotationX);
-			box.Controls.Add(RotationY);
-			box.Controls.Add(RotationZ);
-
-			box.Controls.Add(BoneNameLabel);
-			box.Controls.Add(ParentBoneNameLabel);
-			box.Controls.Add(MaterialLabel);
-			box.Controls.Add(MassLabel);
-			box.Controls.Add(CenterMassLabel);
-			box.Controls.Add(PositionLabel);
-			box.Controls.Add(RotationLabel);
-		}
-
 		private void Clear()
 		{
 			FILE_NAME = "";
@@ -377,7 +130,7 @@ namespace OGF_tool
 			UserDataBox.Clear();
 
 			if (OGF_V.refs != null)
-				MotionRefsBox.Lines = OGF_V.refs.refs0.ToArray();
+				MotionRefsBox.Lines = OGF_V.refs.refs.ToArray();
 
 			if (OGF_V.usertdata != null)
 				UserDataBox.Text = OGF_V.usertdata.data;
@@ -405,12 +158,11 @@ namespace OGF_tool
 			{
 				if (MotionRefsBox.Lines.Count() > 0)
 				{
-					OGF_V.refs.refs0 = new List<string>();
-					OGF_V.refs.refs0.AddRange(MotionRefsBox.Lines);
+					OGF_V.refs.refs = new List<string>();
+					OGF_V.refs.refs.AddRange(MotionRefsBox.Lines);
 				}
 				else
 				{
-					OGF_V.refs.refs0 = null;
 					if (MotionBox.Text == "")
 						m_model_type = 10;
 				}
@@ -432,41 +184,26 @@ namespace OGF_tool
 		}
 
 		public byte[] GetUserdataChunk()
-        {
-			byte[] chunk;
+		{
+			List<byte> chunk = new List<byte>();
 
-			var xr_loader = new XRayLoader();
-			using (var fileStream = new BinaryWriter(File.Create("userdata.chunk")))
-			{
-				xr_loader.open_chunk(fileStream, (int)OGF.OGF4_S_USERDATA);
-				xr_loader.write_stringZ(fileStream, OGF_V.usertdata.data);
-				xr_loader.close_chunk(fileStream);
-			}
+			chunk.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_USERDATA));
+			chunk.AddRange(BitConverter.GetBytes(OGF_V.usertdata.chunk_size()));
+			chunk.AddRange(OGF_V.usertdata.data_all());
 
-			chunk = File.ReadAllBytes("userdata.chunk");
-			File.Delete("userdata.chunk");
-
-			return chunk;
+			return chunk.ToArray();
         }
 
 		public byte[] GetMotionRefsChunk()
 		{
-			byte[] chunk;
+			List<byte> chunk = new List<byte>();
 
-			var xr_loader = new XRayLoader();
-			using (var fileStream = new BinaryWriter(File.Create("motion_refs.chunk")))
-			{
-				xr_loader.open_chunk(fileStream, (int)OGF.OGF4_S_MOTION_REFS2);
-				xr_loader.write_u32(fileStream, (uint)OGF_V.refs.refs0.Count);
-				for (int i = 0; i < OGF_V.refs.refs0.Count; i++)
-					xr_loader.write_stringZ(fileStream, OGF_V.refs.refs0[i]);
-				xr_loader.close_chunk(fileStream);
-			}
+			chunk.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_MOTION_REFS2));
+			chunk.AddRange(BitConverter.GetBytes(OGF_V.refs.chunk_size()));
+			chunk.AddRange(OGF_V.refs.count());
+			chunk.AddRange(OGF_V.refs.data());
 
-			chunk = File.ReadAllBytes("motion_refs.chunk");
-			File.Delete("motion_refs.chunk");
-
-			return chunk;
+			return chunk.ToArray();
 		}
 
 		public byte[] GetDescriptionChunk()
@@ -604,11 +341,6 @@ namespace OGF_tool
 
 			if (Current_OGF == null) return;
 
-			bool remove_motions_chunk = OGF_V.delete_motions;
-
-			if (!remove_motions_chunk && OGF_V.refs != null && OGF_V.refs.refs0 != null && OGF_V.refs.need_create && MotionBox.Text != "" && MessageBox.Show("New motion refs chunk will remove built-in motions, continue?", "OGF Editor", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-				remove_motions_chunk = true;
-
 			using (var fileStream = new BinaryReader(new MemoryStream(Current_OGF)))
 			{
 				fileStream.ReadBytes(4);
@@ -701,7 +433,7 @@ namespace OGF_tool
 
 				if (OGF_V.usertdata != null)
 				{
-					if (OGF_V.usertdata.need_create)
+					if (OGF_V.usertdata.need_create) // „анка не было, создали и в нем что то есть
 					{
 						if (OGF_V.usertdata.data != "")
 						{
@@ -709,7 +441,11 @@ namespace OGF_tool
 							file_bytes.AddRange(userdata);
 						}
 					}
-					else
+					else if (OGF_V.usertdata.need_delete) // „анк был, удалили и не хотим писать
+					{
+						fileStream.ReadBytes(OGF_V.usertdata.old_size + 8);
+					}
+					else // „анк был и мы его перезаписываем
 					{
 						if (OGF_V.usertdata.pos > 0)
 							temp = fileStream.ReadBytes((int)(OGF_V.usertdata.pos - fileStream.BaseStream.Position));
@@ -718,50 +454,55 @@ namespace OGF_tool
 
 						file_bytes.AddRange(temp);
 
-						if (OGF_V.usertdata.data == "")
-						{
-							fileStream.ReadBytes(4);
-							fileStream.ReadBytes(OGF_V.usertdata.old_size);
-							fileStream.ReadBytes(OGF_V.usertdata.old_size + 8);
-						}
-						else
-						{
-							file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_USERDATA));
-							file_bytes.AddRange(BitConverter.GetBytes(OGF_V.usertdata.chunk_size()));
+						file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_USERDATA));
+						file_bytes.AddRange(BitConverter.GetBytes(OGF_V.usertdata.chunk_size()));
 
-							file_bytes.AddRange(OGF_V.usertdata.data_all());
-						}
+						file_bytes.AddRange(OGF_V.usertdata.data_all());
+
+						fileStream.ReadBytes(OGF_V.usertdata.old_size + 8);
 					}
 				}
-				else if (OGF_V.refs != null)
-                {
-					if (OGF_V.refs.pos > 0)
-						temp = fileStream.ReadBytes((int)(OGF_V.refs.pos - fileStream.BaseStream.Position));
-					else if (!remove_motions_chunk)
-						temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
 
-					file_bytes.AddRange(temp);
-				}
-
+				bool refs_created = false;
 				if (OGF_V.refs != null)
 				{
-					if (OGF_V.refs.refs0 != null)
+					if (OGF_V.refs.refs != null)
 					{
 						if (OGF_V.refs.need_create)
 						{
-							if (MotionBox.Text == "" || remove_motions_chunk)
-							{
-								byte[] motionrefs = GetMotionRefsChunk();
-								file_bytes.AddRange(motionrefs);
-							}
+							byte[] motionrefs = GetMotionRefsChunk();
+							file_bytes.AddRange(motionrefs);
+							refs_created = true;
+
+							MessageBox.Show("create");
+						}
+						else if (OGF_V.refs.need_delete)
+                        {
+							if (OGF_V.refs.pos > 0)
+								temp = fileStream.ReadBytes((int)(OGF_V.refs.pos - fileStream.BaseStream.Position));
+							else
+								temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
+
+							file_bytes.AddRange(temp);
+
+							fileStream.ReadBytes(OGF_V.refs.old_size + 8);
+
+							MessageBox.Show("delete");
 						}
 						else
 						{
-							if (OGF_V.refs.refs0.Count() > 1 || !OGF_V.refs.v3)
+							if (OGF_V.refs.pos > 0)
+								temp = fileStream.ReadBytes((int)(OGF_V.refs.pos - fileStream.BaseStream.Position));
+							else
+								temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
+
+							file_bytes.AddRange(temp);
+
+							if (OGF_V.refs.refs.Count() > 1 || !OGF_V.refs.v3)
 							{
 								file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_MOTION_REFS2));
-								file_bytes.AddRange(BitConverter.GetBytes(OGF_V.refs.chunk_size()));
 								file_bytes.AddRange(OGF_V.refs.count());
+								file_bytes.AddRange(BitConverter.GetBytes(OGF_V.refs.chunk_size()));
 							}
 							else
 							{
@@ -770,19 +511,17 @@ namespace OGF_tool
 							}
 
 							file_bytes.AddRange(OGF_V.refs.data());
+
+							fileStream.ReadBytes(OGF_V.refs.old_size + 8);
+							refs_created = true;
+
+							MessageBox.Show("rewrite");
 						}
 					}
-
-					fileStream.ReadBytes(4);
-					fileStream.ReadBytes(OGF_V.refs.old_size);
-					fileStream.ReadBytes(OGF_V.refs.old_size + 8);
 				}
 
-				if (!remove_motions_chunk)
-				{
-					if (Current_OMF != null)
-						file_bytes.AddRange(Current_OMF);
-				}
+				if (Current_OMF != null && !refs_created && MotionBox.Visible)
+					file_bytes.AddRange(Current_OMF);
 			}
 
 			if (BkpCheckBox.Checked)
@@ -921,13 +660,13 @@ namespace OGF_tool
 					MotionRefsBox.Visible = true;
 					OGF_V.refs = new MotionRefs();
 					OGF_V.refs.pos = xr_loader.chunk_pos;
-					OGF_V.refs.refs0 = new List<string>();
+					OGF_V.refs.refs = new List<string>();
 
 					if (v3)
 					{
 						OGF_V.refs.v3 = true;
 						string refs = xr_loader.read_stringZ();
-						OGF_V.refs.refs0.Add(refs);
+						OGF_V.refs.refs.Add(refs);
 						OGF_V.refs.old_size = refs.Length + 1;
 					}
 					else
@@ -939,7 +678,7 @@ namespace OGF_tool
 						for (int i = 0; i < count; i++)
 						{
 							string refs = xr_loader.read_stringZ();
-							OGF_V.refs.refs0.Add(refs);
+							OGF_V.refs.refs.Add(refs);
 							OGF_V.refs.old_size += refs.Length + 1;
 						}
 					}
@@ -1405,17 +1144,31 @@ namespace OGF_tool
         {
 			CreateUserdataButton.Visible = false;
 			UserDataBox.Visible = true;
-			OGF_V.usertdata = new UserData();
-			OGF_V.usertdata.need_create = true;
+			if (OGF_V.usertdata == null)
+			{
+				OGF_V.usertdata = new UserData();
+				OGF_V.usertdata.need_create = true;
+			}
 		}
 
         private void CreateMotionRefsButton_Click(object sender, EventArgs e)
         {
-			m_model_type = 3;
-			CreateMotionRefsButton.Visible = false;
-			MotionRefsBox.Visible = true;
-			OGF_V.refs = new MotionRefs();
-			OGF_V.refs.need_create = true;
+			if (Current_OMF != null && MessageBox.Show("New motion refs chunk will remove built-in motions, continue?", "OGF Editor", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+			{
+				MotionBox.Clear();
+				Current_OMF = null;
+				AppendOMFButton.Visible = true;
+				MotionBox.Visible = false;
+
+				m_model_type = 3;
+				CreateMotionRefsButton.Visible = false;
+				MotionRefsBox.Visible = true;
+
+				if (OGF_V.refs == null)
+					OGF_V.refs = new MotionRefs();
+				OGF_V.refs.need_create = true;
+				OGF_V.refs.need_delete = false;
+			}
 		}
 
         private void reloadToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1443,7 +1196,6 @@ namespace OGF_tool
 						{
 							CreateUserdataButton.Visible = true;
 							UserDataBox.Visible = false;
-							OGF_V.usertdata = null;
 						}
 						break;
 					}
@@ -1456,7 +1208,6 @@ namespace OGF_tool
 
 							CreateMotionRefsButton.Visible = true;
 							MotionRefsBox.Visible = false;
-							OGF_V.refs = null;
 						}
 						break;
 					}
@@ -1469,9 +1220,34 @@ namespace OGF_tool
 			}
 		}
 
-        private void AppendOMFButton_Click(object sender, EventArgs e)
+		private void RichTextBoxTextChanged(object sender, EventArgs e)
+		{
+			RichTextBox curBox = sender as RichTextBox;
+			switch (curBox.Name)
+			{
+				case "UserDataBox":
+					{
+						if (UserDataBox.Text == "")
+							OGF_V.usertdata.need_delete = true;
+						else
+							OGF_V.usertdata.need_delete = false;
+						break;
+					}
+                case "MotionRefsBox":
+                    {
+						if (MotionRefsBox.Text == "")
+							OGF_V.refs.need_delete = true;
+						else
+							OGF_V.refs.need_delete = false;
+						break;
+                    }
+            }
+		}
+
+		private void AppendOMFButton_Click(object sender, EventArgs e)
         {
-			openOMFDialog.ShowDialog();
+			if (MotionRefsBox.Text == "" || MotionRefsBox.Text != "" && MessageBox.Show("Build-in motions will remove motion refs, continue?", "OGF Editor", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+				openOMFDialog.ShowDialog();
         }
 
 		private void AppendMotion(object sender, CancelEventArgs e)
@@ -1480,6 +1256,10 @@ namespace OGF_tool
 			MotionBox.Visible = true;
 			OGF_V.delete_motions = false;
 			motionToolsToolStripMenuItem.Enabled = true;
+			MotionRefsBox.Clear();
+
+			if (OGF_V.refs != null)
+				OGF_V.refs.need_delete = true;
 
 			var xr_loader = new XRayLoader();
 
@@ -1665,6 +1445,255 @@ namespace OGF_tool
 			}
 
 			return object_editor_path;
+		}
+
+		// Interface
+
+		private void CreateTextureGroupBox(int idx)
+		{
+			var GroupBox = new GroupBox();
+			GroupBox.Location = new System.Drawing.Point(3, 3 + 126 * idx);
+			GroupBox.Size = new System.Drawing.Size(385, 126);
+			GroupBox.Text = "Set: [" + idx + "]";
+			GroupBox.Name = "TextureGrpBox_" + idx;
+			GroupBox.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
+			CreateTextureBoxes(idx, GroupBox);
+			CreateTextureLabels(idx, GroupBox);
+			TexturesPage.Controls.Add(GroupBox);
+		}
+
+		private void CreateTextureBoxes(int idx, GroupBox box)
+		{
+			var newTextBox = new TextBox();
+			newTextBox.Name = "textureBox_" + idx;
+			newTextBox.Size = new System.Drawing.Size(373, 23);
+			newTextBox.Location = new System.Drawing.Point(6, 39);
+			newTextBox.TextChanged += new System.EventHandler(this.TextBoxFilter);
+			newTextBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+
+			var newTextBox2 = new TextBox();
+			newTextBox2.Name = "shaderBox_" + idx;
+			newTextBox2.Size = new System.Drawing.Size(373, 23);
+			newTextBox2.Location = new System.Drawing.Point(6, 88);
+			newTextBox2.TextChanged += new System.EventHandler(this.TextBoxFilter);
+			newTextBox2.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+			box.Controls.Add(newTextBox);
+			box.Controls.Add(newTextBox2);
+		}
+
+		private void CreateTextureLabels(int idx, GroupBox box)
+		{
+			var newLbl = new Label();
+			newLbl.Name = "textureLbl_" + idx;
+			newLbl.Text = "Texture Path:";
+			newLbl.Location = new System.Drawing.Point(6, 21);
+
+			var newLbl2 = new Label();
+			newLbl2.Name = "shaderLbl_" + idx;
+			newLbl2.Text = "Shader Name:";
+			newLbl2.Location = new System.Drawing.Point(6, 70);
+
+			box.Controls.Add(newLbl);
+			box.Controls.Add(newLbl2);
+		}
+
+		private void CreateBoneGroupBox(int idx, string bone_name, string parent_bone_name, string material, float mass, Fvector center, Fvector pos, Fvector rot)
+		{
+			var GroupBox = new GroupBox();
+			GroupBox.Location = new System.Drawing.Point(3, 3 + 205 * idx);
+			GroupBox.Size = new System.Drawing.Size(385, 203);
+			GroupBox.Text = "Bone id: [" + idx + "]";
+			GroupBox.Name = "BoneGrpBox_" + idx;
+			GroupBox.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
+
+			CreateBoneTextBox(idx, GroupBox, bone_name, parent_bone_name, material, mass, center, pos, rot);
+			BoneParamsPage.Controls.Add(GroupBox);
+		}
+
+		private void CreateBoneTextBox(int idx, GroupBox box, string bone_name, string parent_bone_name, string material, float mass, Fvector center, Fvector pos, Fvector rot)
+		{
+			var BoneNameTextBox = new TextBox();
+			BoneNameTextBox.Name = "boneBox_" + idx;
+			BoneNameTextBox.Size = new System.Drawing.Size(290, 58);
+			BoneNameTextBox.Location = new System.Drawing.Point(86, 18);
+			BoneNameTextBox.Text = bone_name;
+			BoneNameTextBox.Tag = "string";
+			BoneNameTextBox.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			BoneNameTextBox.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+			BoneNameTextBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+
+			var BoneNameLabel = new Label();
+			BoneNameLabel.Name = "boneLabel_" + idx;
+			BoneNameLabel.Size = new System.Drawing.Size(100, 20);
+			BoneNameLabel.Location = new System.Drawing.Point(6, 20);
+			BoneNameLabel.Text = "Bone Name:";
+
+			var ParentBoneNameTextBox = new TextBox();
+			ParentBoneNameTextBox.Name = "ParentboneBox_" + idx;
+			ParentBoneNameTextBox.Size = new System.Drawing.Size(290, 58);
+			ParentBoneNameTextBox.Location = new System.Drawing.Point(86, 45);
+			ParentBoneNameTextBox.Text = parent_bone_name;
+			ParentBoneNameTextBox.Tag = "string";
+			ParentBoneNameTextBox.ReadOnly = true;
+			ParentBoneNameTextBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+
+			var ParentBoneNameLabel = new Label();
+			ParentBoneNameLabel.Name = "ParentboneLabel_" + idx;
+			ParentBoneNameLabel.Size = new System.Drawing.Size(100, 20);
+			ParentBoneNameLabel.Location = new System.Drawing.Point(6, 47);
+			ParentBoneNameLabel.Text = "Parent Bone:";
+
+			var MaterialTextBox = new TextBox();
+			MaterialTextBox.Name = "MaterialBox_" + idx;
+			MaterialTextBox.Size = new System.Drawing.Size(290, 58);
+			MaterialTextBox.Location = new System.Drawing.Point(86, 72);
+			MaterialTextBox.Text = material;
+			MaterialTextBox.Tag = "string";
+			MaterialTextBox.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			MaterialTextBox.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+			MaterialTextBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+
+			var MaterialLabel = new Label();
+			MaterialLabel.Name = "MaterialLabel_" + idx;
+			MaterialLabel.Size = new System.Drawing.Size(100, 20);
+			MaterialLabel.Location = new System.Drawing.Point(6, 74);
+			MaterialLabel.Text = "Material:";
+
+			var MassTextBox = new TextBox();
+			MassTextBox.Name = "MassBox_" + idx;
+			MassTextBox.Size = new System.Drawing.Size(84, 58);
+			MassTextBox.Location = new System.Drawing.Point(86, 99);
+			MassTextBox.Text = mass.ToString();
+			MassTextBox.Tag = "float";
+			MassTextBox.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			MassTextBox.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+
+			var MassLabel = new Label();
+			MassLabel.Name = "MassLabel_" + idx;
+			MassLabel.Size = new System.Drawing.Size(100, 20);
+			MassLabel.Location = new System.Drawing.Point(6, 101);
+			MassLabel.Text = "Mass:";
+
+			var CenterMassTextBoxX = new TextBox();
+			CenterMassTextBoxX.Name = "CenterBoxX_" + idx;
+			CenterMassTextBoxX.Size = new System.Drawing.Size(84, 58);
+			CenterMassTextBoxX.Location = new System.Drawing.Point(86, 125);
+			CenterMassTextBoxX.Text = center.x.ToString();
+			CenterMassTextBoxX.Tag = "float";
+			CenterMassTextBoxX.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			CenterMassTextBoxX.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+
+			var CenterMassTextBoxY = new TextBox();
+			CenterMassTextBoxY.Name = "CenterBoxY_" + idx;
+			CenterMassTextBoxY.Size = new System.Drawing.Size(84, 58);
+			CenterMassTextBoxY.Location = new System.Drawing.Point(182, 125);
+			CenterMassTextBoxY.Text = center.y.ToString();
+			CenterMassTextBoxY.Tag = "float";
+			CenterMassTextBoxY.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			CenterMassTextBoxY.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+
+			var CenterMassTextBoxZ = new TextBox();
+			CenterMassTextBoxZ.Name = "CenterBoxZ_" + idx;
+			CenterMassTextBoxZ.Size = new System.Drawing.Size(84, 58);
+			CenterMassTextBoxZ.Location = new System.Drawing.Point(277, 125);
+			CenterMassTextBoxZ.Text = center.z.ToString();
+			CenterMassTextBoxZ.Tag = "float";
+			CenterMassTextBoxZ.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			CenterMassTextBoxZ.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+
+			var CenterMassLabel = new Label();
+			CenterMassLabel.Name = "CenterMassLabel_" + idx;
+			CenterMassLabel.Size = new System.Drawing.Size(100, 20);
+			CenterMassLabel.Location = new System.Drawing.Point(6, 127);
+			CenterMassLabel.Text = "Center of Mass:";
+
+			var PositionX = new TextBox();
+			PositionX.Name = "PositionX_" + idx;
+			PositionX.Size = new System.Drawing.Size(84, 58);
+			PositionX.Location = new System.Drawing.Point(86, 151);
+			PositionX.Text = pos.x.ToString();
+			PositionX.Tag = "float";
+			PositionX.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			PositionX.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+
+			var PositionY = new TextBox();
+			PositionY.Name = "PositionY_" + idx;
+			PositionY.Size = new System.Drawing.Size(84, 58);
+			PositionY.Location = new System.Drawing.Point(182, 151);
+			PositionY.Text = pos.y.ToString();
+			PositionY.Tag = "float";
+			PositionY.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			PositionY.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+
+			var PositionZ = new TextBox();
+			PositionZ.Name = "PositionZ_" + idx;
+			PositionZ.Size = new System.Drawing.Size(84, 58);
+			PositionZ.Location = new System.Drawing.Point(277, 151);
+			PositionZ.Text = pos.z.ToString();
+			PositionZ.Tag = "float";
+			PositionZ.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			PositionZ.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+
+			var PositionLabel = new Label();
+			PositionLabel.Name = "PositionLabel_" + idx;
+			PositionLabel.Size = new System.Drawing.Size(100, 20);
+			PositionLabel.Location = new System.Drawing.Point(6, 153);
+			PositionLabel.Text = "Position:";
+
+			var RotationX = new TextBox();
+			RotationX.Name = "RotationX_" + idx;
+			RotationX.Size = new System.Drawing.Size(84, 58);
+			RotationX.Location = new System.Drawing.Point(86, 177);
+			RotationX.Text = rot.x.ToString();
+			RotationX.Tag = "float";
+			RotationX.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			RotationX.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+
+			var RotationY = new TextBox();
+			RotationY.Name = "RotationY_" + idx;
+			RotationY.Size = new System.Drawing.Size(84, 58);
+			RotationY.Location = new System.Drawing.Point(182, 177);
+			RotationY.Text = rot.y.ToString();
+			RotationY.Tag = "float";
+			RotationY.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			RotationY.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+
+			var RotationZ = new TextBox();
+			RotationZ.Name = "RotationZ_" + idx;
+			RotationZ.Size = new System.Drawing.Size(84, 58);
+			RotationZ.Location = new System.Drawing.Point(277, 177);
+			RotationZ.Text = rot.z.ToString();
+			RotationZ.Tag = "float";
+			RotationZ.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			RotationZ.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+
+			var RotationLabel = new Label();
+			RotationLabel.Name = "RotationLabel_" + idx;
+			RotationLabel.Size = new System.Drawing.Size(100, 20);
+			RotationLabel.Location = new System.Drawing.Point(6, 179);
+			RotationLabel.Text = "Rotation:";
+
+			box.Controls.Add(BoneNameTextBox);
+			box.Controls.Add(ParentBoneNameTextBox);
+			box.Controls.Add(MaterialTextBox);
+			box.Controls.Add(MassTextBox);
+			box.Controls.Add(CenterMassTextBoxX);
+			box.Controls.Add(CenterMassTextBoxY);
+			box.Controls.Add(CenterMassTextBoxZ);
+			box.Controls.Add(PositionX);
+			box.Controls.Add(PositionY);
+			box.Controls.Add(PositionZ);
+			box.Controls.Add(RotationX);
+			box.Controls.Add(RotationY);
+			box.Controls.Add(RotationZ);
+
+			box.Controls.Add(BoneNameLabel);
+			box.Controls.Add(ParentBoneNameLabel);
+			box.Controls.Add(MaterialLabel);
+			box.Controls.Add(MassLabel);
+			box.Controls.Add(CenterMassLabel);
+			box.Controls.Add(PositionLabel);
+			box.Controls.Add(RotationLabel);
 		}
     }
 }

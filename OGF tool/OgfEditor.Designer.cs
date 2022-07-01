@@ -149,6 +149,7 @@ namespace OGF_tool
             this.UserDataBox.Size = new System.Drawing.Size(395, 256);
             this.UserDataBox.TabIndex = 0;
             this.UserDataBox.Text = "";
+            this.UserDataBox.TextChanged += new System.EventHandler(this.RichTextBoxTextChanged);
             // 
             // MotionRefsPage
             // 
@@ -187,6 +188,7 @@ namespace OGF_tool
             this.MotionRefsBox.TabIndex = 0;
             this.MotionRefsBox.Text = "";
             this.MotionRefsBox.WordWrap = false;
+            this.MotionRefsBox.TextChanged += new System.EventHandler(this.RichTextBoxTextChanged);
             // 
             // MotionPage
             // 

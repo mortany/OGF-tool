@@ -239,8 +239,9 @@ namespace OGF_tool
     public class MotionRefs
     {
         public long pos;
-        public List<string> refs0;
+        public List<string> refs;
         public bool need_create;
+        public bool need_delete;
         public bool v3;
         public int old_size;
 
@@ -248,27 +249,28 @@ namespace OGF_tool
         {
             this.pos = 0;
             this.old_size = 0;
-            this.refs0 = null;
+            this.refs = null;
             this.need_create = false;
+            this.need_delete = false;
             this.v3 = false;
         }
 
         public uint chunk_size()
         {
             uint temp = 4;
-            foreach (var text in refs0)
+            foreach (var text in refs)
                 temp += (uint)text.Length + 1;
             return temp;
         }
         public byte[] count()
         {
-            return BitConverter.GetBytes(refs0.Count);
+            return BitConverter.GetBytes(refs.Count);
         }
         public byte[] data()
         {
             List<byte> temp = new List<byte>();
 
-            foreach (var str in refs0)
+            foreach (var str in refs)
             {
                 temp.AddRange(Encoding.Default.GetBytes(str));
                 temp.Add(0);
@@ -284,6 +286,7 @@ namespace OGF_tool
         public int old_size;
         public string data;
         public bool need_create;
+        public bool need_delete;
 
         public UserData()
         {
@@ -291,6 +294,7 @@ namespace OGF_tool
             this.old_size = 0;
             this.data = "";
             this.need_create = false;
+            this.need_delete = false;
         }
 
         public byte[] data_all()
