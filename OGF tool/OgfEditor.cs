@@ -106,6 +106,12 @@ namespace OGF_tool
 			saveAsToolStripMenuItem.Enabled = true;
 			openSkeletonInObjectEditorToolStripMenuItem.Enabled = true;
 
+			openOGFDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
+			saveFileDialog1.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
+			saveFileDialog1.FileName = StatusFile.Text.Substring(0, StatusFile.Text.LastIndexOf('.'));
+			openOMFDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
+			openProgramDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
+
 			for (int i = 0; i < OGF_V.childs.Count; i++)
 			{
 				CreateTextureGroupBox(i);
@@ -1080,6 +1086,7 @@ namespace OGF_tool
 				Clear();
 				if (OpenFile(openOGFDialog.FileName))
 				{
+					openOGFDialog.InitialDirectory = "";
 					FILE_NAME = openOGFDialog.FileName;
 					AfterLoad();
 				}
@@ -1123,8 +1130,6 @@ namespace OGF_tool
 
 		private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-			saveFileDialog1.FileName = "";
-
 			saveFileDialog1.Filter = "OGF file|*.ogf|Object file|*.object|Bones file|*.bones";
 			if (Current_OMF != null)
 				saveFileDialog1.Filter += "|Skl file|*.skl|Skls file|*.skls|OMF file|*.omf";
@@ -1134,6 +1139,8 @@ namespace OGF_tool
 
 		private void saveFileDialog1_FileOk(object sender, CancelEventArgs e)
 		{
+			saveFileDialog1.InitialDirectory = "";
+
 			string Filename = (sender as SaveFileDialog).FileName;
 
 			string format = Path.GetExtension(Filename);
@@ -1366,6 +1373,9 @@ namespace OGF_tool
 
 		private void AppendMotion(object sender, CancelEventArgs e)
 		{
+			if (sender != null)
+				openOMFDialog.InitialDirectory = "";
+
 			AppendOMFButton.Visible = false;
 			MotionBox.Visible = true;
 			OGF_V.delete_motions = false;
@@ -1503,6 +1513,7 @@ namespace OGF_tool
 				MessageBox.Show("Please, open OMF Editor path", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
 				if (openProgramDialog.ShowDialog() == DialogResult.OK)
 				{
+					openProgramDialog.InitialDirectory = "";
 					omf_editor_path = openProgramDialog.FileName;
 					Settings.Write("omf_editor", omf_editor_path, "settings");
 				}
@@ -1519,6 +1530,7 @@ namespace OGF_tool
 				MessageBox.Show("Please, open Object Editor path", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
 				if (openProgramDialog.ShowDialog() == DialogResult.OK)
 				{
+					openProgramDialog.InitialDirectory = "";
 					object_editor_path = openProgramDialog.FileName;
 					Settings.Write("object_editor", object_editor_path, "settings");
 				}
