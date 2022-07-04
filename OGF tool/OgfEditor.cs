@@ -154,17 +154,13 @@ namespace OGF_tool
 
 		private void CopyParams()
 		{
+			UpdateModelType();
 			if (OGF_V.refs != null)
 			{
 				if (MotionRefsBox.Lines.Count() > 0)
 				{
 					OGF_V.refs.refs = new List<string>();
 					OGF_V.refs.refs.AddRange(MotionRefsBox.Lines);
-				}
-				else
-				{
-					if (MotionBox.Text == "")
-						m_model_type = 10;
 				}
 			}
 
@@ -473,8 +469,6 @@ namespace OGF_tool
 							byte[] motionrefs = GetMotionRefsChunk();
 							file_bytes.AddRange(motionrefs);
 							refs_created = true;
-
-							MessageBox.Show("create");
 						}
 						else if (OGF_V.refs.need_delete)
                         {
@@ -486,8 +480,6 @@ namespace OGF_tool
 							file_bytes.AddRange(temp);
 
 							fileStream.ReadBytes(OGF_V.refs.old_size + 8);
-
-							MessageBox.Show("delete");
 						}
 						else
 						{
@@ -514,8 +506,6 @@ namespace OGF_tool
 
 							fileStream.ReadBytes(OGF_V.refs.old_size + 8);
 							refs_created = true;
-
-							MessageBox.Show("rewrite");
 						}
 					}
 				}
@@ -1153,14 +1143,14 @@ namespace OGF_tool
 
         private void CreateMotionRefsButton_Click(object sender, EventArgs e)
         {
-			if (Current_OMF != null && MessageBox.Show("New motion refs chunk will remove built-in motions, continue?", "OGF Editor", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+			if (Current_OMF == null || Current_OMF != null && MessageBox.Show("New motion refs chunk will remove built-in motions, continue?", "OGF Editor", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
 			{
 				MotionBox.Clear();
 				Current_OMF = null;
 				AppendOMFButton.Visible = true;
 				MotionBox.Visible = false;
 
-				m_model_type = 3;
+				UpdateModelType();
 				CreateMotionRefsButton.Visible = false;
 				MotionRefsBox.Visible = true;
 
@@ -1239,6 +1229,8 @@ namespace OGF_tool
 							OGF_V.refs.need_delete = true;
 						else
 							OGF_V.refs.need_delete = false;
+
+						UpdateModelType();
 						break;
                     }
             }
@@ -1265,7 +1257,7 @@ namespace OGF_tool
 
 			Current_OMF = File.ReadAllBytes(openOMFDialog.FileName);
 			MotionBox.Clear();
-			m_model_type = 3;
+			UpdateModelType();
 
 			using (var r = new BinaryReader(new MemoryStream(Current_OMF)))
 			{
@@ -1297,56 +1289,22 @@ namespace OGF_tool
 
         private void deleteChunkToolStripMenuItem_Click(object sender, EventArgs e)
         {
-			OGF_V.delete_motions = !OGF_V.delete_motions;
-			if (OGF_V.delete_motions)
-            {
-				deleteMotionsToolStripMenuItem.Text = "Return last motions";
-				MotionBox.Visible = false;
-				AppendOMFButton.Visible = true;
-				replaceMotionsToolStripMenuItem1.Enabled = false;
-				editInOMFEditorToolStripMenuItem.Enabled = false;
+			OGF_V.delete_motions = true;
+			MotionBox.Visible = false;
+			AppendOMFButton.Visible = true;
+			motionToolsToolStripMenuItem.Enabled = false;
+			Current_OMF = null;
+			MotionBox.Clear();
+			UpdateModelType();
+		}
 
-				MotionBox.Clear();
-				m_model_type = 3;
-			}
+		private void UpdateModelType()
+        {
+			if (Current_OMF == null && MotionRefsBox.Text == "")
+				m_model_type = 10;
 			else
-            {
-				deleteMotionsToolStripMenuItem.Text = "Delete motions";
-				MotionBox.Visible = true;
-				AppendOMFButton.Visible = false;
-				replaceMotionsToolStripMenuItem1.Enabled = true;
-				editInOMFEditorToolStripMenuItem.Enabled = true;
-
-				var xr_loader = new XRayLoader();
-
-				using (var r = new BinaryReader(new MemoryStream(Current_OMF)))
-				{
-					xr_loader.SetStream(r.BaseStream);
-
-					if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_S_MOTIONS, false, true)))
-					{
-						int id = 0;
-
-						while (true)
-						{
-							if (!xr_loader.find_chunk(id)) break;
-
-							Stream temp = xr_loader.reader.BaseStream;
-
-							if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk(id, false, true))) break;
-
-							if (id == 0)
-								MotionBox.Text += $"Motions count : {xr_loader.ReadUInt32()}\n";
-							else
-								MotionBox.Text += $"\n{id}. {xr_loader.read_stringZ()}";
-
-							id++;
-							xr_loader.SetStream(temp);
-						}
-					}
-				}
-			}
-        }
+				m_model_type = 3;
+		}
 
 		private void editImOMFEditorToolStripMenuItem_Click(object sender, EventArgs e)
 		{
