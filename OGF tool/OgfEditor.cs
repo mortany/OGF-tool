@@ -462,24 +462,24 @@ namespace OGF_tool
 				bool refs_created = false;
 				if (OGF_V.refs != null)
 				{
-					if (OGF_V.refs.refs != null)
+					if (OGF_V.refs.need_delete)
+					{
+						if (OGF_V.refs.pos > 0)
+							temp = fileStream.ReadBytes((int)(OGF_V.refs.pos - fileStream.BaseStream.Position));
+						else
+							temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
+
+						file_bytes.AddRange(temp);
+
+						fileStream.ReadBytes(OGF_V.refs.old_size + 8);
+					}
+					else if (OGF_V.refs.refs != null)
 					{
 						if (OGF_V.refs.need_create)
 						{
 							byte[] motionrefs = GetMotionRefsChunk();
 							file_bytes.AddRange(motionrefs);
 							refs_created = true;
-						}
-						else if (OGF_V.refs.need_delete)
-                        {
-							if (OGF_V.refs.pos > 0)
-								temp = fileStream.ReadBytes((int)(OGF_V.refs.pos - fileStream.BaseStream.Position));
-							else
-								temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
-
-							file_bytes.AddRange(temp);
-
-							fileStream.ReadBytes(OGF_V.refs.old_size + 8);
 						}
 						else
 						{
