@@ -493,8 +493,8 @@ namespace OGF_tool
 							if (OGF_V.refs.refs.Count() > 1 || !OGF_V.refs.v3)
 							{
 								file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_MOTION_REFS2));
-								file_bytes.AddRange(OGF_V.refs.count());
 								file_bytes.AddRange(BitConverter.GetBytes(OGF_V.refs.chunk_size()));
+								file_bytes.AddRange(OGF_V.refs.count());
 							}
 							else
 							{
