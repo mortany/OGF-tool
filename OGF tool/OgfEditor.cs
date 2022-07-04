@@ -490,7 +490,6 @@ namespace OGF_tool
 						{
 							byte[] loddata = GetLodChunk();
 							file_bytes.AddRange(loddata);
-							MessageBox.Show("create");
 						}
 					}
 					else if (OGF_V.lod.need_delete) // Чанк был, удалили и не хотим писать
