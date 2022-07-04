@@ -177,6 +177,9 @@ namespace OGF_tool
 					}
 				}
 			}
+
+			if (OGF_V.lod != null)
+				OGF_V.lod.data = LodPathBox.Text;
 		}
 
 		public byte[] GetUserdataChunk()
@@ -189,6 +192,17 @@ namespace OGF_tool
 
 			return chunk.ToArray();
         }
+
+		public byte[] GetLodChunk()
+		{
+			List<byte> chunk = new List<byte>();
+
+			chunk.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_LODS));
+			chunk.AddRange(BitConverter.GetBytes(OGF_V.lod.chunk_size()));
+			chunk.AddRange(OGF_V.lod.data_all());
+
+			return chunk.ToArray();
+		}
 
 		public byte[] GetMotionRefsChunk()
 		{
@@ -439,7 +453,17 @@ namespace OGF_tool
 					}
 					else if (OGF_V.usertdata.need_delete) // Чанк был, удалили и не хотим писать
 					{
-						fileStream.ReadBytes(OGF_V.usertdata.old_size + 8);
+						if (OGF_V.usertdata.old_size > 0)
+						{
+							if (OGF_V.usertdata.pos > 0)
+								temp = fileStream.ReadBytes((int)(OGF_V.usertdata.pos - fileStream.BaseStream.Position));
+							else
+								temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
+
+							file_bytes.AddRange(temp);
+
+							fileStream.ReadBytes(OGF_V.usertdata.old_size + 8);
+						}
 					}
 					else // Чанк был и мы его перезаписываем
 					{
@@ -452,26 +476,70 @@ namespace OGF_tool
 
 						file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_USERDATA));
 						file_bytes.AddRange(BitConverter.GetBytes(OGF_V.usertdata.chunk_size()));
-
 						file_bytes.AddRange(OGF_V.usertdata.data_all());
 
 						fileStream.ReadBytes(OGF_V.usertdata.old_size + 8);
 					}
 				}
 
-				bool refs_created = false;
-				if (OGF_V.refs != null)
+				if (OGF_V.lod != null)
 				{
-					if (OGF_V.refs.need_delete)
+					if (OGF_V.lod.need_create) // Чанка не было, создали и в нем что то есть
 					{
-						if (OGF_V.refs.pos > 0)
-							temp = fileStream.ReadBytes((int)(OGF_V.refs.pos - fileStream.BaseStream.Position));
+						if (OGF_V.lod.data != "")
+						{
+							byte[] loddata = GetLodChunk();
+							file_bytes.AddRange(loddata);
+							MessageBox.Show("create");
+						}
+					}
+					else if (OGF_V.lod.need_delete) // Чанк был, удалили и не хотим писать
+					{
+						if (OGF_V.lod.old_size > 0)
+						{
+							if (OGF_V.lod.pos > 0)
+								temp = fileStream.ReadBytes((int)(OGF_V.lod.pos - fileStream.BaseStream.Position));
+							else
+								temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
+
+							file_bytes.AddRange(temp);
+
+							fileStream.ReadBytes(OGF_V.lod.old_size + 8);
+						}
+					}
+					else // Чанк был и мы его перезаписываем
+					{
+						if (OGF_V.lod.pos > 0)
+							temp = fileStream.ReadBytes((int)(OGF_V.lod.pos - fileStream.BaseStream.Position));
 						else
 							temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
 
 						file_bytes.AddRange(temp);
 
-						fileStream.ReadBytes(OGF_V.refs.old_size + 8);
+						file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_LODS));
+						file_bytes.AddRange(BitConverter.GetBytes(OGF_V.lod.chunk_size()));
+						file_bytes.AddRange(OGF_V.lod.data_all());
+
+						fileStream.ReadBytes(OGF_V.lod.old_size + 8);
+					}
+				}
+
+				bool refs_created = false;
+				if (OGF_V.refs != null)
+				{
+					if (OGF_V.refs.need_delete || OGF_V.refs.need_create && MotionRefsBox.Lines.Count() == 0)
+					{
+						if (OGF_V.refs.old_size > 0) // чанк существовал
+						{
+							if (OGF_V.refs.pos > 0)
+								temp = fileStream.ReadBytes((int)(OGF_V.refs.pos - fileStream.BaseStream.Position));
+							else
+								temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
+
+							file_bytes.AddRange(temp);
+
+							fileStream.ReadBytes(OGF_V.refs.old_size + 8);
+						}
 					}
 					else if (OGF_V.refs.refs != null)
 					{
@@ -760,24 +828,24 @@ namespace OGF_tool
 					}
 
 					for (int i = 0; i < OGF_V.bones.bones.Count; i++)
-                    {
+					{
 						List<int> childs = new List<int>();
 						for (int j = 0; j < OGF_V.bones.parent_bones.Count; j++)
-                        {
+						{
 							if (OGF_V.bones.parent_bones[j] == OGF_V.bones.bones[i])
-                            {
+							{
 								childs.Add(j);
 							}
-                        }
+						}
 						OGF_V.bones.bone_childs.Add(childs);
 					}
 				}
 
 				xr_loader.SetStream(r.BaseStream);
 
-                // Ik Data
-                if (xr_loader.find_chunk((int)OGF.OGF4_S_IKDATA, false, true))
-                {
+				// Ik Data
+				if (xr_loader.find_chunk((int)OGF.OGF4_S_IKDATA, false, true))
+				{
 					TabControl.Controls.Add(BoneParamsPage);
 
 					OGF_V.ikdata.pos = xr_loader.chunk_pos;
@@ -791,13 +859,13 @@ namespace OGF_tool
 					OGF_V.ikdata.old_size = 0;
 
 					for (int i = 0; i < OGF_V.bones.bones.Count; i++)
-                    {
+					{
 						List<byte[]> bytes_1 = new List<byte[]>();
 						OGF_V.ikdata.old_size += 4;
 
 						byte[] temp_byte;
 						uint version = xr_loader.ReadUInt32();
-                        string gmtl_name = xr_loader.read_stringZ();
+						string gmtl_name = xr_loader.read_stringZ();
 
 						temp_byte = xr_loader.ReadBytes(112);   // struct SBoneShape
 						bytes_1.Add(temp_byte);
@@ -828,7 +896,7 @@ namespace OGF_tool
 								bytes_1.Add(temp_byte);
 								OGF_V.ikdata.old_size += 4;
 							}
-                        }
+						}
 
 						Fvector rotation = new Fvector();
 						rotation.x = xr_loader.ReadFloat();
@@ -857,7 +925,22 @@ namespace OGF_tool
 						OGF_V.ikdata.position.Add(position);
 						OGF_V.ikdata.rotation.Add(rotation);
 					}
-                }
+				}
+
+				TabControl.Controls.Add(LodPage);
+
+				// Lod ref
+				if (xr_loader.find_chunk((int)OGF.OGF4_S_LODS, false, true))
+				{
+					CreateLodButton.Visible = false;
+					OGF_V.lod = new Lod();
+					OGF_V.lod.pos = xr_loader.chunk_pos;
+					OGF_V.lod.data = xr_loader.read_stringZ();
+					OGF_V.lod.old_size = OGF_V.lod.data.Length + 1;
+					LodPathBox.Text = OGF_V.lod.data;
+				}
+				else
+					CreateLodButton.Visible = true;
 			}
 			return true;
 		}
@@ -1161,7 +1244,17 @@ namespace OGF_tool
 			}
 		}
 
-        private void reloadToolStripMenuItem_Click(object sender, EventArgs e)
+		private void CreateLodButton_Click(object sender, EventArgs e)
+		{
+			CreateLodButton.Visible = false;
+			if (OGF_V.lod == null)
+			{
+				OGF_V.lod = new Lod();
+				OGF_V.lod.need_create = true;
+			}
+		}
+
+		private void reloadToolStripMenuItem_Click(object sender, EventArgs e)
         {
 			string cur_fname = FILE_NAME;
 			Clear();
@@ -1207,6 +1300,20 @@ namespace OGF_tool
 							motionToolsToolStripMenuItem.Enabled = true;
 						break;
 					}
+				case "LodPage":
+					{
+						if (LodPathBox.Text == "")
+						{
+							CreateLodButton.Visible = true;
+						}
+						break;
+					}
+				default:
+                    {
+						if (OGF_V.refs.need_create)
+							OGF_V.refs = null;
+						break;
+                    }
 			}
 		}
 
@@ -1217,7 +1324,7 @@ namespace OGF_tool
 			{
 				case "UserDataBox":
 					{
-						if (UserDataBox.Text == "")
+						if (curBox.Text == "")
 							OGF_V.usertdata.need_delete = true;
 						else
 							OGF_V.usertdata.need_delete = false;
@@ -1225,7 +1332,7 @@ namespace OGF_tool
 					}
                 case "MotionRefsBox":
                     {
-						if (MotionRefsBox.Text == "")
+						if (curBox.Text == "")
 							OGF_V.refs.need_delete = true;
 						else
 							OGF_V.refs.need_delete = false;
@@ -1234,6 +1341,22 @@ namespace OGF_tool
 						break;
                     }
             }
+		}
+
+		private void TextBoxTextChanged(object sender, EventArgs e)
+		{
+			TextBox curBox = sender as TextBox;
+			switch (curBox.Name)
+			{
+				case "LodPathBox":
+					{
+						if (curBox.Text == "")
+							OGF_V.lod.need_delete = true;
+						else
+							OGF_V.lod.need_delete = false;
+						break;
+					}
+			}
 		}
 
 		private void AppendOMFButton_Click(object sender, EventArgs e)
@@ -1411,7 +1534,7 @@ namespace OGF_tool
 		{
 			var GroupBox = new GroupBox();
 			GroupBox.Location = new System.Drawing.Point(3, 3 + 126 * idx);
-			GroupBox.Size = new System.Drawing.Size(385, 126);
+			GroupBox.Size = new System.Drawing.Size(421, 126);
 			GroupBox.Text = "Set: [" + idx + "]";
 			GroupBox.Name = "TextureGrpBox_" + idx;
 			GroupBox.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
@@ -1424,14 +1547,14 @@ namespace OGF_tool
 		{
 			var newTextBox = new TextBox();
 			newTextBox.Name = "textureBox_" + idx;
-			newTextBox.Size = new System.Drawing.Size(373, 23);
+			newTextBox.Size = new System.Drawing.Size(409, 23);
 			newTextBox.Location = new System.Drawing.Point(6, 39);
 			newTextBox.TextChanged += new System.EventHandler(this.TextBoxFilter);
 			newTextBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
 
 			var newTextBox2 = new TextBox();
 			newTextBox2.Name = "shaderBox_" + idx;
-			newTextBox2.Size = new System.Drawing.Size(373, 23);
+			newTextBox2.Size = new System.Drawing.Size(409, 23);
 			newTextBox2.Location = new System.Drawing.Point(6, 88);
 			newTextBox2.TextChanged += new System.EventHandler(this.TextBoxFilter);
 			newTextBox2.Anchor = AnchorStyles.Left | AnchorStyles.Right;
@@ -1459,7 +1582,7 @@ namespace OGF_tool
 		{
 			var GroupBox = new GroupBox();
 			GroupBox.Location = new System.Drawing.Point(3, 3 + 205 * idx);
-			GroupBox.Size = new System.Drawing.Size(385, 203);
+			GroupBox.Size = new System.Drawing.Size(421, 203);
 			GroupBox.Text = "Bone id: [" + idx + "]";
 			GroupBox.Name = "BoneGrpBox_" + idx;
 			GroupBox.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
@@ -1472,7 +1595,7 @@ namespace OGF_tool
 		{
 			var BoneNameTextBox = new TextBox();
 			BoneNameTextBox.Name = "boneBox_" + idx;
-			BoneNameTextBox.Size = new System.Drawing.Size(290, 58);
+			BoneNameTextBox.Size = new System.Drawing.Size(326, 58);
 			BoneNameTextBox.Location = new System.Drawing.Point(86, 18);
 			BoneNameTextBox.Text = bone_name;
 			BoneNameTextBox.Tag = "string";
@@ -1488,7 +1611,7 @@ namespace OGF_tool
 
 			var ParentBoneNameTextBox = new TextBox();
 			ParentBoneNameTextBox.Name = "ParentboneBox_" + idx;
-			ParentBoneNameTextBox.Size = new System.Drawing.Size(290, 58);
+			ParentBoneNameTextBox.Size = new System.Drawing.Size(326, 58);
 			ParentBoneNameTextBox.Location = new System.Drawing.Point(86, 45);
 			ParentBoneNameTextBox.Text = parent_bone_name;
 			ParentBoneNameTextBox.Tag = "string";
@@ -1503,7 +1626,7 @@ namespace OGF_tool
 
 			var MaterialTextBox = new TextBox();
 			MaterialTextBox.Name = "MaterialBox_" + idx;
-			MaterialTextBox.Size = new System.Drawing.Size(290, 58);
+			MaterialTextBox.Size = new System.Drawing.Size(326, 58);
 			MaterialTextBox.Location = new System.Drawing.Point(86, 72);
 			MaterialTextBox.Text = material;
 			MaterialTextBox.Tag = "string";

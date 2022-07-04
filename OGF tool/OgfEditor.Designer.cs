@@ -45,6 +45,10 @@ namespace OGF_tool
             this.BoneNamesPage = new System.Windows.Forms.TabPage();
             this.BoneNamesBox = new System.Windows.Forms.RichTextBox();
             this.BoneParamsPage = new System.Windows.Forms.TabPage();
+            this.LodPage = new System.Windows.Forms.TabPage();
+            this.CreateLodButton = new System.Windows.Forms.Button();
+            this.LodPathBox = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.MenuPanel = new System.Windows.Forms.MenuStrip();
             this.FileMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.LoadMenuParam = new System.Windows.Forms.ToolStripMenuItem();
@@ -73,6 +77,7 @@ namespace OGF_tool
             this.MotionRefsPage.SuspendLayout();
             this.MotionPage.SuspendLayout();
             this.BoneNamesPage.SuspendLayout();
+            this.LodPage.SuspendLayout();
             this.MenuPanel.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -93,11 +98,12 @@ namespace OGF_tool
             this.TabControl.Controls.Add(this.MotionPage);
             this.TabControl.Controls.Add(this.BoneNamesPage);
             this.TabControl.Controls.Add(this.BoneParamsPage);
+            this.TabControl.Controls.Add(this.LodPage);
             this.TabControl.Location = new System.Drawing.Point(12, 27);
             this.TabControl.Multiline = true;
             this.TabControl.Name = "TabControl";
             this.TabControl.SelectedIndex = 0;
-            this.TabControl.Size = new System.Drawing.Size(403, 285);
+            this.TabControl.Size = new System.Drawing.Size(439, 285);
             this.TabControl.SizeMode = System.Windows.Forms.TabSizeMode.FillToRight;
             this.TabControl.TabIndex = 7;
             this.TabControl.SelectedIndexChanged += new System.EventHandler(this.TabControl_SelectedIndexChanged);
@@ -109,7 +115,7 @@ namespace OGF_tool
             this.TexturesPage.Location = new System.Drawing.Point(4, 25);
             this.TexturesPage.Name = "TexturesPage";
             this.TexturesPage.Padding = new System.Windows.Forms.Padding(3);
-            this.TexturesPage.Size = new System.Drawing.Size(395, 256);
+            this.TexturesPage.Size = new System.Drawing.Size(431, 256);
             this.TexturesPage.TabIndex = 0;
             this.TexturesPage.Text = "Textures";
             this.TexturesPage.UseVisualStyleBackColor = true;
@@ -121,7 +127,7 @@ namespace OGF_tool
             this.UserDataPage.Location = new System.Drawing.Point(4, 25);
             this.UserDataPage.Name = "UserDataPage";
             this.UserDataPage.Padding = new System.Windows.Forms.Padding(3);
-            this.UserDataPage.Size = new System.Drawing.Size(395, 256);
+            this.UserDataPage.Size = new System.Drawing.Size(431, 256);
             this.UserDataPage.TabIndex = 2;
             this.UserDataPage.Text = "UserData";
             this.UserDataPage.UseVisualStyleBackColor = true;
@@ -133,7 +139,7 @@ namespace OGF_tool
             | System.Windows.Forms.AnchorStyles.Right)));
             this.CreateUserdataButton.Location = new System.Drawing.Point(6, 6);
             this.CreateUserdataButton.Name = "CreateUserdataButton";
-            this.CreateUserdataButton.Size = new System.Drawing.Size(383, 244);
+            this.CreateUserdataButton.Size = new System.Drawing.Size(419, 244);
             this.CreateUserdataButton.TabIndex = 1;
             this.CreateUserdataButton.Text = "Create UserData";
             this.CreateUserdataButton.UseVisualStyleBackColor = true;
@@ -146,7 +152,7 @@ namespace OGF_tool
             | System.Windows.Forms.AnchorStyles.Right)));
             this.UserDataBox.Location = new System.Drawing.Point(0, 0);
             this.UserDataBox.Name = "UserDataBox";
-            this.UserDataBox.Size = new System.Drawing.Size(395, 256);
+            this.UserDataBox.Size = new System.Drawing.Size(431, 256);
             this.UserDataBox.TabIndex = 0;
             this.UserDataBox.Text = "";
             this.UserDataBox.TextChanged += new System.EventHandler(this.RichTextBoxTextChanged);
@@ -158,7 +164,7 @@ namespace OGF_tool
             this.MotionRefsPage.Location = new System.Drawing.Point(4, 25);
             this.MotionRefsPage.Name = "MotionRefsPage";
             this.MotionRefsPage.Padding = new System.Windows.Forms.Padding(3);
-            this.MotionRefsPage.Size = new System.Drawing.Size(395, 256);
+            this.MotionRefsPage.Size = new System.Drawing.Size(431, 256);
             this.MotionRefsPage.TabIndex = 1;
             this.MotionRefsPage.Text = "Motion Refs";
             this.MotionRefsPage.UseVisualStyleBackColor = true;
@@ -170,7 +176,7 @@ namespace OGF_tool
             | System.Windows.Forms.AnchorStyles.Right)));
             this.CreateMotionRefsButton.Location = new System.Drawing.Point(6, 6);
             this.CreateMotionRefsButton.Name = "CreateMotionRefsButton";
-            this.CreateMotionRefsButton.Size = new System.Drawing.Size(383, 244);
+            this.CreateMotionRefsButton.Size = new System.Drawing.Size(419, 244);
             this.CreateMotionRefsButton.TabIndex = 1;
             this.CreateMotionRefsButton.Text = "Create Motion Refs";
             this.CreateMotionRefsButton.UseVisualStyleBackColor = true;
@@ -184,7 +190,7 @@ namespace OGF_tool
             this.MotionRefsBox.DetectUrls = false;
             this.MotionRefsBox.Location = new System.Drawing.Point(0, 0);
             this.MotionRefsBox.Name = "MotionRefsBox";
-            this.MotionRefsBox.Size = new System.Drawing.Size(395, 256);
+            this.MotionRefsBox.Size = new System.Drawing.Size(431, 256);
             this.MotionRefsBox.TabIndex = 0;
             this.MotionRefsBox.Text = "";
             this.MotionRefsBox.WordWrap = false;
@@ -197,7 +203,7 @@ namespace OGF_tool
             this.MotionPage.Location = new System.Drawing.Point(4, 25);
             this.MotionPage.Name = "MotionPage";
             this.MotionPage.Padding = new System.Windows.Forms.Padding(3);
-            this.MotionPage.Size = new System.Drawing.Size(395, 256);
+            this.MotionPage.Size = new System.Drawing.Size(431, 256);
             this.MotionPage.TabIndex = 4;
             this.MotionPage.Text = "Motions";
             this.MotionPage.UseVisualStyleBackColor = true;
@@ -209,7 +215,7 @@ namespace OGF_tool
             | System.Windows.Forms.AnchorStyles.Right)));
             this.AppendOMFButton.Location = new System.Drawing.Point(6, 6);
             this.AppendOMFButton.Name = "AppendOMFButton";
-            this.AppendOMFButton.Size = new System.Drawing.Size(383, 244);
+            this.AppendOMFButton.Size = new System.Drawing.Size(419, 244);
             this.AppendOMFButton.TabIndex = 4;
             this.AppendOMFButton.Text = "Append OMF";
             this.AppendOMFButton.UseVisualStyleBackColor = true;
@@ -223,7 +229,7 @@ namespace OGF_tool
             this.MotionBox.Location = new System.Drawing.Point(0, 0);
             this.MotionBox.Name = "MotionBox";
             this.MotionBox.ReadOnly = true;
-            this.MotionBox.Size = new System.Drawing.Size(395, 256);
+            this.MotionBox.Size = new System.Drawing.Size(431, 256);
             this.MotionBox.TabIndex = 2;
             this.MotionBox.Text = "";
             // 
@@ -233,7 +239,7 @@ namespace OGF_tool
             this.BoneNamesPage.Location = new System.Drawing.Point(4, 25);
             this.BoneNamesPage.Name = "BoneNamesPage";
             this.BoneNamesPage.Padding = new System.Windows.Forms.Padding(3);
-            this.BoneNamesPage.Size = new System.Drawing.Size(395, 256);
+            this.BoneNamesPage.Size = new System.Drawing.Size(431, 256);
             this.BoneNamesPage.TabIndex = 5;
             this.BoneNamesPage.Text = "Bone Names";
             this.BoneNamesPage.UseVisualStyleBackColor = true;
@@ -247,7 +253,7 @@ namespace OGF_tool
             this.BoneNamesBox.Location = new System.Drawing.Point(0, 0);
             this.BoneNamesBox.Name = "BoneNamesBox";
             this.BoneNamesBox.ReadOnly = true;
-            this.BoneNamesBox.Size = new System.Drawing.Size(395, 256);
+            this.BoneNamesBox.Size = new System.Drawing.Size(431, 256);
             this.BoneNamesBox.TabIndex = 1;
             this.BoneNamesBox.Text = "";
             this.BoneNamesBox.WordWrap = false;
@@ -258,15 +264,58 @@ namespace OGF_tool
             this.BoneParamsPage.Location = new System.Drawing.Point(4, 25);
             this.BoneParamsPage.Name = "BoneParamsPage";
             this.BoneParamsPage.Padding = new System.Windows.Forms.Padding(3);
-            this.BoneParamsPage.Size = new System.Drawing.Size(395, 256);
+            this.BoneParamsPage.Size = new System.Drawing.Size(431, 256);
             this.BoneParamsPage.TabIndex = 3;
             this.BoneParamsPage.Text = "Bone Params";
             this.BoneParamsPage.UseVisualStyleBackColor = true;
             // 
+            // LodPage
+            // 
+            this.LodPage.Controls.Add(this.CreateLodButton);
+            this.LodPage.Controls.Add(this.LodPathBox);
+            this.LodPage.Controls.Add(this.label1);
+            this.LodPage.Location = new System.Drawing.Point(4, 25);
+            this.LodPage.Name = "LodPage";
+            this.LodPage.Padding = new System.Windows.Forms.Padding(3);
+            this.LodPage.Size = new System.Drawing.Size(431, 256);
+            this.LodPage.TabIndex = 6;
+            this.LodPage.Text = "Lod";
+            this.LodPage.UseVisualStyleBackColor = true;
+            // 
+            // CreateLodButton
+            // 
+            this.CreateLodButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.CreateLodButton.Location = new System.Drawing.Point(6, 6);
+            this.CreateLodButton.Name = "CreateLodButton";
+            this.CreateLodButton.Size = new System.Drawing.Size(419, 244);
+            this.CreateLodButton.TabIndex = 2;
+            this.CreateLodButton.Text = "Create Lod";
+            this.CreateLodButton.UseVisualStyleBackColor = true;
+            this.CreateLodButton.Click += new System.EventHandler(this.CreateLodButton_Click);
+            // 
+            // LodPathBox
+            // 
+            this.LodPathBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.LodPathBox.Location = new System.Drawing.Point(6, 26);
+            this.LodPathBox.Name = "LodPathBox";
+            this.LodPathBox.Size = new System.Drawing.Size(419, 20);
+            this.LodPathBox.TabIndex = 1;
+            this.LodPathBox.TextChanged += new System.EventHandler(this.TextBoxTextChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(3, 10);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(52, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Lod path:";
+            // 
             // MenuPanel
             // 
-            this.MenuPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.MenuPanel.Dock = System.Windows.Forms.DockStyle.None;
             this.MenuPanel.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.FileMenuItem,
@@ -412,7 +461,7 @@ namespace OGF_tool
             this.StatusFile});
             this.statusStrip1.Location = new System.Drawing.Point(0, 315);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(427, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(463, 22);
             this.statusStrip1.TabIndex = 30;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -420,7 +469,7 @@ namespace OGF_tool
             // 
             this.BkpCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.BkpCheckBox.AutoSize = true;
-            this.BkpCheckBox.Location = new System.Drawing.Point(315, 7);
+            this.BkpCheckBox.Location = new System.Drawing.Point(351, 7);
             this.BkpCheckBox.Name = "BkpCheckBox";
             this.BkpCheckBox.Size = new System.Drawing.Size(96, 17);
             this.BkpCheckBox.TabIndex = 31;
@@ -447,7 +496,7 @@ namespace OGF_tool
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(427, 337);
+            this.ClientSize = new System.Drawing.Size(463, 337);
             this.Controls.Add(this.MenuPanel);
             this.Controls.Add(this.BkpCheckBox);
             this.Controls.Add(this.statusStrip1);
@@ -456,7 +505,7 @@ namespace OGF_tool
             this.MainMenuStrip = this.MenuPanel;
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(550, 880);
-            this.MinimumSize = new System.Drawing.Size(443, 251);
+            this.MinimumSize = new System.Drawing.Size(479, 251);
             this.Name = "OGF_Editor";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "OGF Params Editor";
@@ -466,6 +515,8 @@ namespace OGF_tool
             this.MotionRefsPage.ResumeLayout(false);
             this.MotionPage.ResumeLayout(false);
             this.BoneNamesPage.ResumeLayout(false);
+            this.LodPage.ResumeLayout(false);
+            this.LodPage.PerformLayout();
             this.MenuPanel.ResumeLayout(false);
             this.MenuPanel.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
@@ -514,6 +565,10 @@ namespace OGF_tool
         private System.Windows.Forms.ToolStripMenuItem deleteMotionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editInOMFEditorToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem replaceMotionsToolStripMenuItem1;
+        private System.Windows.Forms.TabPage LodPage;
+        private System.Windows.Forms.TextBox LodPathBox;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button CreateLodButton;
     }
 }
 

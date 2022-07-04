@@ -221,6 +221,8 @@ namespace OGF_tool
 
         public UserData usertdata = null;
 
+        public Lod lod = null;
+
         public BoneData bones = new BoneData();
 
         public IK_Data ikdata = new IK_Data();
@@ -289,6 +291,39 @@ namespace OGF_tool
         public bool need_delete;
 
         public UserData()
+        {
+            this.pos = 0;
+            this.old_size = 0;
+            this.data = "";
+            this.need_create = false;
+            this.need_delete = false;
+        }
+
+        public byte[] data_all()
+        {
+            List<byte> temp = new List<byte>();
+
+            temp.AddRange(Encoding.Default.GetBytes(data));
+            temp.Add(0);
+
+            return temp.ToArray();
+        }
+
+        public uint chunk_size()
+        {
+            return (uint)data.Length +1;
+        }
+    }
+
+    public class Lod
+    {
+        public long pos;
+        public int old_size;
+        public string data;
+        public bool need_create;
+        public bool need_delete;
+
+        public Lod()
         {
             this.pos = 0;
             this.old_size = 0;
