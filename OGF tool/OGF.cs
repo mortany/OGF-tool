@@ -213,6 +213,7 @@ namespace OGF_tool
     {
         public byte m_version = 0;
         public byte m_model_type = 0; // 1 - Without bones, 3 - Animated, 10 - Rigid
+        public bool IsDM = false;
 
         public List<OGF_Child> childs = new List<OGF_Child>();
 

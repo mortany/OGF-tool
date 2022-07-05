@@ -63,6 +63,7 @@ namespace OGF_tool
             this.deleteMotionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editInOMFEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.replaceMotionsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.importDataFromModelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.oGFInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.FileLabel = new System.Windows.Forms.ToolStripStatusLabel();
@@ -72,7 +73,7 @@ namespace OGF_tool
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.openOMFDialog = new System.Windows.Forms.OpenFileDialog();
             this.openProgramDialog = new System.Windows.Forms.OpenFileDialog();
-            this.importDataFromModelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openOGF_DmDialog = new System.Windows.Forms.OpenFileDialog();
             this.TabControl.SuspendLayout();
             this.UserDataPage.SuspendLayout();
             this.MotionRefsPage.SuspendLayout();
@@ -85,7 +86,7 @@ namespace OGF_tool
             // 
             // openOGFDialog
             // 
-            this.openOGFDialog.Filter = "OGF |*.ogf";
+            this.openOGFDialog.Filter = "OGF file|*.ogf";
             // 
             // TabControl
             // 
@@ -323,7 +324,7 @@ namespace OGF_tool
             this.viewToolStripMenuItem});
             this.MenuPanel.Location = new System.Drawing.Point(0, 4);
             this.MenuPanel.Name = "MenuPanel";
-            this.MenuPanel.Size = new System.Drawing.Size(321, 24);
+            this.MenuPanel.Size = new System.Drawing.Size(201, 24);
             this.MenuPanel.TabIndex = 8;
             this.MenuPanel.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
@@ -428,6 +429,13 @@ namespace OGF_tool
             this.replaceMotionsToolStripMenuItem1.Text = "Replace motions";
             this.replaceMotionsToolStripMenuItem1.Click += new System.EventHandler(this.AppendOMFButton_Click);
             // 
+            // importDataFromModelToolStripMenuItem
+            // 
+            this.importDataFromModelToolStripMenuItem.Name = "importDataFromModelToolStripMenuItem";
+            this.importDataFromModelToolStripMenuItem.Size = new System.Drawing.Size(235, 22);
+            this.importDataFromModelToolStripMenuItem.Text = "Import data from same model";
+            this.importDataFromModelToolStripMenuItem.Click += new System.EventHandler(this.importDataFromModelToolStripMenuItem_Click);
+            // 
             // oGFInfoToolStripMenuItem
             // 
             this.oGFInfoToolStripMenuItem.Name = "oGFInfoToolStripMenuItem";
@@ -492,12 +500,9 @@ namespace OGF_tool
             // 
             this.openProgramDialog.Filter = "Program|*.exe";
             // 
-            // importDataFromModelToolStripMenuItem
+            // openOGF_DmDialog
             // 
-            this.importDataFromModelToolStripMenuItem.Name = "importDataFromModelToolStripMenuItem";
-            this.importDataFromModelToolStripMenuItem.Size = new System.Drawing.Size(235, 22);
-            this.importDataFromModelToolStripMenuItem.Text = "Import data from same model";
-            this.importDataFromModelToolStripMenuItem.Click += new System.EventHandler(this.importDataFromModelToolStripMenuItem_Click);
+            this.openOGF_DmDialog.Filter = "OGF file|*.ogf|DM file|*.dm";
             // 
             // OGF_Editor
             // 
@@ -577,6 +582,7 @@ namespace OGF_tool
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button CreateLodButton;
         private System.Windows.Forms.ToolStripMenuItem importDataFromModelToolStripMenuItem;
+        private System.Windows.Forms.OpenFileDialog openOGF_DmDialog;
     }
 }
 

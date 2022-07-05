@@ -108,11 +108,13 @@ namespace OGF_tool
 				oGFInfoToolStripMenuItem.Enabled = true;
 				SaveMenuParam.Enabled = true;
 				saveAsToolStripMenuItem.Enabled = true;
-				toolStripMenuItem1.Enabled = true;
+				toolStripMenuItem1.Enabled = !OGF_V.IsDM;
+				oGFInfoToolStripMenuItem.Enabled = !OGF_V.IsDM;
 				openSkeletonInObjectEditorToolStripMenuItem.Enabled = OGF_V.IsSkeleton();
 				viewToolStripMenuItem.Enabled = OGF_V.IsSkeleton();
 
 				openOGFDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
+				openOGF_DmDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
 				saveFileDialog1.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
 				saveFileDialog1.FileName = StatusFile.Text.Substring(0, StatusFile.Text.LastIndexOf('.'));
 				openOMFDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
@@ -228,7 +230,7 @@ namespace OGF_tool
 			if (OGF_V.userdata != null)
 				UserDataBox.Text = OGF_V.userdata.userdata;
 
-			if (main_file)
+			if (main_file && !OGF_V.IsDM)
 			{
 				IsModelBroken = CatchBrokenModel();
 
@@ -401,6 +403,29 @@ namespace OGF_tool
 			return true;
 		}
 
+		private void WriteFile(string filename)
+        {
+			if (BkpCheckBox.Checked)
+			{
+				string backup_path = filename + ".bak";
+
+				if (File.Exists(backup_path))
+				{
+					FileInfo backup_file = new FileInfo(backup_path);
+					backup_file.Delete();
+				}
+
+				FileInfo file = new FileInfo(filename);
+				file.CopyTo(backup_path);
+			}
+
+			using (var fileStream = new FileStream(filename, FileMode.Truncate))
+			{
+				byte[] data = file_bytes.ToArray();
+				fileStream.Write(data, 0, data.Length);
+			}
+		}
+
 		private void SaveFile(string filename)
 		{
 			file_bytes.Clear();
@@ -409,6 +434,19 @@ namespace OGF_tool
 
 			using (var fileStream = new BinaryReader(new MemoryStream(Current_OGF)))
 			{
+				if (OGF_V.IsDM)
+				{
+                    fileStream.ReadBytes(OGF_V.childs[0].old_size);
+					file_bytes.AddRange(Encoding.Default.GetBytes(OGF_V.childs[0].m_shader));
+					file_bytes.Add(0);
+					file_bytes.AddRange(Encoding.Default.GetBytes(OGF_V.childs[0].m_texture));
+					file_bytes.Add(0);
+                    byte[] dm_data = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
+					file_bytes.AddRange(dm_data);
+					WriteFile(filename);
+					return;
+				}
+
 				fileStream.ReadBytes(4);
 				byte[] temp = fileStream.ReadBytes(4);
 				file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_HEADER));
@@ -456,7 +494,7 @@ namespace OGF_tool
 					fileStream.BaseStream.Position += ch.old_size + 8;
 				}
 
-				if (OGF_V.m_model_type == 1)
+				if (!OGF_V.IsSkeleton())
                 {
 					temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
 					file_bytes.AddRange(temp);
@@ -568,38 +606,34 @@ namespace OGF_tool
 					file_bytes.AddRange(Current_OMF);
 			}
 
-			if (BkpCheckBox.Checked)
-			{
-				string backup_path = filename + ".bak";
-
-				if (File.Exists(backup_path))
-				{
-					FileInfo backup_file = new FileInfo(backup_path);
-					backup_file.Delete();
-				}
-
-				FileInfo file = new FileInfo(filename);
-				file.CopyTo(backup_path);
-			}
-
-			using (var fileStream = new FileStream(filename, FileMode.Truncate))
-			{
-				byte[] data = file_bytes.ToArray();
-				fileStream.Write(data, 0, data.Length);
-			}
+			WriteFile(filename);
 		}
 
 		private bool OpenFile(string filename, ref OGF_Children OGF_C, ref byte[] Cur_OGF, ref byte[] Cur_OMF)
 		{
 			var xr_loader = new XRayLoader();
 
+			string format = Path.GetExtension(filename);
+
 			OGF_C = new OGF_Children();
+
+			if (format == ".dm")
+				OGF_C.IsDM = true;
 
 			Cur_OGF = File.ReadAllBytes(filename);
 
 			using (var r = new BinaryReader(new MemoryStream(Cur_OGF)))
 			{
 				xr_loader.SetStream(r.BaseStream);
+
+				if (OGF_C.IsDM)
+                {
+					string shader = xr_loader.read_stringZ();
+					string texture = xr_loader.read_stringZ();
+					OGF_Child chld = new OGF_Child(0, 0, 0, shader.Length + texture.Length + 2, texture, shader);
+					OGF_C.childs.Add(chld);
+					return true;
+				}
 
 				xr_loader.find_chunk((int)OGF.OGF4_HEADER);
 
@@ -678,7 +712,6 @@ namespace OGF_tool
 					xr_loader.SetStream(r.BaseStream);
 
 					// Motion Refs
-
 					bool v3 = xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS, false, true);
 
 					if (v3 || xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS2, false, true))
@@ -1010,16 +1043,16 @@ namespace OGF_tool
 
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
         {
-			openOGFDialog.FileName = "";
-			DialogResult res = openOGFDialog.ShowDialog();
+			openOGF_DmDialog.FileName = "";
+			DialogResult res = openOGF_DmDialog.ShowDialog();
 
 			if (res == DialogResult.OK)
 			{
 				Clear(false);
-				if (OpenFile(openOGFDialog.FileName, ref OGF_V, ref Current_OGF, ref Current_OMF))
+				if (OpenFile(openOGF_DmDialog.FileName, ref OGF_V, ref Current_OGF, ref Current_OMF))
 				{
-					openOGFDialog.InitialDirectory = "";
-					FILE_NAME = openOGFDialog.FileName;
+					openOGF_DmDialog.InitialDirectory = "";
+					FILE_NAME = openOGF_DmDialog.FileName;
 					AfterLoad(true);
 				}
 			}
@@ -1062,13 +1095,20 @@ namespace OGF_tool
 
 		private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-			saveFileDialog1.Filter = "OGF file|*.ogf|Object file|*.object";
+			if (OGF_V.IsDM)
+            {
+				saveFileDialog1.Filter = "DM file|*.dm";
+			}
+			else
+			{
+				saveFileDialog1.Filter = "OGF file|*.ogf|Object file|*.object";
 
-			if (OGF_V.m_model_type != 1)
-				saveFileDialog1.Filter += "|Bones file|*.bones";
+				if (OGF_V.m_model_type != 1)
+					saveFileDialog1.Filter += "|Bones file|*.bones";
 
-			if (Current_OMF != null)
-				saveFileDialog1.Filter += "|Skl file|*.skl|Skls file|*.skls|OMF file|*.omf";
+				if (Current_OMF != null)
+					saveFileDialog1.Filter += "|Skl file|*.skl|Skls file|*.skls|OMF file|*.omf";
+			}
 
 			saveFileDialog1.ShowDialog();
 		}
@@ -1087,7 +1127,7 @@ namespace OGF_tool
 				backup_file.Delete();
 			}
 
-			if (format == ".ogf")
+			if (format == ".ogf" || format == ".dm")
 			{
 				FileInfo file = new FileInfo(FILE_NAME);
 				file.CopyTo(Filename);
