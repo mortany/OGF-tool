@@ -211,6 +211,9 @@ namespace OGF_tool
 
     public class OGF_Children
     {
+        public byte m_version = 0;
+        public byte m_model_type = 0; // 1 - Without bones, 3 - Animated, 10 - Rigid
+
         public List<OGF_Child> childs = new List<OGF_Child>();
 
         public uint chunk_size;
@@ -229,11 +232,17 @@ namespace OGF_tool
 
         public Description description = null;
 
+        public string motions = "";
+
         public OGF_Children()
         {
 
         }
 
+        public bool IsSkeleton()
+        {
+            return m_model_type == 3 || m_model_type == 10;
+        }
     }
 
     public class MotionRefs

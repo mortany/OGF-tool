@@ -72,6 +72,7 @@ namespace OGF_tool
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.openOMFDialog = new System.Windows.Forms.OpenFileDialog();
             this.openProgramDialog = new System.Windows.Forms.OpenFileDialog();
+            this.importDataFromModelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.TabControl.SuspendLayout();
             this.UserDataPage.SuspendLayout();
             this.MotionRefsPage.SuspendLayout();
@@ -322,7 +323,7 @@ namespace OGF_tool
             this.viewToolStripMenuItem});
             this.MenuPanel.Location = new System.Drawing.Point(0, 4);
             this.MenuPanel.Name = "MenuPanel";
-            this.MenuPanel.Size = new System.Drawing.Size(201, 24);
+            this.MenuPanel.Size = new System.Drawing.Size(321, 24);
             this.MenuPanel.TabIndex = 8;
             this.MenuPanel.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
@@ -342,40 +343,40 @@ namespace OGF_tool
             // LoadMenuParam
             // 
             this.LoadMenuParam.Name = "LoadMenuParam";
-            this.LoadMenuParam.Size = new System.Drawing.Size(121, 22);
+            this.LoadMenuParam.Size = new System.Drawing.Size(180, 22);
             this.LoadMenuParam.Text = "Load";
             this.LoadMenuParam.Click += new System.EventHandler(this.loadToolStripMenuItem_Click);
             // 
             // SaveMenuParam
             // 
             this.SaveMenuParam.Name = "SaveMenuParam";
-            this.SaveMenuParam.Size = new System.Drawing.Size(121, 22);
+            this.SaveMenuParam.Size = new System.Drawing.Size(180, 22);
             this.SaveMenuParam.Text = "Save";
             this.SaveMenuParam.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveAsToolStripMenuItem.Text = "Save as...";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(118, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // reloadToolStripMenuItem
             // 
             this.reloadToolStripMenuItem.Name = "reloadToolStripMenuItem";
-            this.reloadToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
+            this.reloadToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.reloadToolStripMenuItem.Text = "Reload";
             this.reloadToolStripMenuItem.Click += new System.EventHandler(this.reloadToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -383,7 +384,8 @@ namespace OGF_tool
             // 
             this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openSkeletonInObjectEditorToolStripMenuItem,
-            this.motionToolsToolStripMenuItem});
+            this.motionToolsToolStripMenuItem,
+            this.importDataFromModelToolStripMenuItem});
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
             this.toolStripMenuItem1.Size = new System.Drawing.Size(46, 20);
             this.toolStripMenuItem1.Text = "Tools";
@@ -490,6 +492,13 @@ namespace OGF_tool
             // 
             this.openProgramDialog.Filter = "Program|*.exe";
             // 
+            // importDataFromModelToolStripMenuItem
+            // 
+            this.importDataFromModelToolStripMenuItem.Name = "importDataFromModelToolStripMenuItem";
+            this.importDataFromModelToolStripMenuItem.Size = new System.Drawing.Size(235, 22);
+            this.importDataFromModelToolStripMenuItem.Text = "Import data from same model";
+            this.importDataFromModelToolStripMenuItem.Click += new System.EventHandler(this.importDataFromModelToolStripMenuItem_Click);
+            // 
             // OGF_Editor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -567,6 +576,7 @@ namespace OGF_tool
         private System.Windows.Forms.TextBox LodPathBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button CreateLodButton;
+        private System.Windows.Forms.ToolStripMenuItem importDataFromModelToolStripMenuItem;
     }
 }
 
