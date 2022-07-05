@@ -250,10 +250,16 @@ enum ogf4_key_presence_flag {
 	KPF_T_PRESENT	= 0x01,
 	KPF_R_ABSENT	= 0x02,
 	KPF_T_HQ	= 0x04,		// 3456+
+	KPF_T_HQFFT	= 0x08,		// StCop
 };
 
 struct ogf_key_qr {
 	int16_t				x, y, z, w;
+	template<typename T> void	dequantize(_quaternion<T>& q) const;
+};
+
+struct ogf_key_qr_fft {
+	float				x, y, z, w;
 	template<typename T> void	dequantize(_quaternion<T>& q) const;
 };
 
@@ -266,19 +272,36 @@ template<typename T> inline void ogf_key_qr::dequantize(_quaternion<T>& q) const
 	q.w = w*m;
 }
 
+template<typename T> inline void ogf_key_qr_fft::dequantize(_quaternion<T>& q) const
+{
+	q.x = x;
+	q.y = y;
+	q.z = z;
+	q.w = w;
+}
+
 template<typename T> struct _ogf4_key_qt {
 	T	x, y, z;
 	void	dequantize(fvector3& value, const fvector3& scale) const;
+	void	dequantize_hq(fvector3& value, const fvector3& scale) const;
 };
 
 typedef _ogf4_key_qt<int8_t> ogf4_key_qt;
 typedef _ogf4_key_qt<int16_t> ogf4_key_qt_hq;
+typedef _ogf4_key_qt<float> ogf4_key_qt_fft;
 
 template<typename T> inline void _ogf4_key_qt<T>::dequantize(fvector3& value, const fvector3& scale) const
 {
 	value.x = x*scale.x;
 	value.y = y*scale.y;
 	value.z = z*scale.z;
+};
+
+template<typename T> inline void _ogf4_key_qt<T>::dequantize_hq(fvector3& value, const fvector3& scale) const
+{
+	value.x = x;
+	value.y = y;
+	value.z = z;
 };
 
 struct ogf_motion_def {
