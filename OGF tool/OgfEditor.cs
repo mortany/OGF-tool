@@ -62,6 +62,7 @@ namespace OGF_tool
 			saveAsToolStripMenuItem.Enabled = false;
 			motionToolsToolStripMenuItem.Enabled = false;
 			openSkeletonInObjectEditorToolStripMenuItem.Enabled = false;
+			toolStripMenuItem1.Enabled = false;
 
 			string file_path = Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\Settings.ini";
 			Settings = new IniFile(file_path);
@@ -106,6 +107,7 @@ namespace OGF_tool
 			SaveMenuParam.Enabled = true;
 			saveAsToolStripMenuItem.Enabled = true;
 			openSkeletonInObjectEditorToolStripMenuItem.Enabled = true;
+			toolStripMenuItem1.Enabled = true;
 
 			openOGFDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
 			saveFileDialog1.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
@@ -128,9 +130,12 @@ namespace OGF_tool
 				}
 			}
 
-			for (int i = 0; i < OGF_V.bones.bones.Count; i++)
+			if (OGF_V.bones.bones != null)
 			{
-				CreateBoneGroupBox(i, OGF_V.bones.bones[i], OGF_V.bones.parent_bones[i], OGF_V.ikdata.materials[i], OGF_V.ikdata.mass[i], OGF_V.ikdata.center_mass[i], OGF_V.ikdata.position[i], OGF_V.ikdata.rotation[i]);
+				for (int i = 0; i < OGF_V.bones.bones.Count; i++)
+				{
+					CreateBoneGroupBox(i, OGF_V.bones.bones[i], OGF_V.bones.parent_bones[i], OGF_V.ikdata.materials[i], OGF_V.ikdata.mass[i], OGF_V.ikdata.center_mass[i], OGF_V.ikdata.position[i], OGF_V.ikdata.rotation[i]);
+				}
 			}
 
 			MotionRefsBox.Clear();
@@ -593,94 +598,100 @@ namespace OGF_tool
 
 				xr_loader.SetStream(r.BaseStream);
 
+				bool HasBones = xr_loader.find_chunk((int)OGF.OGF4_S_BONE_NAMES, false, true);
+				openSkeletonInObjectEditorToolStripMenuItem.Enabled = HasBones;
+
 				// Motion Refs
-				TabControl.Controls.Add(MotionRefsPage);
-				MotionRefsPage.Controls.Clear();
-
-				MotionRefsPage.Controls.Add(MotionRefsBox);
-				MotionRefsPage.Controls.Add(CreateMotionRefsButton);
-				CreateMotionRefsButton.Visible = false;
-				MotionRefsBox.Visible = false;
-
-				bool v3 = xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS, false, true);
-
-				if (v3 || xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS2, false, true))
+				if (HasBones)
 				{
-					MotionRefsBox.Visible = true;
-					OGF_V.motion_refs = new MotionRefs();
-					OGF_V.motion_refs.pos = xr_loader.chunk_pos;
-					OGF_V.motion_refs.refs = new List<string>();
+					TabControl.Controls.Add(MotionRefsPage);
+					MotionRefsPage.Controls.Clear();
 
-					if (v3)
+					MotionRefsPage.Controls.Add(MotionRefsBox);
+					MotionRefsPage.Controls.Add(CreateMotionRefsButton);
+					CreateMotionRefsButton.Visible = false;
+					MotionRefsBox.Visible = false;
+
+					bool v3 = xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS, false, true);
+
+					if (v3 || xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS2, false, true))
 					{
-						OGF_V.motion_refs.v3 = true;
-						string refs = xr_loader.read_stringZ();
-						OGF_V.motion_refs.refs.Add(refs);
-						OGF_V.motion_refs.old_size = refs.Length + 1;
+						MotionRefsBox.Visible = true;
+						OGF_V.motion_refs = new MotionRefs();
+						OGF_V.motion_refs.pos = xr_loader.chunk_pos;
+						OGF_V.motion_refs.refs = new List<string>();
+
+						if (v3)
+						{
+							OGF_V.motion_refs.v3 = true;
+							string refs = xr_loader.read_stringZ();
+							OGF_V.motion_refs.refs.Add(refs);
+							OGF_V.motion_refs.old_size = refs.Length + 1;
+						}
+						else
+						{
+							uint count = xr_loader.ReadUInt32();
+
+							OGF_V.motion_refs.old_size = 4;
+
+							for (int i = 0; i < count; i++)
+							{
+								string refs = xr_loader.read_stringZ();
+								OGF_V.motion_refs.refs.Add(refs);
+								OGF_V.motion_refs.old_size += refs.Length + 1;
+							}
+						}
+					}
+					else
+						CreateMotionRefsButton.Visible = true;
+
+					xr_loader.SetStream(r.BaseStream);
+
+					MotionBox.Clear();
+					TabControl.Controls.Add(MotionPage);
+					Current_OMF = null;
+
+					//Motions
+					if (xr_loader.find_chunk((int)OGF.OGF4_S_MOTIONS, false, true))
+					{
+						xr_loader.reader.BaseStream.Position -= 8;
+						Current_OMF = xr_loader.ReadBytes((int)xr_loader.reader.BaseStream.Length - (int)xr_loader.reader.BaseStream.Position);
+					}
+
+					xr_loader.SetStream(r.BaseStream);
+
+					if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_S_MOTIONS, false, true)))
+					{
+						AppendOMFButton.Visible = false;
+						MotionBox.Visible = true;
+
+						id = 0;
+
+						while (true)
+						{
+							if (!xr_loader.find_chunk(id)) break;
+
+							Stream temp = xr_loader.reader.BaseStream;
+
+							if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk(id, false, true))) break;
+
+							if (id == 0)
+								MotionBox.Text += $"Motions count : {xr_loader.ReadUInt32()}\n";
+							else
+								MotionBox.Text += $"\n{id}. {xr_loader.read_stringZ()}";
+
+							id++;
+							xr_loader.SetStream(temp);
+						}
 					}
 					else
 					{
-						uint count = xr_loader.ReadUInt32();
-
-						OGF_V.motion_refs.old_size = 4;
-
-						for (int i = 0; i < count; i++)
-						{
-							string refs = xr_loader.read_stringZ();
-							OGF_V.motion_refs.refs.Add(refs);
-							OGF_V.motion_refs.old_size += refs.Length + 1;
-						}
+						MotionBox.Visible = false;
+						AppendOMFButton.Visible = true;
 					}
+
+					xr_loader.SetStream(r.BaseStream);
 				}
-				else
-					CreateMotionRefsButton.Visible = true;
-
-				xr_loader.SetStream(r.BaseStream);
-
-				MotionBox.Clear();
-				TabControl.Controls.Add(MotionPage);
-				Current_OMF = null;
-
-				//Motions
-				if (xr_loader.find_chunk((int)OGF.OGF4_S_MOTIONS, false, true))
-				{
-					xr_loader.reader.BaseStream.Position -= 8;
-					Current_OMF = xr_loader.ReadBytes((int)xr_loader.reader.BaseStream.Length - (int)xr_loader.reader.BaseStream.Position);
-				}
-
-				xr_loader.SetStream(r.BaseStream);
-
-				if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_S_MOTIONS, false, true)))
-				{
-					AppendOMFButton.Visible = false;
-					MotionBox.Visible = true;
-
-					id = 0;
-
-					while (true)
-					{
-						if (!xr_loader.find_chunk(id)) break;
-
-						Stream temp = xr_loader.reader.BaseStream;
-
-						if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk(id, false, true))) break;
-
-						if (id == 0)
-							MotionBox.Text += $"Motions count : {xr_loader.ReadUInt32()}\n";
-						else
-							MotionBox.Text += $"\n{id}. {xr_loader.read_stringZ()}";
-
-						id++;
-						xr_loader.SetStream(temp);
-					}
-				}
-				else
-				{
-					MotionBox.Visible = false;
-					AppendOMFButton.Visible = true;
-				}
-
-				xr_loader.SetStream(r.BaseStream);
 
 				// Bones
 				if (xr_loader.find_chunk((int)OGF.OGF4_S_BONE_NAMES, false, true))
@@ -1328,7 +1339,7 @@ namespace OGF_tool
 
 			string ObjectEditor = GetObjectEditorPath();
 
-			if (ObjectEditor == null)
+			if (ObjectEditor == null || ObjectEditor == "")
 			{
 				MessageBox.Show("Please, set Object Editor path!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return;
