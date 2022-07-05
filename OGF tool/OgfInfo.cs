@@ -19,7 +19,7 @@ namespace OGF_tool
             InitializeComponent();
 
             OgfVersLabel.Text = vers.ToString();
-            ModelTypeLabel.Text = (type == 3 ? "Animated" : "Rigid");
+            ModelTypeLabel.Text = (type == 1 ? "Object" : type == 3 ? "Animated" : "Rigid");
 
             SourceTextBox.Text = init_descr.m_source;
             ConverterTextBox.Text = init_descr.m_export_tool;

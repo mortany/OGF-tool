@@ -18,7 +18,7 @@ namespace OGF_tool
 	{
 		// About file
 		byte m_version;
-		byte m_model_type; // 3 - Animated, 10 - Rigid
+		byte m_model_type; // 1 - Without bones, 3 - Animated, 10 - Rigid
 
 		// File sytem
 		public OGF_Children OGF_V = null;
@@ -103,11 +103,8 @@ namespace OGF_tool
 		private void AfterLoad()
 		{
 			oGFInfoToolStripMenuItem.Enabled = true;
-			viewToolStripMenuItem.Enabled = true;
 			SaveMenuParam.Enabled = true;
 			saveAsToolStripMenuItem.Enabled = true;
-			openSkeletonInObjectEditorToolStripMenuItem.Enabled = true;
-			toolStripMenuItem1.Enabled = true;
 
 			openOGFDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
 			saveFileDialog1.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
@@ -368,6 +365,12 @@ namespace OGF_tool
 					fileStream.BaseStream.Position += ch.old_size + 8;
 				}
 
+				if (m_model_type == 1)
+                {
+					temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
+					file_bytes.AddRange(temp);
+				}
+
                 if (OGF_V.bones.bones != null)
                 {
                     if (OGF_V.bones.pos > 0)
@@ -576,34 +579,38 @@ namespace OGF_tool
 
 				xr_loader.SetStream(r.BaseStream);
 
-				// Userdata
-				TabControl.Controls.Add(UserDataPage);
-				UserDataPage.Controls.Clear();
-
-				UserDataPage.Controls.Add(UserDataBox);
-				UserDataPage.Controls.Add(CreateUserdataButton);
-				CreateUserdataButton.Visible = false;
-				UserDataBox.Visible = false;
-
-				if (xr_loader.find_chunk((int)OGF.OGF4_S_USERDATA, false, true))
-				{
-					UserDataBox.Visible = true;
-					OGF_V.userdata = new UserData();
-					OGF_V.userdata.pos = xr_loader.chunk_pos;
-					OGF_V.userdata.userdata = xr_loader.read_stringZ();
-					OGF_V.userdata.old_size = OGF_V.userdata.userdata.Length + 1;
-				}
-				else
-					CreateUserdataButton.Visible = true;
+				bool HasBones = xr_loader.find_chunk((int)OGF.OGF4_S_BONE_NAMES, false, true);
+				openSkeletonInObjectEditorToolStripMenuItem.Enabled = HasBones;
+				toolStripMenuItem1.Enabled = HasBones;
+				viewToolStripMenuItem.Enabled = HasBones;
 
 				xr_loader.SetStream(r.BaseStream);
 
-				bool HasBones = xr_loader.find_chunk((int)OGF.OGF4_S_BONE_NAMES, false, true);
-				openSkeletonInObjectEditorToolStripMenuItem.Enabled = HasBones;
-
-				// Motion Refs
 				if (HasBones)
 				{
+					// Userdata
+					TabControl.Controls.Add(UserDataPage);
+					UserDataPage.Controls.Clear();
+
+					UserDataPage.Controls.Add(UserDataBox);
+					UserDataPage.Controls.Add(CreateUserdataButton);
+					CreateUserdataButton.Visible = false;
+					UserDataBox.Visible = false;
+
+					if (xr_loader.find_chunk((int)OGF.OGF4_S_USERDATA, false, true))
+					{
+						UserDataBox.Visible = true;
+						OGF_V.userdata = new UserData();
+						OGF_V.userdata.pos = xr_loader.chunk_pos;
+						OGF_V.userdata.userdata = xr_loader.read_stringZ();
+						OGF_V.userdata.old_size = OGF_V.userdata.userdata.Length + 1;
+					}
+					else
+						CreateUserdataButton.Visible = true;
+
+					xr_loader.SetStream(r.BaseStream);
+
+					// Motion Refs
 					TabControl.Controls.Add(MotionRefsPage);
 					MotionRefsPage.Controls.Clear();
 
@@ -691,158 +698,161 @@ namespace OGF_tool
 					}
 
 					xr_loader.SetStream(r.BaseStream);
-				}
 
-				// Bones
-				if (xr_loader.find_chunk((int)OGF.OGF4_S_BONE_NAMES, false, true))
-				{
-					OGF_V.bones.pos = xr_loader.chunk_pos;
-					OGF_V.bones.bones = new List<string>();
-					OGF_V.bones.parent_bones = new List<string>();
-					OGF_V.bones.fobb = new List<byte[]>();
-					OGF_V.bones.bone_childs = new List<List<int>>();
-					OGF_V.bones.old_size = 0;
-
-					BoneNamesBox.Clear();
-					TabControl.Controls.Add(BoneNamesPage);
-
-					uint count = xr_loader.ReadUInt32();
-					uint count_saved = count;
-					OGF_V.bones.old_size += 4;
-
-					BoneNamesBox.Text += $"Bones count : {count}\n\n";
-
-					for (; count != 0; count--)
+					// Bones
+					if (xr_loader.find_chunk((int)OGF.OGF4_S_BONE_NAMES, false, true))
 					{
-						string bone_name = xr_loader.read_stringZ();
-						string parent_name = xr_loader.read_stringZ();
-						byte[] obb = xr_loader.ReadBytes(60);    // Fobb
-						BoneNamesBox.Text += $"{count_saved - count + 1}. {bone_name}";
+						OGF_V.bones.pos = xr_loader.chunk_pos;
+						OGF_V.bones.bones = new List<string>();
+						OGF_V.bones.parent_bones = new List<string>();
+						OGF_V.bones.fobb = new List<byte[]>();
+						OGF_V.bones.bone_childs = new List<List<int>>();
+						OGF_V.bones.old_size = 0;
 
-						if (count != 1)
-							BoneNamesBox.Text += "\n";
+						BoneNamesBox.Clear();
+						TabControl.Controls.Add(BoneNamesPage);
 
-						OGF_V.bones.bones.Add(bone_name);
-						OGF_V.bones.parent_bones.Add(parent_name);
-						OGF_V.bones.fobb.Add(obb);
+						uint count = xr_loader.ReadUInt32();
+						uint count_saved = count;
+						OGF_V.bones.old_size += 4;
 
-						OGF_V.bones.old_size += bone_name.Length + 1 + parent_name.Length + 1 + 60;
-					}
+						BoneNamesBox.Text += $"Bones count : {count}\n\n";
 
-					for (int i = 0; i < OGF_V.bones.bones.Count; i++)
-					{
-						List<int> childs = new List<int>();
-						for (int j = 0; j < OGF_V.bones.parent_bones.Count; j++)
+						for (; count != 0; count--)
 						{
-							if (OGF_V.bones.parent_bones[j] == OGF_V.bones.bones[i])
-							{
-								childs.Add(j);
-							}
+							string bone_name = xr_loader.read_stringZ();
+							string parent_name = xr_loader.read_stringZ();
+							byte[] obb = xr_loader.ReadBytes(60);    // Fobb
+							BoneNamesBox.Text += $"{count_saved - count + 1}. {bone_name}";
+
+							if (count != 1)
+								BoneNamesBox.Text += "\n";
+
+							OGF_V.bones.bones.Add(bone_name);
+							OGF_V.bones.parent_bones.Add(parent_name);
+							OGF_V.bones.fobb.Add(obb);
+
+							OGF_V.bones.old_size += bone_name.Length + 1 + parent_name.Length + 1 + 60;
 						}
-						OGF_V.bones.bone_childs.Add(childs);
-					}
-				}
 
-				xr_loader.SetStream(r.BaseStream);
-
-				// Ik Data
-				if (xr_loader.find_chunk((int)OGF.OGF4_S_IKDATA, false, true))
-				{
-					TabControl.Controls.Add(BoneParamsPage);
-
-					OGF_V.ikdata.pos = xr_loader.chunk_pos;
-					OGF_V.ikdata.materials = new List<string>();
-					OGF_V.ikdata.mass = new List<float>();
-					OGF_V.ikdata.version = new List<uint>();
-					OGF_V.ikdata.center_mass = new List<Fvector>();
-					OGF_V.ikdata.position = new List<Fvector>();
-					OGF_V.ikdata.rotation = new List<Fvector>();
-					OGF_V.ikdata.bytes_1 = new List<List<byte[]>>();
-					OGF_V.ikdata.old_size = 0;
-
-					for (int i = 0; i < OGF_V.bones.bones.Count; i++)
-					{
-						List<byte[]> bytes_1 = new List<byte[]>();
-						OGF_V.ikdata.old_size += 4;
-
-						byte[] temp_byte;
-						uint version = xr_loader.ReadUInt32();
-						string gmtl_name = xr_loader.read_stringZ();
-
-						temp_byte = xr_loader.ReadBytes(112);   // struct SBoneShape
-						bytes_1.Add(temp_byte);
-						OGF_V.ikdata.old_size += gmtl_name.Length + 1 + 112;
-
-						// Import
+						for (int i = 0; i < OGF_V.bones.bones.Count; i++)
 						{
-							temp_byte = xr_loader.ReadBytes(4);
-							bytes_1.Add(temp_byte);
-							temp_byte = xr_loader.ReadBytes(16 * 3);
-							bytes_1.Add(temp_byte);
-							temp_byte = xr_loader.ReadBytes(4);
-							bytes_1.Add(temp_byte);
-							temp_byte = xr_loader.ReadBytes(4);
-							bytes_1.Add(temp_byte);
-							temp_byte = xr_loader.ReadBytes(4);
-							bytes_1.Add(temp_byte);
-							temp_byte = xr_loader.ReadBytes(4);
-							bytes_1.Add(temp_byte);
-							temp_byte = xr_loader.ReadBytes(4);
-							bytes_1.Add(temp_byte);
+							List<int> childs = new List<int>();
+							for (int j = 0; j < OGF_V.bones.parent_bones.Count; j++)
+							{
+								if (OGF_V.bones.parent_bones[j] == OGF_V.bones.bones[i])
+								{
+									childs.Add(j);
+								}
+							}
+							OGF_V.bones.bone_childs.Add(childs);
+						}
+					}
 
-							OGF_V.ikdata.old_size += 4 + 16 * 3 + 4 + 4 + 4 + 4 + 4;
+					xr_loader.SetStream(r.BaseStream);
 
-							if (version > 0)
+					// Ik Data
+					if (xr_loader.find_chunk((int)OGF.OGF4_S_IKDATA, false, true))
+					{
+						TabControl.Controls.Add(BoneParamsPage);
+
+						OGF_V.ikdata.pos = xr_loader.chunk_pos;
+						OGF_V.ikdata.materials = new List<string>();
+						OGF_V.ikdata.mass = new List<float>();
+						OGF_V.ikdata.version = new List<uint>();
+						OGF_V.ikdata.center_mass = new List<Fvector>();
+						OGF_V.ikdata.position = new List<Fvector>();
+						OGF_V.ikdata.rotation = new List<Fvector>();
+						OGF_V.ikdata.bytes_1 = new List<List<byte[]>>();
+						OGF_V.ikdata.old_size = 0;
+
+						for (int i = 0; i < OGF_V.bones.bones.Count; i++)
+						{
+							List<byte[]> bytes_1 = new List<byte[]>();
+							OGF_V.ikdata.old_size += 4;
+
+							byte[] temp_byte;
+							uint version = xr_loader.ReadUInt32();
+							string gmtl_name = xr_loader.read_stringZ();
+
+							temp_byte = xr_loader.ReadBytes(112);   // struct SBoneShape
+							bytes_1.Add(temp_byte);
+							OGF_V.ikdata.old_size += gmtl_name.Length + 1 + 112;
+
+							// Import
 							{
 								temp_byte = xr_loader.ReadBytes(4);
 								bytes_1.Add(temp_byte);
-								OGF_V.ikdata.old_size += 4;
+								temp_byte = xr_loader.ReadBytes(16 * 3);
+								bytes_1.Add(temp_byte);
+								temp_byte = xr_loader.ReadBytes(4);
+								bytes_1.Add(temp_byte);
+								temp_byte = xr_loader.ReadBytes(4);
+								bytes_1.Add(temp_byte);
+								temp_byte = xr_loader.ReadBytes(4);
+								bytes_1.Add(temp_byte);
+								temp_byte = xr_loader.ReadBytes(4);
+								bytes_1.Add(temp_byte);
+								temp_byte = xr_loader.ReadBytes(4);
+								bytes_1.Add(temp_byte);
+
+								OGF_V.ikdata.old_size += 4 + 16 * 3 + 4 + 4 + 4 + 4 + 4;
+
+								if (version > 0)
+								{
+									temp_byte = xr_loader.ReadBytes(4);
+									bytes_1.Add(temp_byte);
+									OGF_V.ikdata.old_size += 4;
+								}
 							}
+
+							Fvector rotation = new Fvector();
+							rotation.x = xr_loader.ReadFloat();
+							rotation.y = xr_loader.ReadFloat();
+							rotation.z = xr_loader.ReadFloat();
+
+							Fvector position = new Fvector();
+							position.x = xr_loader.ReadFloat();
+							position.y = xr_loader.ReadFloat();
+							position.z = xr_loader.ReadFloat();
+
+							float mass = xr_loader.ReadFloat();
+
+							Fvector center = new Fvector();
+							center.x = xr_loader.ReadFloat();
+							center.y = xr_loader.ReadFloat();
+							center.z = xr_loader.ReadFloat();
+
+							OGF_V.ikdata.old_size += 12 + 12 + 4 + 12;
+
+							OGF_V.ikdata.materials.Add(gmtl_name);
+							OGF_V.ikdata.mass.Add(mass);
+							OGF_V.ikdata.version.Add(version);
+							OGF_V.ikdata.center_mass.Add(center);
+							OGF_V.ikdata.bytes_1.Add(bytes_1);
+							OGF_V.ikdata.position.Add(position);
+							OGF_V.ikdata.rotation.Add(rotation);
 						}
-
-						Fvector rotation = new Fvector();
-						rotation.x = xr_loader.ReadFloat();
-						rotation.y = xr_loader.ReadFloat();
-						rotation.z = xr_loader.ReadFloat();
-
-						Fvector position = new Fvector();
-						position.x = xr_loader.ReadFloat();
-						position.y = xr_loader.ReadFloat();
-						position.z = xr_loader.ReadFloat();
-
-						float mass = xr_loader.ReadFloat();
-
-						Fvector center = new Fvector();
-						center.x = xr_loader.ReadFloat();
-						center.y = xr_loader.ReadFloat();
-						center.z = xr_loader.ReadFloat();
-
-						OGF_V.ikdata.old_size += 12 + 12 + 4 + 12;
-
-						OGF_V.ikdata.materials.Add(gmtl_name);
-						OGF_V.ikdata.mass.Add(mass);
-						OGF_V.ikdata.version.Add(version);
-						OGF_V.ikdata.center_mass.Add(center);
-						OGF_V.ikdata.bytes_1.Add(bytes_1);
-						OGF_V.ikdata.position.Add(position);
-						OGF_V.ikdata.rotation.Add(rotation);
 					}
-				}
 
-				TabControl.Controls.Add(LodPage);
+					TabControl.Controls.Add(LodPage);
 
-				// Lod ref
-				if (xr_loader.find_chunk((int)OGF.OGF4_S_LODS, false, true))
-				{
-					CreateLodButton.Visible = false;
-					OGF_V.lod = new Lod();
-					OGF_V.lod.pos = xr_loader.chunk_pos;
-					OGF_V.lod.lod_path = xr_loader.read_stringZ();
-					OGF_V.lod.old_size = OGF_V.lod.lod_path.Length + 1;
-					LodPathBox.Text = OGF_V.lod.lod_path;
+					xr_loader.SetStream(r.BaseStream);
+
+					// Lod ref
+					if (xr_loader.find_chunk((int)OGF.OGF4_S_LODS, false, true))
+					{
+						CreateLodButton.Visible = false;
+						OGF_V.lod = new Lod();
+						OGF_V.lod.pos = xr_loader.chunk_pos;
+						OGF_V.lod.lod_path = xr_loader.read_stringZ();
+						OGF_V.lod.old_size = OGF_V.lod.lod_path.Length + 1;
+						LodPathBox.Text = OGF_V.lod.lod_path;
+					}
+					else
+						CreateLodButton.Visible = true;
+
 				}
-				else
-					CreateLodButton.Visible = true;
 			}
 			return true;
 		}
@@ -1027,7 +1037,11 @@ namespace OGF_tool
 
 		private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-			saveFileDialog1.Filter = "OGF file|*.ogf|Object file|*.object|Bones file|*.bones";
+			saveFileDialog1.Filter = "OGF file|*.ogf|Object file|*.object";
+
+			if (m_model_type != 1)
+				saveFileDialog1.Filter += "|Bones file|*.bones";
+
 			if (Current_OMF != null)
 				saveFileDialog1.Filter += "|Skl file|*.skl|Skls file|*.skls|OMF file|*.omf";
 
@@ -1287,7 +1301,9 @@ namespace OGF_tool
 
 		private void UpdateModelType()
         {
-			if (Current_OMF == null && MotionRefsBox.Text == "")
+			if (OGF_V.bones.bones == null)
+				m_model_type = 1;
+			else if (Current_OMF == null && MotionRefsBox.Text == "")
 				m_model_type = 10;
 			else
 				m_model_type = 3;
