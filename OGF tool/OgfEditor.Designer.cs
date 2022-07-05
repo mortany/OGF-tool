@@ -155,7 +155,6 @@ namespace OGF_tool
             this.UserDataBox.Size = new System.Drawing.Size(431, 256);
             this.UserDataBox.TabIndex = 0;
             this.UserDataBox.Text = "";
-            this.UserDataBox.TextChanged += new System.EventHandler(this.RichTextBoxTextChanged);
             // 
             // MotionRefsPage
             // 
@@ -303,7 +302,6 @@ namespace OGF_tool
             this.LodPathBox.Name = "LodPathBox";
             this.LodPathBox.Size = new System.Drawing.Size(419, 20);
             this.LodPathBox.TabIndex = 1;
-            this.LodPathBox.TextChanged += new System.EventHandler(this.TextBoxTextChanged);
             // 
             // label1
             // 

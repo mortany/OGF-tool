@@ -217,9 +217,9 @@ namespace OGF_tool
 
         public long pos;
 
-        public MotionRefs refs = null;
+        public MotionRefs motion_refs = null;
 
-        public UserData usertdata = null;
+        public UserData userdata = null;
 
         public Lod lod = null;
 
@@ -227,9 +227,7 @@ namespace OGF_tool
 
         public IK_Data ikdata = new IK_Data();
 
-        public Description descr = null;
-
-        public bool delete_motions = false;
+        public Description description = null;
 
         public OGF_Children()
         {
@@ -242,8 +240,6 @@ namespace OGF_tool
     {
         public long pos;
         public List<string> refs;
-        public bool need_create;
-        public bool need_delete;
         public bool v3;
         public int old_size;
 
@@ -251,9 +247,7 @@ namespace OGF_tool
         {
             this.pos = 0;
             this.old_size = 0;
-            this.refs = null;
-            this.need_create = false;
-            this.need_delete = false;
+            this.refs = new List<string>();
             this.v3 = false;
         }
 
@@ -286,24 +280,20 @@ namespace OGF_tool
     {
         public long pos;
         public int old_size;
-        public string data;
-        public bool need_create;
-        public bool need_delete;
+        public string userdata;
 
         public UserData()
         {
             this.pos = 0;
             this.old_size = 0;
-            this.data = "";
-            this.need_create = false;
-            this.need_delete = false;
+            this.userdata = "";
         }
 
-        public byte[] data_all()
+        public byte[] data()
         {
             List<byte> temp = new List<byte>();
 
-            temp.AddRange(Encoding.Default.GetBytes(data));
+            temp.AddRange(Encoding.Default.GetBytes(userdata));
             temp.Add(0);
 
             return temp.ToArray();
@@ -311,7 +301,7 @@ namespace OGF_tool
 
         public uint chunk_size()
         {
-            return (uint)data.Length +1;
+            return (uint)userdata.Length +1;
         }
     }
 
@@ -319,24 +309,20 @@ namespace OGF_tool
     {
         public long pos;
         public int old_size;
-        public string data;
-        public bool need_create;
-        public bool need_delete;
+        public string lod_path;
 
         public Lod()
         {
             this.pos = 0;
             this.old_size = 0;
-            this.data = "";
-            this.need_create = false;
-            this.need_delete = false;
+            this.lod_path = "";
         }
 
-        public byte[] data_all()
+        public byte[] data()
         {
             List<byte> temp = new List<byte>();
 
-            temp.AddRange(Encoding.Default.GetBytes(data));
+            temp.AddRange(Encoding.Default.GetBytes(lod_path));
             temp.Add(0);
 
             return temp.ToArray();
@@ -344,7 +330,7 @@ namespace OGF_tool
 
         public uint chunk_size()
         {
-            return (uint)data.Length +1;
+            return (uint)lod_path.Length +1;
         }
     }
 
