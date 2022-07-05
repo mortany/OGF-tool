@@ -213,6 +213,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\dm_tools.h" />
     <ClInclude Include="..\lzo\lzoconf.h" />
     <ClInclude Include="..\lzo\lzodefs.h" />
     <ClInclude Include="..\lzo\minilzo.h" />
@@ -229,6 +230,7 @@
     <ClInclude Include="..\xr_cl_parser.h" />
     <ClInclude Include="..\xr_color.h" />
     <ClInclude Include="..\xr_cylinder.h" />
+    <ClInclude Include="..\xr_dm.h" />
     <ClInclude Include="..\xr_envelope.h" />
     <ClInclude Include="..\xr_file_system.h" />
     <ClInclude Include="..\xr_file_system_posix.h" />
@@ -259,6 +261,7 @@
     <ClInclude Include="..\xr_packet.h" />
     <ClInclude Include="..\xr_quaternion.h" />
     <ClInclude Include="..\xr_reader.h" />
+    <ClInclude Include="..\xr_rect.h" />
     <ClInclude Include="..\xr_skeleton.h" />
     <ClInclude Include="..\xr_skl_motion.h" />
     <ClInclude Include="..\xr_sphere.h" />
@@ -273,6 +276,7 @@
     <ClInclude Include="..\xr_writer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\dm_tools.cxx" />
     <ClCompile Include="..\lzo\minilzo.c" />
     <ClCompile Include="..\crc32\crc32.c" />
     <ClCompile Include="..\object_tools.cxx" />
@@ -283,6 +287,7 @@
     <ClCompile Include="..\xr_build_err.cxx" />
     <ClCompile Include="..\xr_clsid.cxx" />
     <ClCompile Include="..\xr_cl_parser.cxx" />
+    <ClCompile Include="..\xr_dm.cxx" />
     <ClCompile Include="..\xr_envelope.cxx" />
     <ClCompile Include="..\xr_envelope_eval.cxx" />
     <ClCompile Include="..\xr_file_system.cxx" />

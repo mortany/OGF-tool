@@ -244,6 +244,11 @@ namespace OGF_tool
         {
             return m_model_type == 3 || m_model_type == 10;
         }
+
+        public bool IsAnimated()
+        {
+            return m_model_type == 3;
+        }
     }
 
     public class MotionRefs

@@ -48,6 +48,10 @@
     <ClCompile Include="..\xr_name_gen.cxx" />
     <ClCompile Include="..\xr_clsid.cxx" />
     <ClCompile Include="..\xr_ogf.cxx" />
+    <ClCompile Include="..\xr_dm.cxx" />
+    <ClCompile Include="..\dm_tools.cxx">
+      <Filter>object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\batch_helper.h" />
@@ -120,6 +124,11 @@
     <ClInclude Include="..\xr_ini_file.h" />
     <ClInclude Include="..\xr_name_gen.h" />
     <ClInclude Include="..\xr_clsid.h" />
+    <ClInclude Include="..\xr_rect.h" />
+    <ClInclude Include="..\xr_dm.h" />
+    <ClInclude Include="..\dm_tools.h">
+      <Filter>object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="crc32">

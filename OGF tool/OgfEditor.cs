@@ -25,6 +25,7 @@ namespace OGF_tool
 		public List<byte> file_bytes = new List<byte>();
 		public string FILE_NAME = "";
 		IniFile Settings = null;
+		FolderSelectDialog SaveSklDialog = null;
 
 		// Input
 		public bool bKeyIsDown = false;
@@ -59,6 +60,9 @@ namespace OGF_tool
 			motionToolsToolStripMenuItem.Enabled = false;
 			openSkeletonInObjectEditorToolStripMenuItem.Enabled = false;
 			toolStripMenuItem1.Enabled = false;
+			exportToolStripMenuItem.Enabled = false;
+
+			SaveSklDialog = new FolderSelectDialog();
 
 			string file_path = Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\Settings.ini";
 			Settings = new IniFile(file_path);
@@ -112,13 +116,27 @@ namespace OGF_tool
 				oGFInfoToolStripMenuItem.Enabled = !OGF_V.IsDM;
 				openSkeletonInObjectEditorToolStripMenuItem.Enabled = OGF_V.IsSkeleton();
 				viewToolStripMenuItem.Enabled = OGF_V.IsSkeleton();
+				exportToolStripMenuItem.Enabled = true;
+				bonesToolStripMenuItem.Enabled = OGF_V.IsSkeleton();
+				omfToolStripMenuItem.Enabled = Current_OMF != null;
+				sklToolStripMenuItem.Enabled = Current_OMF != null;
+				sklsToolStripMenuItem.Enabled = Current_OMF != null;
 
-				openOGFDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
-				openOGF_DmDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
-				saveFileDialog1.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
-				saveFileDialog1.FileName = StatusFile.Text.Substring(0, StatusFile.Text.LastIndexOf('.'));
-				openOMFDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
-				openProgramDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
+				OpenOGFDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
+				OpenOGF_DmDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
+				SaveAsDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
+				SaveAsDialog.FileName = StatusFile.Text.Substring(0, StatusFile.Text.LastIndexOf('.'));
+				OpenOMFDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
+				OpenProgramDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
+				SaveSklDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
+				SaveSklsDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
+				SaveSklsDialog.FileName = StatusFile.Text.Substring(0, StatusFile.Text.LastIndexOf('.')) + ".skls";
+				SaveOmfDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
+				SaveOmfDialog.FileName = StatusFile.Text.Substring(0, StatusFile.Text.LastIndexOf('.')) + ".omf";
+				SaveBonesDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
+				SaveBonesDialog.FileName = StatusFile.Text.Substring(0, StatusFile.Text.LastIndexOf('.')) + ".bones";
+				SaveObjectDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
+				SaveObjectDialog.FileName = StatusFile.Text.Substring(0, StatusFile.Text.LastIndexOf('.')) + ".object";
 			}
 
 			// Textures
@@ -602,7 +620,7 @@ namespace OGF_tool
 						fileStream.ReadBytes(OGF_V.motion_refs.old_size + 8);
 				}
 
-				if (Current_OMF != null && !refs_created && MotionBox.Visible)
+				if (Current_OMF != null && !refs_created)
 					file_bytes.AddRange(Current_OMF);
 			}
 
@@ -1043,16 +1061,16 @@ namespace OGF_tool
 
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
         {
-			openOGF_DmDialog.FileName = "";
-			DialogResult res = openOGF_DmDialog.ShowDialog();
+			OpenOGF_DmDialog.FileName = "";
+			DialogResult res = OpenOGF_DmDialog.ShowDialog();
 
 			if (res == DialogResult.OK)
 			{
 				Clear(false);
-				if (OpenFile(openOGF_DmDialog.FileName, ref OGF_V, ref Current_OGF, ref Current_OMF))
+				if (OpenFile(OpenOGF_DmDialog.FileName, ref OGF_V, ref Current_OGF, ref Current_OMF))
 				{
-					openOGF_DmDialog.InitialDirectory = "";
-					FILE_NAME = openOGF_DmDialog.FileName;
+					OpenOGF_DmDialog.InitialDirectory = "";
+					FILE_NAME = OpenOGF_DmDialog.FileName;
 					AfterLoad(true);
 				}
 			}
@@ -1096,84 +1114,130 @@ namespace OGF_tool
 		private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
 			if (OGF_V.IsDM)
-            {
-				saveFileDialog1.Filter = "DM file|*.dm";
-			}
+				SaveAsDialog.Filter = "DM file|*.dm";
 			else
+				SaveAsDialog.Filter = "OGF file|*.ogf";
+
+			if (SaveAsDialog.ShowDialog() == DialogResult.OK)
 			{
-				saveFileDialog1.Filter = "OGF file|*.ogf|Object file|*.object";
-
-				if (OGF_V.m_model_type != 1)
-					saveFileDialog1.Filter += "|Bones file|*.bones";
-
-				if (Current_OMF != null)
-					saveFileDialog1.Filter += "|Skl file|*.skl|Skls file|*.skls|OMF file|*.omf";
+				SaveTools(SaveAsDialog.FileName, 0);
+				SaveAsDialog.InitialDirectory = "";
 			}
-
-			saveFileDialog1.ShowDialog();
 		}
 
-		private void saveFileDialog1_FileOk(object sender, CancelEventArgs e)
+		private void SaveTools(string filename, int format)
 		{
-			saveFileDialog1.InitialDirectory = "";
+			bool has_msg = false;
 
-			string Filename = (sender as SaveFileDialog).FileName;
-
-			string format = Path.GetExtension(Filename);
-
-			if (File.Exists(Filename))
+			if (File.Exists(filename) && filename != FILE_NAME)
 			{
-				FileInfo backup_file = new FileInfo(Filename);
+				FileInfo backup_file = new FileInfo(filename);
 				backup_file.Delete();
 			}
 
-			if (format == ".ogf" || format == ".dm")
+			if (format == 0)
 			{
-				FileInfo file = new FileInfo(FILE_NAME);
-				file.CopyTo(Filename);
-
-				CopyParams();
-				SaveFile((sender as SaveFileDialog).FileName);
-			}
-			else if (format == ".object")
-			{
-				if (File.Exists(Filename + ".ogf"))
+				if (filename != FILE_NAME)
 				{
-					FileInfo backup_file = new FileInfo(Filename + ".ogf");
-					backup_file.Delete();
+					FileInfo file = new FileInfo(FILE_NAME);
+					file.CopyTo(filename);
 				}
 
-				FileInfo file = new FileInfo(FILE_NAME);
-				file.CopyTo(Filename + ".ogf");
+				CopyParams();
+				SaveFile(filename);
+				AutoClosingMessageBox.Show(IsModelBroken ? "Repaired and Saved!" : "Saved!", "", IsModelBroken ? 700 : 500, MessageBoxIcon.Information);
+				has_msg = true;
+			}
+			else if (format == 1)
+			{
+				string ext = OGF_V.IsDM ? ".dm" : ".ogf";
+
+				if (filename != FILE_NAME)
+				{
+					if (File.Exists(filename + ext))
+					{
+						FileInfo backup_file = new FileInfo(filename + ext);
+						backup_file.Delete();
+					}
+
+					FileInfo file = new FileInfo(FILE_NAME);
+					file.CopyTo(filename + ext);
+				}
 
 				CopyParams();
-				SaveFile((sender as SaveFileDialog).FileName + ".ogf");
+				SaveFile(filename + ext);
 
-				RunConverter(Filename + ".ogf", Filename, 0, 0);
+				RunConverter(filename + ext, filename, OGF_V.IsDM ? 2 : 0, 0);
 
-				if (File.Exists(Filename + ".ogf"))
+				if (File.Exists(filename + ext))
 				{
-					FileInfo backup_file = new FileInfo(Filename + ".ogf");
+					FileInfo backup_file = new FileInfo(filename + ext);
 					backup_file.Delete();
 				}
 			}
-			else if (format == ".bones")
-				RunConverter(FILE_NAME, Filename, 0, 1);
-			else if (format == ".skl")
-				RunConverter(FILE_NAME, Filename, 0, 2);
-			else if (format == ".skls")
-				RunConverter(FILE_NAME, Filename, 0, 3);
-			else if (format == ".omf")
+			else if (format == 2)
+				RunConverter(FILE_NAME, filename, 0, 1);
+			else if (format == 3)
+				RunConverter(FILE_NAME, filename, 0, 2);
+			else if (format == 4)
+				RunConverter(FILE_NAME, filename, 0, 3);
+			else if (format == 5)
 			{
-				using (var fileStream = new FileStream(Filename, FileMode.OpenOrCreate))
+				using (var fileStream = new FileStream(filename, FileMode.OpenOrCreate))
 				{
 					fileStream.Write(Current_OMF, 0, Current_OMF.Length);
 				}
 			}
-			AutoClosingMessageBox.Show(IsModelBroken ? "Repaired and Saved!" : "Saved!", "", IsModelBroken ? 700 : 500, MessageBoxIcon.Information);
+			if (!has_msg)
+				AutoClosingMessageBox.Show(IsModelBroken ? "Repaired and Exported!" : "Exported!", "", IsModelBroken ? 700 : 500, MessageBoxIcon.Information);
 		}
 
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+		private void objectToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (SaveObjectDialog.ShowDialog() == DialogResult.OK)
+			{
+				SaveTools(SaveObjectDialog.FileName, 1);
+				SaveObjectDialog.InitialDirectory = "";
+			}
+		}
+
+		private void bonesToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (SaveBonesDialog.ShowDialog() == DialogResult.OK)
+			{
+				SaveTools(SaveBonesDialog.FileName, 2);
+				SaveBonesDialog.InitialDirectory = "";
+			}
+		}
+
+		private void omfToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (SaveOmfDialog.ShowDialog() == DialogResult.OK)
+			{
+				SaveTools(SaveOmfDialog.FileName, 5);
+				SaveOmfDialog.InitialDirectory = "";
+			}
+		}
+
+		private void sklToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (SaveSklDialog.ShowDialog(this.Handle))
+			{
+				SaveTools(SaveSklDialog.FileName, 3);
+				SaveSklDialog.InitialDirectory = "";
+			}
+		}
+
+		private void sklsToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (SaveSklsDialog.ShowDialog() == DialogResult.OK)
+			{
+				SaveTools(SaveSklsDialog.FileName, 4);
+				SaveSklsDialog.InitialDirectory = "";
+			}
+		}
+
+		private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
 			if (MessageBox.Show("Are you sure you want to exit?", "OGF Editor", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
 				Close();
@@ -1303,15 +1367,15 @@ namespace OGF_tool
 		private void AppendOMFButton_Click(object sender, EventArgs e)
         {
 			if (MotionRefsBox.Text == "" && (OGF_V.motion_refs == null || OGF_V.motion_refs.refs.Count() == 0) || (MotionRefsBox.Text != "" || OGF_V.motion_refs != null && OGF_V.motion_refs.refs.Count() > 0) && MessageBox.Show("Build-in motions will remove motion refs, continue?", "OGF Editor", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-				openOMFDialog.ShowDialog();
+				OpenOMFDialog.ShowDialog();
         }
 
 		private void AppendMotion(object sender, CancelEventArgs e)
 		{
 			if (sender != null)
-				openOMFDialog.InitialDirectory = "";
+				OpenOMFDialog.InitialDirectory = "";
 
-            byte[] OpenedOmf = File.ReadAllBytes(openOMFDialog.FileName);
+            byte[] OpenedOmf = File.ReadAllBytes(OpenOMFDialog.FileName);
 
 			var xr_loader = new XRayLoader();
 
@@ -1372,15 +1436,15 @@ namespace OGF_tool
 
 		private void importDataFromModelToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			openOGFDialog.FileName = "";
-			if (openOGFDialog.ShowDialog() == DialogResult.OK)
+			OpenOGFDialog.FileName = "";
+			if (OpenOGFDialog.ShowDialog() == DialogResult.OK)
 			{
 				bool UpdateUi = false;
 
 				OGF_Children SecondOgf = null;
 				byte[] SecondOgfByte = null;
 				byte[] SecondOmfByte = null;
-				OpenFile(openOGFDialog.FileName, ref SecondOgf, ref SecondOgfByte, ref SecondOmfByte);
+				OpenFile(OpenOGFDialog.FileName, ref SecondOgf, ref SecondOgfByte, ref SecondOmfByte);
 
 				if (OGF_V.childs.Count == SecondOgf.childs.Count && MessageBox.Show("Import textures and shaders path?\nThey may have different positions", "OGF Editor", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
 				{
@@ -1466,6 +1530,11 @@ namespace OGF_tool
 				OGF_V.m_model_type = 10;
 			else
 				OGF_V.m_model_type = 3;
+
+			// Апдейтим экспорт аним тут, т.к. при любом изменении омф вызывается эта функция
+			omfToolStripMenuItem.Enabled = Current_OMF != null;
+			sklToolStripMenuItem.Enabled = Current_OMF != null;
+			sklsToolStripMenuItem.Enabled = Current_OMF != null;
 		}
 
 		private void editImOMFEditorToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1493,9 +1562,9 @@ namespace OGF_tool
 			proc.Start();
 			proc.WaitForExit();
 
-			openOMFDialog.FileName = Filename;
+			OpenOMFDialog.FileName = Filename;
 			AppendMotion(null, null);
-			openOMFDialog.FileName = "";
+			OpenOMFDialog.FileName = "";
 
 			File.Delete(Filename);
 
@@ -1541,10 +1610,10 @@ namespace OGF_tool
 			if (!File.Exists(omf_editor_path))
 			{
 				MessageBox.Show("Please, open OMF Editor path", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-				if (openProgramDialog.ShowDialog() == DialogResult.OK)
+				if (OpenProgramDialog.ShowDialog() == DialogResult.OK)
 				{
-					openProgramDialog.InitialDirectory = "";
-					omf_editor_path = openProgramDialog.FileName;
+					OpenProgramDialog.InitialDirectory = "";
+					omf_editor_path = OpenProgramDialog.FileName;
 					Settings.Write("omf_editor", omf_editor_path, "settings");
 				}
 			}
@@ -1558,10 +1627,10 @@ namespace OGF_tool
 			if (!File.Exists(object_editor_path))
 			{
 				MessageBox.Show("Please, open Object Editor path", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-				if (openProgramDialog.ShowDialog() == DialogResult.OK)
+				if (OpenProgramDialog.ShowDialog() == DialogResult.OK)
 				{
-					openProgramDialog.InitialDirectory = "";
-					object_editor_path = openProgramDialog.FileName;
+					OpenProgramDialog.InitialDirectory = "";
+					object_editor_path = OpenProgramDialog.FileName;
 					Settings.Write("object_editor", object_editor_path, "settings");
 				}
 			}

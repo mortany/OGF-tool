@@ -30,7 +30,7 @@ namespace OGF_tool
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OGF_Editor));
-            this.openOGFDialog = new System.Windows.Forms.OpenFileDialog();
+            this.OpenOGFDialog = new System.Windows.Forms.OpenFileDialog();
             this.TabControl = new System.Windows.Forms.TabControl();
             this.TexturesPage = new System.Windows.Forms.TabPage();
             this.UserDataPage = new System.Windows.Forms.TabPage();
@@ -68,12 +68,22 @@ namespace OGF_tool
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.FileLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.StatusFile = new System.Windows.Forms.ToolStripStatusLabel();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.StatusPanel = new System.Windows.Forms.StatusStrip();
             this.BkpCheckBox = new System.Windows.Forms.CheckBox();
-            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.openOMFDialog = new System.Windows.Forms.OpenFileDialog();
-            this.openProgramDialog = new System.Windows.Forms.OpenFileDialog();
-            this.openOGF_DmDialog = new System.Windows.Forms.OpenFileDialog();
+            this.SaveAsDialog = new System.Windows.Forms.SaveFileDialog();
+            this.OpenOMFDialog = new System.Windows.Forms.OpenFileDialog();
+            this.OpenProgramDialog = new System.Windows.Forms.OpenFileDialog();
+            this.OpenOGF_DmDialog = new System.Windows.Forms.OpenFileDialog();
+            this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.objectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.bonesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sklToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sklsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.omfToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.SaveSklsDialog = new System.Windows.Forms.SaveFileDialog();
+            this.SaveOmfDialog = new System.Windows.Forms.SaveFileDialog();
+            this.SaveBonesDialog = new System.Windows.Forms.SaveFileDialog();
+            this.SaveObjectDialog = new System.Windows.Forms.SaveFileDialog();
             this.TabControl.SuspendLayout();
             this.UserDataPage.SuspendLayout();
             this.MotionRefsPage.SuspendLayout();
@@ -81,12 +91,12 @@ namespace OGF_tool
             this.BoneNamesPage.SuspendLayout();
             this.LodPage.SuspendLayout();
             this.MenuPanel.SuspendLayout();
-            this.statusStrip1.SuspendLayout();
+            this.StatusPanel.SuspendLayout();
             this.SuspendLayout();
             // 
-            // openOGFDialog
+            // OpenOGFDialog
             // 
-            this.openOGFDialog.Filter = "OGF file|*.ogf";
+            this.OpenOGFDialog.Filter = "OGF file|*.ogf";
             // 
             // TabControl
             // 
@@ -334,6 +344,7 @@ namespace OGF_tool
             this.LoadMenuParam,
             this.SaveMenuParam,
             this.saveAsToolStripMenuItem,
+            this.exportToolStripMenuItem,
             this.toolStripSeparator1,
             this.reloadToolStripMenuItem,
             this.exitToolStripMenuItem});
@@ -462,16 +473,16 @@ namespace OGF_tool
             this.StatusFile.Size = new System.Drawing.Size(12, 17);
             this.StatusFile.Text = "-";
             // 
-            // statusStrip1
+            // StatusPanel
             // 
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.StatusPanel.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.FileLabel,
             this.StatusFile});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 315);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(463, 22);
-            this.statusStrip1.TabIndex = 30;
-            this.statusStrip1.Text = "statusStrip1";
+            this.StatusPanel.Location = new System.Drawing.Point(0, 315);
+            this.StatusPanel.Name = "StatusPanel";
+            this.StatusPanel.Size = new System.Drawing.Size(463, 22);
+            this.StatusPanel.TabIndex = 30;
+            this.StatusPanel.Text = "statusStrip1";
             // 
             // BkpCheckBox
             // 
@@ -485,24 +496,86 @@ namespace OGF_tool
             this.BkpCheckBox.UseVisualStyleBackColor = true;
             this.BkpCheckBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
-            // saveFileDialog1
+            // SaveAsDialog
             // 
-            this.saveFileDialog1.Filter = "OGF file|*.ogf|Object file|*.object|Bones file|*.bones|Skl file|*.skl|Skls file|*" +
+            this.SaveAsDialog.Filter = "OGF file|*.ogf|Object file|*.object|Bones file|*.bones|Skl file|*.skl|Skls file|*" +
     ".skls|OMF file|*.omf";
-            this.saveFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.saveFileDialog1_FileOk);
             // 
-            // openOMFDialog
+            // OpenOMFDialog
             // 
-            this.openOMFDialog.Filter = "OMF file|*.omf";
-            this.openOMFDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.AppendMotion);
+            this.OpenOMFDialog.Filter = "OMF file|*.omf";
+            this.OpenOMFDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.AppendMotion);
             // 
-            // openProgramDialog
+            // OpenProgramDialog
             // 
-            this.openProgramDialog.Filter = "Program|*.exe";
+            this.OpenProgramDialog.Filter = "Program|*.exe";
             // 
-            // openOGF_DmDialog
+            // OpenOGF_DmDialog
             // 
-            this.openOGF_DmDialog.Filter = "OGF file|*.ogf|DM file|*.dm";
+            this.OpenOGF_DmDialog.Filter = "OGF file|*.ogf|DM file|*.dm";
+            // 
+            // exportToolStripMenuItem
+            // 
+            this.exportToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.objectToolStripMenuItem,
+            this.bonesToolStripMenuItem,
+            this.omfToolStripMenuItem,
+            this.sklToolStripMenuItem,
+            this.sklsToolStripMenuItem});
+            this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exportToolStripMenuItem.Text = "Export";
+            // 
+            // objectToolStripMenuItem
+            // 
+            this.objectToolStripMenuItem.Name = "objectToolStripMenuItem";
+            this.objectToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.objectToolStripMenuItem.Text = "Object";
+            this.objectToolStripMenuItem.Click += new System.EventHandler(this.objectToolStripMenuItem_Click);
+            // 
+            // bonesToolStripMenuItem
+            // 
+            this.bonesToolStripMenuItem.Name = "bonesToolStripMenuItem";
+            this.bonesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.bonesToolStripMenuItem.Text = "Bones";
+            this.bonesToolStripMenuItem.Click += new System.EventHandler(this.bonesToolStripMenuItem_Click);
+            // 
+            // sklToolStripMenuItem
+            // 
+            this.sklToolStripMenuItem.Name = "sklToolStripMenuItem";
+            this.sklToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.sklToolStripMenuItem.Text = "Skl";
+            this.sklToolStripMenuItem.Click += new System.EventHandler(this.sklToolStripMenuItem_Click);
+            // 
+            // sklsToolStripMenuItem
+            // 
+            this.sklsToolStripMenuItem.Name = "sklsToolStripMenuItem";
+            this.sklsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.sklsToolStripMenuItem.Text = "Skls";
+            this.sklsToolStripMenuItem.Click += new System.EventHandler(this.sklsToolStripMenuItem_Click);
+            // 
+            // omfToolStripMenuItem
+            // 
+            this.omfToolStripMenuItem.Name = "omfToolStripMenuItem";
+            this.omfToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.omfToolStripMenuItem.Text = "Omf";
+            this.omfToolStripMenuItem.Click += new System.EventHandler(this.omfToolStripMenuItem_Click);
+            // 
+            // SaveSklsDialog
+            // 
+            this.SaveSklsDialog.Filter = "Skls file|*.skls";
+            // 
+            // SaveOmfDialog
+            // 
+            this.SaveOmfDialog.Filter = "OMF file|*omf";
+            // 
+            // SaveBonesDialog
+            // 
+            this.SaveBonesDialog.Filter = "Bones file|*bones";
+            // 
+            // SaveObjectDialog
+            // 
+            this.SaveObjectDialog.Filter = "Object file|*object";
             // 
             // OGF_Editor
             // 
@@ -511,7 +584,7 @@ namespace OGF_tool
             this.ClientSize = new System.Drawing.Size(463, 337);
             this.Controls.Add(this.MenuPanel);
             this.Controls.Add(this.BkpCheckBox);
-            this.Controls.Add(this.statusStrip1);
+            this.Controls.Add(this.StatusPanel);
             this.Controls.Add(this.TabControl);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.MenuPanel;
@@ -531,15 +604,15 @@ namespace OGF_tool
             this.LodPage.PerformLayout();
             this.MenuPanel.ResumeLayout(false);
             this.MenuPanel.PerformLayout();
-            this.statusStrip1.ResumeLayout(false);
-            this.statusStrip1.PerformLayout();
+            this.StatusPanel.ResumeLayout(false);
+            this.StatusPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-        private System.Windows.Forms.OpenFileDialog openOGFDialog;
+        private System.Windows.Forms.OpenFileDialog OpenOGFDialog;
         private System.Windows.Forms.TabControl TabControl;
         private System.Windows.Forms.TabPage TexturesPage;
         private System.Windows.Forms.TabPage MotionRefsPage;
@@ -552,7 +625,7 @@ namespace OGF_tool
         private System.Windows.Forms.ToolStripMenuItem LoadMenuParam;
         private System.Windows.Forms.ToolStripStatusLabel FileLabel;
         private System.Windows.Forms.ToolStripStatusLabel StatusFile;
-        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.StatusStrip StatusPanel;
         private System.Windows.Forms.ToolStripMenuItem oGFInfoToolStripMenuItem;
         private System.Windows.Forms.CheckBox BkpCheckBox;
         private System.Windows.Forms.TabPage BoneParamsPage;
@@ -563,14 +636,14 @@ namespace OGF_tool
         private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
-        private System.Windows.Forms.SaveFileDialog saveFileDialog1;
+        private System.Windows.Forms.SaveFileDialog SaveAsDialog;
         private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
         private System.Windows.Forms.Button CreateUserdataButton;
         private System.Windows.Forms.Button CreateMotionRefsButton;
         private System.Windows.Forms.ToolStripMenuItem reloadToolStripMenuItem;
         private System.Windows.Forms.Button AppendOMFButton;
-        private System.Windows.Forms.OpenFileDialog openOMFDialog;
-        private System.Windows.Forms.OpenFileDialog openProgramDialog;
+        private System.Windows.Forms.OpenFileDialog OpenOMFDialog;
+        private System.Windows.Forms.OpenFileDialog OpenProgramDialog;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem openSkeletonInObjectEditorToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem motionToolsToolStripMenuItem;
@@ -582,7 +655,17 @@ namespace OGF_tool
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button CreateLodButton;
         private System.Windows.Forms.ToolStripMenuItem importDataFromModelToolStripMenuItem;
-        private System.Windows.Forms.OpenFileDialog openOGF_DmDialog;
+        private System.Windows.Forms.OpenFileDialog OpenOGF_DmDialog;
+        private System.Windows.Forms.ToolStripMenuItem exportToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem objectToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem bonesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem sklToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem sklsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem omfToolStripMenuItem;
+        private System.Windows.Forms.SaveFileDialog SaveSklsDialog;
+        private System.Windows.Forms.SaveFileDialog SaveOmfDialog;
+        private System.Windows.Forms.SaveFileDialog SaveBonesDialog;
+        private System.Windows.Forms.SaveFileDialog SaveObjectDialog;
     }
 }
 

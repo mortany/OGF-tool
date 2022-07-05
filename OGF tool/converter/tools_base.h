@@ -17,6 +17,7 @@ public:
 
 		TOOLS_OGF	= 0x001,
 		TOOLS_OMF	= 0x002,
+		TOOLS_DM	= 0x004,
 	};
 
 	virtual void	process(const cl_parser& cl) = 0;

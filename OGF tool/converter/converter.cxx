@@ -1,6 +1,7 @@
 #include "converter.h"
 #include "tools_base.h"
 #include "ogf_tools.h"
+#include "dm_tools.h"
 #include "xr_file_system.h"
 #include "xr_log.h"
 #include <time.h>
@@ -90,6 +91,8 @@ int main(int argc, char* argv[], std::vector<std::string> motions)
 		format |= tools_base::TOOLS_OGF;
 	if (cl.exist("-omf"))
 		format |= tools_base::TOOLS_OMF;
+	if (cl.exist("-dm"))
+		format |= tools_base::TOOLS_DM;
 
 	if (format == tools_base::TOOLS_AUTO) 
 	{
@@ -102,6 +105,8 @@ int main(int argc, char* argv[], std::vector<std::string> motions)
 				format |= tools_base::TOOLS_OGF;
 			else if (extension == ".omf")
 				format |= tools_base::TOOLS_OMF;
+			else if (extension == ".dm")
+				format |= tools_base::TOOLS_DM;
 		}
 		if (format == tools_base::TOOLS_AUTO) {
 			if (num_params)
@@ -139,6 +144,10 @@ int main(int argc, char* argv[], std::vector<std::string> motions)
 		tools = new omf_tools;
 		tools->motions_vec = motions;
 		break;
+	case tools_base::TOOLS_DM:
+		tools = new dm_tools;
+		tools->motions_vec = motions;
+		break;
 	}
 	if (tools == 0) {
 		msg("locked");
@@ -150,6 +159,7 @@ int main(int argc, char* argv[], std::vector<std::string> motions)
 	msg("total time: %.3lfs", (clock() - start) / 1.0 / CLOCKS_PER_SEC);
 
 	delete tools;
+
 	return 0;
 }
 
@@ -208,6 +218,11 @@ extern "C"
 						args[4] = "-skls";
 					}break;
 				}
+			}break;
+			case 2: // DM
+			{
+				args[0] = "-dm";
+				args[4] = "-object";
 			}break;
 		}
 
