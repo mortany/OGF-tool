@@ -108,8 +108,8 @@ namespace OGF_tool
 				oGFInfoToolStripMenuItem.Enabled = true;
 				SaveMenuParam.Enabled = true;
 				saveAsToolStripMenuItem.Enabled = true;
+				toolStripMenuItem1.Enabled = true;
 				openSkeletonInObjectEditorToolStripMenuItem.Enabled = OGF_V.IsSkeleton();
-				toolStripMenuItem1.Enabled = OGF_V.IsSkeleton();
 				viewToolStripMenuItem.Enabled = OGF_V.IsSkeleton();
 
 				openOGFDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
@@ -1334,19 +1334,22 @@ namespace OGF_tool
 		{
 			openOGFDialog.FileName = "";
 			if (openOGFDialog.ShowDialog() == DialogResult.OK)
-            {
+			{
+				bool UpdateUi = false;
+
 				OGF_Children SecondOgf = null;
 				byte[] SecondOgfByte = null;
 				byte[] SecondOmfByte = null;
 				OpenFile(openOGFDialog.FileName, ref SecondOgf, ref SecondOgfByte, ref SecondOmfByte);
 
 				if (OGF_V.childs.Count == SecondOgf.childs.Count && MessageBox.Show("Import textures and shaders path?\nThey may have different positions", "OGF Editor", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                {
+				{
 					for (int i = 0; i < OGF_V.childs.Count; i++)
-                    {
+					{
 						OGF_V.childs[i].m_texture = SecondOgf.childs[i].m_texture;
 						OGF_V.childs[i].m_shader = SecondOgf.childs[i].m_shader;
 					}
+					UpdateUi = true;
 				}
 
 				if (OGF_V.IsSkeleton())
@@ -1356,6 +1359,8 @@ namespace OGF_tool
 						if (OGF_V.userdata == null)
 							OGF_V.userdata = new UserData();
 						OGF_V.userdata.userdata = SecondOgf.userdata.userdata;
+
+						UpdateUi = true;
 					}
 					else
 						OGF_V.userdata = null;
@@ -1365,6 +1370,8 @@ namespace OGF_tool
 						if (OGF_V.lod == null)
 							OGF_V.lod = new Lod();
 						OGF_V.lod.lod_path = SecondOgf.lod.lod_path;
+
+						UpdateUi = true;
 					}
 					else
 						OGF_V.lod = null;
@@ -1375,22 +1382,39 @@ namespace OGF_tool
 							OGF_V.motion_refs = new MotionRefs();
 
 						OGF_V.motion_refs.refs = SecondOgf.motion_refs.refs;
+
+						UpdateUi = true;
 					}
 					else
 						OGF_V.motion_refs = null;
 
 					if (SecondOmfByte != null)
-						Current_OMF = SecondOmfByte;
-
-					for (int i = 0; i < OGF_V.ikdata.materials.Count; i++)
 					{
-						OGF_V.ikdata.materials[i] = SecondOgf.ikdata.materials[i];
-						OGF_V.ikdata.mass[i] = SecondOgf.ikdata.mass[i];
+						Current_OMF = SecondOmfByte;
+						UpdateUi = true;
+					}
+
+					if (OGF_V.ikdata.materials.Count == SecondOgf.ikdata.materials.Count)
+					{
+						for (int i = 0; i < OGF_V.ikdata.materials.Count; i++)
+						{
+							OGF_V.ikdata.materials[i] = SecondOgf.ikdata.materials[i];
+							OGF_V.ikdata.mass[i] = SecondOgf.ikdata.mass[i];
+						}
+						UpdateUi = true;
 					}
 				}
 
-				Clear(true);
-				AfterLoad(false);
+				if (UpdateUi)
+				{
+					Clear(true);
+					AfterLoad(false);
+					AutoClosingMessageBox.Show("OGF Params changed!", "", 1000, MessageBoxIcon.Information);
+				}
+				else
+                {
+					AutoClosingMessageBox.Show("OGF Params don't changed!", "", 1000, MessageBoxIcon.Error);
+				}
 			}
 		}
 
