@@ -251,9 +251,9 @@ namespace OGF_tool
             this.v3 = false;
         }
 
-        public uint chunk_size()
+        public uint chunk_size(bool v3)
         {
-            uint temp = 4;
+            uint temp = (uint)(v3 ? 0 : 4);
             foreach (var text in refs)
                 temp += (uint)text.Length + 1;
             return temp;
@@ -262,13 +262,28 @@ namespace OGF_tool
         {
             return BitConverter.GetBytes(refs.Count);
         }
-        public byte[] data()
+        public byte[] data(bool v3)
         {
             List<byte> temp = new List<byte>();
 
-            foreach (var str in refs)
+            if (!v3)
             {
-                temp.AddRange(Encoding.Default.GetBytes(str));
+                foreach (var str in refs)
+                {
+                    temp.AddRange(Encoding.Default.GetBytes(str));
+                    temp.Add(0);
+                }
+            }
+            else
+            {
+                string strref = refs[0];
+                if (refs.Count > 1)
+                {
+                    for (int i = 1; i < refs.Count; i++)
+                        strref += refs[i] + ",";
+                }
+
+                temp.AddRange(Encoding.Default.GetBytes(strref));
                 temp.Add(0);
             }
 

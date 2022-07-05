@@ -165,10 +165,14 @@ namespace OGF_tool
 		{
 			if (OGF_V.motion_refs != null)
 			{
+				OGF_V.motion_refs.refs.Clear();
+
 				if (MotionRefsBox.Lines.Count() > 0)
 				{
-					OGF_V.motion_refs.refs.Clear();
 					OGF_V.motion_refs.refs.AddRange(MotionRefsBox.Lines);
+
+					if (MotionRefsBox.Lines.Count() > 1)
+						OGF_V.motion_refs.v3 = false;
 				}
 			}
 
@@ -457,18 +461,16 @@ namespace OGF_tool
 						refs_created = true;
 
 						if (!OGF_V.motion_refs.v3)
-						{
 							file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_MOTION_REFS2));
-							file_bytes.AddRange(BitConverter.GetBytes(OGF_V.motion_refs.chunk_size()));
-							file_bytes.AddRange(OGF_V.motion_refs.count());
-						}
 						else
-						{
 							file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_MOTION_REFS));
-							file_bytes.AddRange(BitConverter.GetBytes(OGF_V.motion_refs.chunk_size()));
-						}
 
-						file_bytes.AddRange(OGF_V.motion_refs.data());
+						file_bytes.AddRange(BitConverter.GetBytes(OGF_V.motion_refs.chunk_size(OGF_V.motion_refs.v3)));
+
+						if (!OGF_V.motion_refs.v3)
+							file_bytes.AddRange(OGF_V.motion_refs.count());
+
+						file_bytes.AddRange(OGF_V.motion_refs.data(OGF_V.motion_refs.v3));
 					}
 
 					if (OGF_V.motion_refs.old_size > 0) // Сдвигаем позицию риадера если в модели был чанк
