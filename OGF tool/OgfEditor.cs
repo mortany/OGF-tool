@@ -1392,7 +1392,8 @@ namespace OGF_tool
 
 					// Чистим встроенные рефы, интерфейс почистится сам при активации вкладки
 					MotionRefsBox.Clear();
-					OGF_V.motion_refs.refs.Clear();
+					if (OGF_V.motion_refs != null)
+						OGF_V.motion_refs.refs.Clear();
 
 					Current_OMF = OpenedOmf;
 					OGF_V.motions = "";
