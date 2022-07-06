@@ -723,8 +723,8 @@ namespace OGF_tool
 					{
 						OGF_C.userdata = new UserData();
 						OGF_C.userdata.pos = xr_loader.chunk_pos;
-						OGF_C.userdata.userdata = xr_loader.read_stringZ();
-						OGF_C.userdata.old_size = OGF_C.userdata.userdata.Length + 1;
+						OGF_C.userdata.userdata = xr_loader.read_stringData(ref OGF_C.userdata.data_str);
+						OGF_C.userdata.old_size = OGF_C.userdata.userdata.Length + (OGF_C.userdata.data_str ? 2 : 1);
 					}
 
 					xr_loader.SetStream(r.BaseStream);
@@ -925,8 +925,8 @@ namespace OGF_tool
 					{
 						OGF_C.lod = new Lod();
 						OGF_C.lod.pos = xr_loader.chunk_pos;
-						OGF_C.lod.lod_path = xr_loader.read_stringZ();
-						OGF_C.lod.old_size = OGF_C.lod.lod_path.Length + 1;
+						OGF_C.lod.lod_path = xr_loader.read_stringData(ref OGF_C.lod.data_str);
+						OGF_C.lod.old_size = OGF_C.lod.lod_path.Length + (OGF_C.lod.data_str ? 2 : 1);
 					}
 				}
 			}
