@@ -54,6 +54,12 @@ namespace OGF_tool
             this.LoadMenuParam = new System.Windows.Forms.ToolStripMenuItem();
             this.SaveMenuParam = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.objectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.bonesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.omfToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sklToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sklsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.reloadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -74,12 +80,6 @@ namespace OGF_tool
             this.OpenOMFDialog = new System.Windows.Forms.OpenFileDialog();
             this.OpenProgramDialog = new System.Windows.Forms.OpenFileDialog();
             this.OpenOGF_DmDialog = new System.Windows.Forms.OpenFileDialog();
-            this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.objectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.bonesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.sklToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.sklsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.omfToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.SaveSklsDialog = new System.Windows.Forms.SaveFileDialog();
             this.SaveOmfDialog = new System.Windows.Forms.SaveFileDialog();
             this.SaveBonesDialog = new System.Windows.Forms.SaveFileDialog();
@@ -334,7 +334,7 @@ namespace OGF_tool
             this.viewToolStripMenuItem});
             this.MenuPanel.Location = new System.Drawing.Point(0, 4);
             this.MenuPanel.Name = "MenuPanel";
-            this.MenuPanel.Size = new System.Drawing.Size(201, 24);
+            this.MenuPanel.Size = new System.Drawing.Size(321, 24);
             this.MenuPanel.TabIndex = 8;
             this.MenuPanel.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
@@ -372,6 +372,53 @@ namespace OGF_tool
             this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveAsToolStripMenuItem.Text = "Save as...";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
+            // 
+            // exportToolStripMenuItem
+            // 
+            this.exportToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.objectToolStripMenuItem,
+            this.bonesToolStripMenuItem,
+            this.omfToolStripMenuItem,
+            this.sklToolStripMenuItem,
+            this.sklsToolStripMenuItem});
+            this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exportToolStripMenuItem.Text = "Export";
+            // 
+            // objectToolStripMenuItem
+            // 
+            this.objectToolStripMenuItem.Name = "objectToolStripMenuItem";
+            this.objectToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.objectToolStripMenuItem.Text = "Object";
+            this.objectToolStripMenuItem.Click += new System.EventHandler(this.objectToolStripMenuItem_Click);
+            // 
+            // bonesToolStripMenuItem
+            // 
+            this.bonesToolStripMenuItem.Name = "bonesToolStripMenuItem";
+            this.bonesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.bonesToolStripMenuItem.Text = "Bones";
+            this.bonesToolStripMenuItem.Click += new System.EventHandler(this.bonesToolStripMenuItem_Click);
+            // 
+            // omfToolStripMenuItem
+            // 
+            this.omfToolStripMenuItem.Name = "omfToolStripMenuItem";
+            this.omfToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.omfToolStripMenuItem.Text = "OMF";
+            this.omfToolStripMenuItem.Click += new System.EventHandler(this.omfToolStripMenuItem_Click);
+            // 
+            // sklToolStripMenuItem
+            // 
+            this.sklToolStripMenuItem.Name = "sklToolStripMenuItem";
+            this.sklToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.sklToolStripMenuItem.Text = "Skl";
+            this.sklToolStripMenuItem.Click += new System.EventHandler(this.sklToolStripMenuItem_Click);
+            // 
+            // sklsToolStripMenuItem
+            // 
+            this.sklsToolStripMenuItem.Name = "sklsToolStripMenuItem";
+            this.sklsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.sklsToolStripMenuItem.Text = "Skls";
+            this.sklsToolStripMenuItem.Click += new System.EventHandler(this.sklsToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
@@ -513,53 +560,6 @@ namespace OGF_tool
             // OpenOGF_DmDialog
             // 
             this.OpenOGF_DmDialog.Filter = "OGF file|*.ogf|DM file|*.dm";
-            // 
-            // exportToolStripMenuItem
-            // 
-            this.exportToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.objectToolStripMenuItem,
-            this.bonesToolStripMenuItem,
-            this.omfToolStripMenuItem,
-            this.sklToolStripMenuItem,
-            this.sklsToolStripMenuItem});
-            this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.exportToolStripMenuItem.Text = "Export";
-            // 
-            // objectToolStripMenuItem
-            // 
-            this.objectToolStripMenuItem.Name = "objectToolStripMenuItem";
-            this.objectToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.objectToolStripMenuItem.Text = "Object";
-            this.objectToolStripMenuItem.Click += new System.EventHandler(this.objectToolStripMenuItem_Click);
-            // 
-            // bonesToolStripMenuItem
-            // 
-            this.bonesToolStripMenuItem.Name = "bonesToolStripMenuItem";
-            this.bonesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.bonesToolStripMenuItem.Text = "Bones";
-            this.bonesToolStripMenuItem.Click += new System.EventHandler(this.bonesToolStripMenuItem_Click);
-            // 
-            // sklToolStripMenuItem
-            // 
-            this.sklToolStripMenuItem.Name = "sklToolStripMenuItem";
-            this.sklToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.sklToolStripMenuItem.Text = "Skl";
-            this.sklToolStripMenuItem.Click += new System.EventHandler(this.sklToolStripMenuItem_Click);
-            // 
-            // sklsToolStripMenuItem
-            // 
-            this.sklsToolStripMenuItem.Name = "sklsToolStripMenuItem";
-            this.sklsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.sklsToolStripMenuItem.Text = "Skls";
-            this.sklsToolStripMenuItem.Click += new System.EventHandler(this.sklsToolStripMenuItem_Click);
-            // 
-            // omfToolStripMenuItem
-            // 
-            this.omfToolStripMenuItem.Name = "omfToolStripMenuItem";
-            this.omfToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.omfToolStripMenuItem.Text = "Omf";
-            this.omfToolStripMenuItem.Click += new System.EventHandler(this.omfToolStripMenuItem_Click);
             // 
             // SaveSklsDialog
             // 
