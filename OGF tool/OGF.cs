@@ -336,14 +336,12 @@ namespace OGF_tool
         public long pos;
         public int old_size;
         public string userdata;
-        public bool data_str;
 
         public UserData()
         {
             this.pos = 0;
             this.old_size = 0;
             this.userdata = "";
-            this.data_str = false;
         }
 
         public byte[] data()
@@ -351,20 +349,14 @@ namespace OGF_tool
             List<byte> temp = new List<byte>();
 
             temp.AddRange(Encoding.Default.GetBytes(userdata));
-            if (data_str)
-            {
-                temp.Add(0xD);
-                temp.Add(0xA);
-            }
-            else
-                temp.Add(0);
+            temp.Add(0);
 
             return temp.ToArray();
         }
 
         public uint chunk_size()
         {
-            return (uint)userdata.Length + (uint)(data_str ? 2 : 1);
+            return (uint)userdata.Length + 1;
         }
     }
 
