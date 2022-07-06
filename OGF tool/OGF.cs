@@ -372,7 +372,7 @@ namespace OGF_tool
             this.pos = 0;
             this.old_size = 0;
             this.lod_path = "";
-            this.data_str = false;
+            this.data_str = true;
         }
 
         public byte[] data()

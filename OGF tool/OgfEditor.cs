@@ -291,7 +291,7 @@ namespace OGF_tool
 				{
 					for (int i = 0; i < UserDataBox.Lines.Count(); i++)
 					{
-						string ext = i == UserDataBox.Lines.Count() - 1 ? "" : "\r\n";
+						string ext = i == UserDataBox.Lines.Count() - 1 ? "" : "\n";
 						OGF_V.userdata.userdata += UserDataBox.Lines[i] + ext;
 					}
 				}
