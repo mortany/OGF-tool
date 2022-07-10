@@ -531,101 +531,95 @@ namespace OGF_tool
                 {
 					temp = fileStream.ReadBytes((int)(last_child_size));
 					file_bytes.AddRange(temp);
-				}
-				else
-                {
-					temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
-					file_bytes.AddRange(temp);
-				}
 
-                if (OGF_V.bones.bones != null)
-                {
-                    file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_BONE_NAMES));
-                    file_bytes.AddRange(BitConverter.GetBytes(OGF_V.bones.chunk_size()));
-                    file_bytes.AddRange(OGF_V.bones.data(false));
+					file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_BONE_NAMES));
+					file_bytes.AddRange(BitConverter.GetBytes(OGF_V.bones.chunk_size()));
+					file_bytes.AddRange(OGF_V.bones.data(false));
 
 					fileStream.ReadBytes(OGF_V.bones.old_size + 8);
-				}
 
-				if (OGF_V.ikdata.materials != null)
-				{
 					file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_IKDATA));
 					file_bytes.AddRange(BitConverter.GetBytes(OGF_V.ikdata.chunk_size()));
 					file_bytes.AddRange(OGF_V.ikdata.data());
 
 					fileStream.ReadBytes(OGF_V.ikdata.old_size + 8);
-				}
 
-				if (OGF_V.userdata != null)
+					if (OGF_V.userdata != null)
+					{
+						if (OGF_V.userdata.pos > 0 && (OGF_V.userdata.pos - fileStream.BaseStream.Position) > 0) // Двигаемся до текущего чанка
+						{
+							temp = fileStream.ReadBytes((int)(OGF_V.userdata.pos - fileStream.BaseStream.Position));
+							file_bytes.AddRange(temp);
+						}
+
+						if (OGF_V.userdata.userdata != "") // Пишем если есть что писать
+						{
+							file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_USERDATA));
+							file_bytes.AddRange(BitConverter.GetBytes(OGF_V.userdata.chunk_size()));
+							file_bytes.AddRange(OGF_V.userdata.data());
+						}
+
+						if (OGF_V.userdata.old_size > 0) // Сдвигаем позицию риадера если в модели был чанк
+							fileStream.ReadBytes(OGF_V.userdata.old_size + 8);
+					}
+
+					if (OGF_V.lod != null)
+					{
+						if (OGF_V.lod.pos > 0 && (OGF_V.lod.pos - fileStream.BaseStream.Position) > 0) // Двигаемся до текущего чанка
+						{
+							temp = fileStream.ReadBytes((int)(OGF_V.lod.pos - fileStream.BaseStream.Position));
+							file_bytes.AddRange(temp);
+						}
+
+						if (OGF_V.lod.lod_path != "") // Пишем если есть что писать
+						{
+							file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_LODS));
+							file_bytes.AddRange(BitConverter.GetBytes(OGF_V.lod.chunk_size()));
+							file_bytes.AddRange(OGF_V.lod.data());
+						}
+
+						if (OGF_V.lod.old_size > 0) // Сдвигаем позицию риадера если в модели был чанк
+							fileStream.ReadBytes(OGF_V.lod.old_size + 8);
+					}
+
+					bool refs_created = false;
+					if (OGF_V.motion_refs != null)
+					{
+						if (OGF_V.motion_refs.pos > 0 && (OGF_V.motion_refs.pos - fileStream.BaseStream.Position) > 0) // Двигаемся до текущего чанка
+						{
+							temp = fileStream.ReadBytes((int)(OGF_V.motion_refs.pos - fileStream.BaseStream.Position));
+							file_bytes.AddRange(temp);
+						}
+
+						if (OGF_V.motion_refs.refs.Count > 0) // Пишем если есть что писать
+						{
+							refs_created = true;
+
+							if (!OGF_V.motion_refs.v3)
+								file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_MOTION_REFS2));
+							else
+								file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_MOTION_REFS));
+
+							file_bytes.AddRange(BitConverter.GetBytes(OGF_V.motion_refs.chunk_size(OGF_V.motion_refs.v3)));
+
+							if (!OGF_V.motion_refs.v3)
+								file_bytes.AddRange(OGF_V.motion_refs.count());
+
+							file_bytes.AddRange(OGF_V.motion_refs.data(OGF_V.motion_refs.v3));
+						}
+
+						if (OGF_V.motion_refs.old_size > 0) // Сдвигаем позицию риадера если в модели был чанк
+							fileStream.ReadBytes(OGF_V.motion_refs.old_size + 8);
+					}
+
+					if (Current_OMF != null && !refs_created)
+						file_bytes.AddRange(Current_OMF);
+				}
+				else
 				{
-					if (OGF_V.userdata.pos > 0 && (OGF_V.userdata.pos - fileStream.BaseStream.Position) > 0) // Двигаемся до текущего чанка
-					{
-						temp = fileStream.ReadBytes((int)(OGF_V.userdata.pos - fileStream.BaseStream.Position));
-						file_bytes.AddRange(temp);
-					}
-
-					if (OGF_V.userdata.userdata != "") // Пишем если есть что писать
-					{
-						file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_USERDATA));
-						file_bytes.AddRange(BitConverter.GetBytes(OGF_V.userdata.chunk_size()));
-						file_bytes.AddRange(OGF_V.userdata.data());
-					}
-
-					if (OGF_V.userdata.old_size > 0) // Сдвигаем позицию риадера если в модели был чанк
-						fileStream.ReadBytes(OGF_V.userdata.old_size + 8);
+					temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
+					file_bytes.AddRange(temp);
 				}
-
-				if (OGF_V.lod != null)
-				{
-					if (OGF_V.lod.pos > 0 && (OGF_V.lod.pos - fileStream.BaseStream.Position) > 0) // Двигаемся до текущего чанка
-					{
-						temp = fileStream.ReadBytes((int)(OGF_V.lod.pos - fileStream.BaseStream.Position));
-						file_bytes.AddRange(temp);
-					}
-
-					if (OGF_V.lod.lod_path != "") // Пишем если есть что писать
-					{
-						file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_LODS));
-						file_bytes.AddRange(BitConverter.GetBytes(OGF_V.lod.chunk_size()));
-						file_bytes.AddRange(OGF_V.lod.data());
-					}
-
-					if (OGF_V.lod.old_size > 0) // Сдвигаем позицию риадера если в модели был чанк
-						fileStream.ReadBytes(OGF_V.lod.old_size + 8);
-				}
-
-				bool refs_created = false;
-				if (OGF_V.motion_refs != null)
-				{
-					if (OGF_V.motion_refs.pos > 0 && (OGF_V.motion_refs.pos - fileStream.BaseStream.Position) > 0) // Двигаемся до текущего чанка
-					{
-						temp = fileStream.ReadBytes((int)(OGF_V.motion_refs.pos - fileStream.BaseStream.Position));
-						file_bytes.AddRange(temp);
-					}
-
-					if (OGF_V.motion_refs.refs.Count > 0) // Пишем если есть что писать
-					{
-						refs_created = true;
-
-						if (!OGF_V.motion_refs.v3)
-							file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_MOTION_REFS2));
-						else
-							file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_MOTION_REFS));
-
-						file_bytes.AddRange(BitConverter.GetBytes(OGF_V.motion_refs.chunk_size(OGF_V.motion_refs.v3)));
-
-						if (!OGF_V.motion_refs.v3)
-							file_bytes.AddRange(OGF_V.motion_refs.count());
-
-						file_bytes.AddRange(OGF_V.motion_refs.data(OGF_V.motion_refs.v3));
-					}
-
-					if (OGF_V.motion_refs.old_size > 0) // Сдвигаем позицию риадера если в модели был чанк
-						fileStream.ReadBytes(OGF_V.motion_refs.old_size + 8);
-				}
-
-				if (Current_OMF != null && !refs_created)
-					file_bytes.AddRange(Current_OMF);
 			}
 
 			WriteFile(filename);
@@ -806,7 +800,12 @@ namespace OGF_tool
 					xr_loader.SetStream(r.BaseStream);
 
 					// Bones
-					if (xr_loader.find_chunk((int)OGF.OGF4_S_BONE_NAMES, false, true))
+					if (!xr_loader.find_chunk((int)OGF.OGF4_S_BONE_NAMES, false, true))
+					{
+						MessageBox.Show("Unsupported OGF format! Can't find bones chunk!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+						return false;
+					}
+					else
 					{
 						OGF_C.bones.pos = xr_loader.chunk_pos;
 
@@ -848,7 +847,12 @@ namespace OGF_tool
 					xr_loader.SetStream(r.BaseStream);
 
 					// Ik Data
-					if (xr_loader.find_chunk((int)OGF.OGF4_S_IKDATA, false, true))
+					if (!xr_loader.find_chunk((int)OGF.OGF4_S_IKDATA, false, true))
+					{
+						MessageBox.Show("Unsupported OGF format! Can't find ik data chunk!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+						return false;
+					}
+					else
 					{
 						OGF_C.ikdata.materials = new List<string>();
 						OGF_C.ikdata.mass = new List<float>();
