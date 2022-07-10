@@ -968,9 +968,6 @@ namespace OGF_tool
 			{
 				case "float":
 					{
-						if (curBox.Text == "NaN")
-							curBox.Text = "0";
-
 						if (bKeyIsDown)
 						{
 							if (curBox.Text.Length == 0)
@@ -1719,9 +1716,9 @@ namespace OGF_tool
 			BoneNameTextBox.Name = "boneBox_" + idx;
 			BoneNameTextBox.Size = new System.Drawing.Size(326, 58);
 			BoneNameTextBox.Location = new System.Drawing.Point(86, 18);
+			BoneNameTextBox.Text = bone_name;
 			BoneNameTextBox.Tag = "string";
 			BoneNameTextBox.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			BoneNameTextBox.Text = bone_name;
 			BoneNameTextBox.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 			BoneNameTextBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
 
@@ -1750,9 +1747,9 @@ namespace OGF_tool
 			MaterialTextBox.Name = "MaterialBox_" + idx;
 			MaterialTextBox.Size = new System.Drawing.Size(326, 58);
 			MaterialTextBox.Location = new System.Drawing.Point(86, 72);
+			MaterialTextBox.Text = material;
 			MaterialTextBox.Tag = "string";
 			MaterialTextBox.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			MaterialTextBox.Text = material;
 			MaterialTextBox.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 			MaterialTextBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
 
@@ -1766,9 +1763,9 @@ namespace OGF_tool
 			MassTextBox.Name = "MassBox_" + idx;
 			MassTextBox.Size = new System.Drawing.Size(84, 58);
 			MassTextBox.Location = new System.Drawing.Point(86, 99);
+			MassTextBox.Text = mass.ToString();
 			MassTextBox.Tag = "float";
 			MassTextBox.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			MassTextBox.Text = mass.ToString();
 			MassTextBox.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 
 			var MassLabel = new Label();
@@ -1781,27 +1778,27 @@ namespace OGF_tool
 			CenterMassTextBoxX.Name = "CenterBoxX_" + idx;
 			CenterMassTextBoxX.Size = new System.Drawing.Size(84, 58);
 			CenterMassTextBoxX.Location = new System.Drawing.Point(86, 125);
+			CenterMassTextBoxX.Text = center.x.ToString();
 			CenterMassTextBoxX.Tag = "float";
 			CenterMassTextBoxX.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			CenterMassTextBoxX.Text = center.x.ToString();
 			CenterMassTextBoxX.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 
 			var CenterMassTextBoxY = new TextBox();
 			CenterMassTextBoxY.Name = "CenterBoxY_" + idx;
 			CenterMassTextBoxY.Size = new System.Drawing.Size(84, 58);
 			CenterMassTextBoxY.Location = new System.Drawing.Point(182, 125);
+			CenterMassTextBoxY.Text = center.y.ToString();
 			CenterMassTextBoxY.Tag = "float";
 			CenterMassTextBoxY.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			CenterMassTextBoxY.Text = center.y.ToString();
 			CenterMassTextBoxY.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 
 			var CenterMassTextBoxZ = new TextBox();
 			CenterMassTextBoxZ.Name = "CenterBoxZ_" + idx;
 			CenterMassTextBoxZ.Size = new System.Drawing.Size(84, 58);
 			CenterMassTextBoxZ.Location = new System.Drawing.Point(277, 125);
+			CenterMassTextBoxZ.Text = center.z.ToString();
 			CenterMassTextBoxZ.Tag = "float";
 			CenterMassTextBoxZ.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			CenterMassTextBoxZ.Text = center.z.ToString();
 			CenterMassTextBoxZ.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 
 			var CenterMassLabel = new Label();
@@ -1814,27 +1811,27 @@ namespace OGF_tool
 			PositionX.Name = "PositionX_" + idx;
 			PositionX.Size = new System.Drawing.Size(84, 58);
 			PositionX.Location = new System.Drawing.Point(86, 151);
+			PositionX.Text = pos.x.ToString();
 			PositionX.Tag = "float";
 			PositionX.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			PositionX.Text = pos.x.ToString();
 			PositionX.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 
 			var PositionY = new TextBox();
 			PositionY.Name = "PositionY_" + idx;
 			PositionY.Size = new System.Drawing.Size(84, 58);
 			PositionY.Location = new System.Drawing.Point(182, 151);
+			PositionY.Text = pos.y.ToString();
 			PositionY.Tag = "float";
 			PositionY.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			PositionY.Text = pos.y.ToString();
 			PositionY.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 
 			var PositionZ = new TextBox();
 			PositionZ.Name = "PositionZ_" + idx;
 			PositionZ.Size = new System.Drawing.Size(84, 58);
 			PositionZ.Location = new System.Drawing.Point(277, 151);
+			PositionZ.Text = pos.z.ToString();
 			PositionZ.Tag = "float";
 			PositionZ.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			PositionZ.Text = pos.z.ToString();
 			PositionZ.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 
 			var PositionLabel = new Label();
@@ -1847,27 +1844,27 @@ namespace OGF_tool
 			RotationX.Name = "RotationX_" + idx;
 			RotationX.Size = new System.Drawing.Size(84, 58);
 			RotationX.Location = new System.Drawing.Point(86, 177);
+			RotationX.Text = rot.x.ToString();
 			RotationX.Tag = "float";
 			RotationX.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			RotationX.Text = rot.x.ToString();
 			RotationX.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 
 			var RotationY = new TextBox();
 			RotationY.Name = "RotationY_" + idx;
 			RotationY.Size = new System.Drawing.Size(84, 58);
 			RotationY.Location = new System.Drawing.Point(182, 177);
+			RotationY.Text = rot.y.ToString();
 			RotationY.Tag = "float";
 			RotationY.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			RotationY.Text = rot.y.ToString();
 			RotationY.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 
 			var RotationZ = new TextBox();
 			RotationZ.Name = "RotationZ_" + idx;
 			RotationZ.Size = new System.Drawing.Size(84, 58);
 			RotationZ.Location = new System.Drawing.Point(277, 177);
+			RotationZ.Text = rot.z.ToString();
 			RotationZ.Tag = "float";
 			RotationZ.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			RotationZ.Text = rot.z.ToString();
 			RotationZ.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 
 			var RotationLabel = new Label();
