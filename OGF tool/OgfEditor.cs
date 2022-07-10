@@ -684,8 +684,6 @@ namespace OGF_tool
 					OGF_C.description.old_size = OGF_C.description.m_source.Length + 1 + OGF_C.description.m_export_tool.Length + 1 + 8 + OGF_C.description.m_owner_name.Length + 1 + 8 + OGF_C.description.m_export_modif_name_tool.Length + 1 + 8;
 				}
 
-				xr_loader.SetStream(r.BaseStream);
-
 				if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_CHILDREN, false, true)))
 				{
 					MessageBox.Show("Unsupported OGF format! Can't find children chunk!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -722,83 +720,6 @@ namespace OGF_tool
 
 				if (OGF_C.IsSkeleton())
 				{
-					// Userdata
-					if (xr_loader.find_chunk((int)OGF.OGF4_S_USERDATA, false, true))
-					{
-						OGF_C.userdata = new UserData();
-						OGF_C.userdata.pos = xr_loader.chunk_pos;
-						OGF_C.userdata.userdata = xr_loader.read_stringZ();
-						OGF_C.userdata.old_size = OGF_C.userdata.userdata.Length + 1;
-					}
-
-					xr_loader.SetStream(r.BaseStream);
-
-					// Motion Refs
-					bool v3 = xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS, false, true);
-
-					if (v3 || xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS2, false, true))
-					{
-						OGF_C.motion_refs = new MotionRefs();
-						OGF_C.motion_refs.pos = xr_loader.chunk_pos;
-						OGF_C.motion_refs.refs = new List<string>();
-
-						if (v3)
-						{
-							OGF_C.motion_refs.v3 = true;
-							string refs = xr_loader.read_stringZ();
-							OGF_C.motion_refs.refs.Add(refs);
-							OGF_C.motion_refs.old_size = refs.Length + 1;
-						}
-						else
-						{
-							uint count = xr_loader.ReadUInt32();
-
-							OGF_C.motion_refs.old_size = 4;
-
-							for (int i = 0; i < count; i++)
-							{
-								string refs = xr_loader.read_stringZ();
-								OGF_C.motion_refs.refs.Add(refs);
-								OGF_C.motion_refs.old_size += refs.Length + 1;
-							}
-						}
-					}
-
-					xr_loader.SetStream(r.BaseStream);
-
-					//Motions
-					if (xr_loader.find_chunk((int)OGF.OGF4_S_MOTIONS, false, true))
-					{
-						xr_loader.reader.BaseStream.Position -= 8;
-						Cur_OMF = xr_loader.ReadBytes((int)xr_loader.reader.BaseStream.Length - (int)xr_loader.reader.BaseStream.Position);
-					}
-
-					xr_loader.SetStream(r.BaseStream);
-
-					if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_S_MOTIONS, false, true)))
-					{
-						id = 0;
-
-						while (true)
-						{
-							if (!xr_loader.find_chunk(id)) break;
-
-							Stream temp = xr_loader.reader.BaseStream;
-
-							if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk(id, false, true))) break;
-
-							if (id == 0)
-								OGF_C.motions += $"Motions count : {xr_loader.ReadUInt32()}\n";
-							else
-								OGF_C.motions += $"\n{id}. {xr_loader.read_stringZ()}";
-
-							id++;
-							xr_loader.SetStream(temp);
-						}
-					}
-
-					xr_loader.SetStream(r.BaseStream);
-
 					// Bones
 					if (!xr_loader.find_chunk((int)OGF.OGF4_S_BONE_NAMES, false, true))
 					{
@@ -843,8 +764,6 @@ namespace OGF_tool
 							OGF_C.bones.bone_childs.Add(childs);
 						}
 					}
-
-					xr_loader.SetStream(r.BaseStream);
 
 					// Ik Data
 					if (!xr_loader.find_chunk((int)OGF.OGF4_S_IKDATA, false, true))
@@ -932,7 +851,14 @@ namespace OGF_tool
 						}
 					}
 
-					xr_loader.SetStream(r.BaseStream);
+					// Userdata
+					if (xr_loader.find_chunk((int)OGF.OGF4_S_USERDATA, false, true))
+					{
+						OGF_C.userdata = new UserData();
+						OGF_C.userdata.pos = xr_loader.chunk_pos;
+						OGF_C.userdata.userdata = xr_loader.read_stringZ();
+						OGF_C.userdata.old_size = OGF_C.userdata.userdata.Length + 1;
+					}
 
 					// Lod ref
 					if (xr_loader.find_chunk((int)OGF.OGF4_S_LODS, false, true))
@@ -941,6 +867,66 @@ namespace OGF_tool
 						OGF_C.lod.pos = xr_loader.chunk_pos;
 						OGF_C.lod.lod_path = xr_loader.read_stringData(ref OGF_C.lod.data_str);
 						OGF_C.lod.old_size = OGF_C.lod.lod_path.Length + (OGF_C.lod.data_str ? 2 : 1);
+					}
+
+					// Motion Refs
+					bool v3 = xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS, false, true);
+
+					if (v3 || xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS2, false, true))
+					{
+						OGF_C.motion_refs = new MotionRefs();
+						OGF_C.motion_refs.pos = xr_loader.chunk_pos;
+						OGF_C.motion_refs.refs = new List<string>();
+
+						if (v3)
+						{
+							OGF_C.motion_refs.v3 = true;
+							string refs = xr_loader.read_stringZ();
+							OGF_C.motion_refs.refs.Add(refs);
+							OGF_C.motion_refs.old_size = refs.Length + 1;
+						}
+						else
+						{
+							uint count = xr_loader.ReadUInt32();
+
+							OGF_C.motion_refs.old_size = 4;
+
+							for (int i = 0; i < count; i++)
+							{
+								string refs = xr_loader.read_stringZ();
+								OGF_C.motion_refs.refs.Add(refs);
+								OGF_C.motion_refs.old_size += refs.Length + 1;
+							}
+						}
+					}
+
+					//Motions
+					if (xr_loader.find_chunk((int)OGF.OGF4_S_MOTIONS, false, true))
+					{
+						xr_loader.reader.BaseStream.Position -= 8;
+						Cur_OMF = xr_loader.ReadBytes((int)xr_loader.reader.BaseStream.Length - (int)xr_loader.reader.BaseStream.Position);
+					}
+
+					if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_S_MOTIONS, false, true)))
+					{
+						id = 0;
+
+						while (true)
+						{
+							if (!xr_loader.find_chunk(id)) break;
+
+							Stream temp = xr_loader.reader.BaseStream;
+
+							if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk(id, false, true))) break;
+
+							if (id == 0)
+								OGF_C.motions += $"Motions count : {xr_loader.ReadUInt32()}\n";
+							else
+								OGF_C.motions += $"\n{id}. {xr_loader.read_stringZ()}";
+
+							id++;
+							xr_loader.SetStream(temp);
+						}
 					}
 				}
 			}
