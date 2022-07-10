@@ -84,6 +84,7 @@ namespace OGF_tool
             this.SaveOmfDialog = new System.Windows.Forms.SaveFileDialog();
             this.SaveBonesDialog = new System.Windows.Forms.SaveFileDialog();
             this.SaveObjectDialog = new System.Windows.Forms.SaveFileDialog();
+            this.LabelBroken = new System.Windows.Forms.Label();
             this.TabControl.SuspendLayout();
             this.UserDataPage.SuspendLayout();
             this.MotionRefsPage.SuspendLayout();
@@ -334,7 +335,7 @@ namespace OGF_tool
             this.viewToolStripMenuItem});
             this.MenuPanel.Location = new System.Drawing.Point(0, 4);
             this.MenuPanel.Name = "MenuPanel";
-            this.MenuPanel.Size = new System.Drawing.Size(321, 24);
+            this.MenuPanel.Size = new System.Drawing.Size(201, 24);
             this.MenuPanel.TabIndex = 8;
             this.MenuPanel.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
@@ -355,21 +356,21 @@ namespace OGF_tool
             // LoadMenuParam
             // 
             this.LoadMenuParam.Name = "LoadMenuParam";
-            this.LoadMenuParam.Size = new System.Drawing.Size(180, 22);
+            this.LoadMenuParam.Size = new System.Drawing.Size(121, 22);
             this.LoadMenuParam.Text = "Load";
             this.LoadMenuParam.Click += new System.EventHandler(this.loadToolStripMenuItem_Click);
             // 
             // SaveMenuParam
             // 
             this.SaveMenuParam.Name = "SaveMenuParam";
-            this.SaveMenuParam.Size = new System.Drawing.Size(180, 22);
+            this.SaveMenuParam.Size = new System.Drawing.Size(121, 22);
             this.SaveMenuParam.Text = "Save";
             this.SaveMenuParam.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
             this.saveAsToolStripMenuItem.Text = "Save as...";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
             // 
@@ -382,60 +383,60 @@ namespace OGF_tool
             this.sklToolStripMenuItem,
             this.sklsToolStripMenuItem});
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
             this.exportToolStripMenuItem.Text = "Export";
             // 
             // objectToolStripMenuItem
             // 
             this.objectToolStripMenuItem.Name = "objectToolStripMenuItem";
-            this.objectToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.objectToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
             this.objectToolStripMenuItem.Text = "Object";
             this.objectToolStripMenuItem.Click += new System.EventHandler(this.objectToolStripMenuItem_Click);
             // 
             // bonesToolStripMenuItem
             // 
             this.bonesToolStripMenuItem.Name = "bonesToolStripMenuItem";
-            this.bonesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.bonesToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
             this.bonesToolStripMenuItem.Text = "Bones";
             this.bonesToolStripMenuItem.Click += new System.EventHandler(this.bonesToolStripMenuItem_Click);
             // 
             // omfToolStripMenuItem
             // 
             this.omfToolStripMenuItem.Name = "omfToolStripMenuItem";
-            this.omfToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.omfToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
             this.omfToolStripMenuItem.Text = "OMF";
             this.omfToolStripMenuItem.Click += new System.EventHandler(this.omfToolStripMenuItem_Click);
             // 
             // sklToolStripMenuItem
             // 
             this.sklToolStripMenuItem.Name = "sklToolStripMenuItem";
-            this.sklToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.sklToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
             this.sklToolStripMenuItem.Text = "Skl";
             this.sklToolStripMenuItem.Click += new System.EventHandler(this.sklToolStripMenuItem_Click);
             // 
             // sklsToolStripMenuItem
             // 
             this.sklsToolStripMenuItem.Name = "sklsToolStripMenuItem";
-            this.sklsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.sklsToolStripMenuItem.Size = new System.Drawing.Size(109, 22);
             this.sklsToolStripMenuItem.Text = "Skls";
             this.sklsToolStripMenuItem.Click += new System.EventHandler(this.sklsToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(118, 6);
             // 
             // reloadToolStripMenuItem
             // 
             this.reloadToolStripMenuItem.Name = "reloadToolStripMenuItem";
-            this.reloadToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.reloadToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
             this.reloadToolStripMenuItem.Text = "Reload";
             this.reloadToolStripMenuItem.Click += new System.EventHandler(this.reloadToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(121, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -577,11 +578,22 @@ namespace OGF_tool
             // 
             this.SaveObjectDialog.Filter = "Object file|*object";
             // 
+            // LabelBroken
+            // 
+            this.LabelBroken.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.LabelBroken.AutoSize = true;
+            this.LabelBroken.Location = new System.Drawing.Point(403, 319);
+            this.LabelBroken.Name = "LabelBroken";
+            this.LabelBroken.Size = new System.Drawing.Size(41, 13);
+            this.LabelBroken.TabIndex = 32;
+            this.LabelBroken.Text = "Broken";
+            // 
             // OGF_Editor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(463, 337);
+            this.Controls.Add(this.LabelBroken);
             this.Controls.Add(this.MenuPanel);
             this.Controls.Add(this.BkpCheckBox);
             this.Controls.Add(this.StatusPanel);
@@ -666,6 +678,7 @@ namespace OGF_tool
         private System.Windows.Forms.SaveFileDialog SaveOmfDialog;
         private System.Windows.Forms.SaveFileDialog SaveBonesDialog;
         private System.Windows.Forms.SaveFileDialog SaveObjectDialog;
+        private System.Windows.Forms.Label LabelBroken;
     }
 }
 

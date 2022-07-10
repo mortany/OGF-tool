@@ -242,9 +242,9 @@ namespace OGF_tool
 
         public List<OGF_Child> childs = new List<OGF_Child>();
 
-        public uint chunk_size;
+        public uint chunk_size = 0;
 
-        public long pos;
+        public long pos = 0;
 
         public MotionRefs motion_refs = null;
 
@@ -259,6 +259,9 @@ namespace OGF_tool
         public Description description = null;
 
         public string motions = "";
+
+        public uint BrokenType = 0;
+        public bool Descr4Byte = false;
 
         public OGF_Children()
         {
@@ -420,13 +423,12 @@ namespace OGF_tool
 
             return temp;
         }
-        public byte[] count()
-        {
-            return BitConverter.GetBytes(bones.Count);
-        }
-        public byte[] data()
+
+        public byte[] data(bool repair)
         {
             List<byte> temp = new List<byte>();
+
+            temp.AddRange(BitConverter.GetBytes(bones.Count));
 
             for (int i = 0; i < bones.Count; i++)
             {
@@ -434,7 +436,14 @@ namespace OGF_tool
                 temp.Add(0);
                 temp.AddRange(Encoding.Default.GetBytes(parent_bones[i]));// parent bone name
                 temp.Add(0);
-                temp.AddRange(fobb[i]);                                 // obb
+
+                if (repair)
+                {
+                    for (int j = 0; j < 60; j++)
+                        temp.Add(0);
+                }
+                else
+                    temp.AddRange(fobb[i]);                               // obb
             }
 
             return temp.ToArray();
@@ -450,7 +459,6 @@ namespace OGF_tool
 
     public struct IK_Data
     {
-        public long pos;
         public int old_size;
 
         public List<string> materials;

@@ -20,8 +20,6 @@ namespace OGF_tool
 		public OGF_Children OGF_V = null;
 		public byte[] Current_OGF = null;
 		public byte[] Current_OMF = null;
-		public bool IsModelBroken = false;
-		public bool IsModelDescr4byte = false;
 		public List<byte> file_bytes = new List<byte>();
 		public string FILE_NAME = "";
 		IniFile Settings = null;
@@ -61,6 +59,7 @@ namespace OGF_tool
 			openSkeletonInObjectEditorToolStripMenuItem.Enabled = false;
 			toolStripMenuItem1.Enabled = false;
 			exportToolStripMenuItem.Enabled = false;
+			LabelBroken.Visible = false;
 
 			SaveSklDialog = new FolderSelectDialog();
 
@@ -250,21 +249,24 @@ namespace OGF_tool
 
 			if (main_file && !OGF_V.IsDM)
 			{
-				IsModelBroken = CatchBrokenModel();
+				OGF_V.BrokenType = CatchBrokenModel();
 
-				if (IsModelBroken)
+				if (OGF_V.BrokenType == 1)
 				{
-					IsModelDescr4byte = CatchDescr4ByteModel();
-					if (IsModelDescr4byte)
-						IsModelBroken = false;
+					OGF_V.Descr4Byte = CatchDescr4ByteModel();
+					if (OGF_V.Descr4Byte)
+						OGF_V.BrokenType = 0;
 				}
 
-				if (IsModelBroken)
+				if (OGF_V.BrokenType > 0)
 				{
 					OGF_V.description.m_export_time = 0;
 					OGF_V.description.m_creation_time = 0;
 					OGF_V.description.m_modified_time = 0;
 				}
+
+				LabelBroken.Text = OGF_V.BrokenType > 0 ? "Broken " + OGF_V.BrokenType.ToString() : "4 byte";
+				LabelBroken.Visible = OGF_V.BrokenType > 0 || OGF_V.Descr4Byte;
 			}
 		}
 
@@ -303,9 +305,12 @@ namespace OGF_tool
 			UpdateModelType();
 		}
 
-		private bool CatchBrokenModel()
+		private uint CatchBrokenModel()
 		{
-			if (Current_OGF == null) return false;
+			if (Current_OGF == null) return 0;
+
+			if (OGF_V.IsSkeleton() && OGF_V.bones.pos < OGF_V.pos)
+				return 2;
 
 			try
 			{
@@ -330,10 +335,10 @@ namespace OGF_tool
 			}
 			catch (Exception)
 			{
-				return true;
+				return 1;
 			}
 
-			return false;
+			return 0;
 		}
 
 		private bool CatchDescr4ByteModel()
@@ -474,28 +479,36 @@ namespace OGF_tool
 
 				file_bytes.Add(OGF_V.m_version);
 				file_bytes.Add(OGF_V.m_model_type);
-
-				temp = fileStream.ReadBytes(42);
+				temp = fileStream.ReadBytes(2);
 				file_bytes.AddRange(temp);
 
-				file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_DESC));
-				file_bytes.AddRange(BitConverter.GetBytes(OGF_V.description.chunk_size(IsModelDescr4byte)));
-				file_bytes.AddRange(OGF_V.description.data(IsModelDescr4byte));
-
-				if (!IsModelBroken)
-					fileStream.ReadBytes(OGF_V.description.old_size + 8);
+				temp = fileStream.ReadBytes(40);
+				if (OGF_V.BrokenType == 2)
+				{
+					for (int i = 0; i < 40; i++)
+						file_bytes.AddRange(BitConverter.GetBytes(0));
+				}
 				else
-					fileStream.ReadBytes((int)(OGF_V.pos - fileStream.BaseStream.Position));
+                {
+					file_bytes.AddRange(temp);
+				}
 
-				uint chld_section = fileStream.ReadUInt32();
+				file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_DESC));
+				file_bytes.AddRange(BitConverter.GetBytes(OGF_V.description.chunk_size(OGF_V.Descr4Byte)));
+				file_bytes.AddRange(OGF_V.description.data(OGF_V.Descr4Byte));
+
+				fileStream.ReadBytes((int)(OGF_V.pos - fileStream.BaseStream.Position));
+
+				fileStream.ReadBytes(4);
 				uint new_size = fileStream.ReadUInt32();
 
 				foreach (var ch in OGF_V.childs)
 					new_size += ch.NewSize();
 
-				file_bytes.AddRange(BitConverter.GetBytes(chld_section));
+				file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_CHILDREN));
 				file_bytes.AddRange(BitConverter.GetBytes(new_size));
 
+				uint last_child_size = 0;
 				foreach (var ch in OGF_V.childs)
 				{
 					temp = fileStream.ReadBytes((int)(ch.parent_pos - fileStream.BaseStream.Position));
@@ -503,16 +516,24 @@ namespace OGF_tool
 					fileStream.ReadUInt32();
 					new_size = fileStream.ReadUInt32();
 					new_size += ch.NewSize();
+					last_child_size = new_size;
 					file_bytes.AddRange(BitConverter.GetBytes(ch.parent_id));
 					file_bytes.AddRange(BitConverter.GetBytes(new_size));
 
+					last_child_size -= (uint)(ch.pos - fileStream.BaseStream.Position);
 					temp = fileStream.ReadBytes((int)(ch.pos - fileStream.BaseStream.Position));
 					file_bytes.AddRange(temp);
 					file_bytes.AddRange(ch.data());
+					last_child_size -= (uint)(ch.old_size + 8);
 					fileStream.BaseStream.Position += ch.old_size + 8;
 				}
 
-				if (!OGF_V.IsSkeleton())
+				if (OGF_V.IsSkeleton())
+                {
+					temp = fileStream.ReadBytes((int)(last_child_size));
+					file_bytes.AddRange(temp);
+				}
+				else
                 {
 					temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
 					file_bytes.AddRange(temp);
@@ -520,31 +541,15 @@ namespace OGF_tool
 
                 if (OGF_V.bones.bones != null)
                 {
-                    if (OGF_V.bones.pos > 0)
-                        temp = fileStream.ReadBytes((int)(OGF_V.bones.pos - fileStream.BaseStream.Position));
-                    else
-                        temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
-
-                    file_bytes.AddRange(temp);
-
                     file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_BONE_NAMES));
                     file_bytes.AddRange(BitConverter.GetBytes(OGF_V.bones.chunk_size()));
-
-                    file_bytes.AddRange(OGF_V.bones.count());
-                    file_bytes.AddRange(OGF_V.bones.data());
+                    file_bytes.AddRange(OGF_V.bones.data(false));
 
 					fileStream.ReadBytes(OGF_V.bones.old_size + 8);
 				}
 
 				if (OGF_V.ikdata.materials != null)
 				{
-					if (OGF_V.ikdata.pos > 0)
-						temp = fileStream.ReadBytes((int)(OGF_V.ikdata.pos - fileStream.BaseStream.Position));
-					else
-						temp = fileStream.ReadBytes((int)(fileStream.BaseStream.Length - fileStream.BaseStream.Position));
-
-					file_bytes.AddRange(temp);
-
 					file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_IKDATA));
 					file_bytes.AddRange(BitConverter.GetBytes(OGF_V.ikdata.chunk_size()));
 					file_bytes.AddRange(OGF_V.ikdata.data());
@@ -657,16 +662,16 @@ namespace OGF_tool
 
 				OGF_C.m_version = xr_loader.ReadByte();
 				OGF_C.m_model_type = xr_loader.ReadByte();
+				xr_loader.ReadBytes(42);
 
-				if (!xr_loader.find_chunk((int)OGF.OGF4_S_DESC, false, true))
+				if (!xr_loader.find_chunk((int)OGF.OGF4_S_DESC))
 				{
-					MessageBox.Show("Unsupported OGF format!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					MessageBox.Show("Unsupported OGF format! Can't find description chunk!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 					return false;
 				}
 				else
                 {
 					OGF_C.description = new Description();
-
 					OGF_C.description.pos = xr_loader.chunk_pos;
 
 					OGF_C.description.m_source = xr_loader.read_stringZ();
@@ -678,13 +683,13 @@ namespace OGF_tool
 					OGF_C.description.m_modified_time = xr_loader.ReadInt64();
 
 					OGF_C.description.old_size = OGF_C.description.m_source.Length + 1 + OGF_C.description.m_export_tool.Length + 1 + 8 + OGF_C.description.m_owner_name.Length + 1 + 8 + OGF_C.description.m_export_modif_name_tool.Length + 1 + 8;
-
-					xr_loader.SetStream(r.BaseStream);
 				}
+
+				xr_loader.SetStream(r.BaseStream);
 
 				if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_CHILDREN, false, true)))
 				{
-					MessageBox.Show("Unsupported OGF format!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					MessageBox.Show("Unsupported OGF format! Can't find children chunk!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 					return false;
 				}
 
@@ -799,6 +804,7 @@ namespace OGF_tool
 					if (xr_loader.find_chunk((int)OGF.OGF4_S_BONE_NAMES, false, true))
 					{
 						OGF_C.bones.pos = xr_loader.chunk_pos;
+
 						OGF_C.bones.bones = new List<string>();
 						OGF_C.bones.parent_bones = new List<string>();
 						OGF_C.bones.fobb = new List<byte[]>();
@@ -839,7 +845,6 @@ namespace OGF_tool
 					// Ik Data
 					if (xr_loader.find_chunk((int)OGF.OGF4_S_IKDATA, false, true))
 					{
-						OGF_C.ikdata.pos = xr_loader.chunk_pos;
 						OGF_C.ikdata.materials = new List<string>();
 						OGF_C.ikdata.mass = new List<float>();
 						OGF_C.ikdata.version = new List<uint>();
@@ -963,6 +968,9 @@ namespace OGF_tool
 			{
 				case "float":
 					{
+						if (curBox.Text == "NaN")
+							curBox.Text = "0";
+
 						if (bKeyIsDown)
 						{
 							if (curBox.Text.Length == 0)
@@ -1012,6 +1020,7 @@ namespace OGF_tool
 
 						for (int i = 0; i < OGF_V.bones.parent_bones.Count; i++)
                         {
+							if (BoneParamsPage.Controls.Count < i) continue;
 							for (int j = 0; j < OGF_V.bones.bone_childs[idx].Count; j++)
                             {
 								if (OGF_V.bones.bone_childs[idx][j] == i)
@@ -1056,7 +1065,7 @@ namespace OGF_tool
 
 			CopyParams();
 			SaveFile(FILE_NAME);
-			AutoClosingMessageBox.Show(IsModelBroken ? "Repaired and Saved!" : "Saved!", "", IsModelBroken ? 700 : 500, MessageBoxIcon.Information);
+			AutoClosingMessageBox.Show(OGF_V.BrokenType > 0 ? "Repaired and Saved!" : "Saved!", "", OGF_V.BrokenType > 0 ? 700 : 500, MessageBoxIcon.Information);
 		}
 
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1145,7 +1154,7 @@ namespace OGF_tool
 
 				CopyParams();
 				SaveFile(filename);
-				AutoClosingMessageBox.Show(IsModelBroken ? "Repaired and Saved!" : "Saved!", "", IsModelBroken ? 700 : 500, MessageBoxIcon.Information);
+				AutoClosingMessageBox.Show(OGF_V.BrokenType > 0 ? "Repaired and Saved!" : "Saved!", "", OGF_V.BrokenType > 0 ? 700 : 500, MessageBoxIcon.Information);
 				has_msg = true;
 			}
 			else if (format == 1)
@@ -1189,7 +1198,7 @@ namespace OGF_tool
 				}
 			}
 			if (!has_msg)
-				AutoClosingMessageBox.Show(IsModelBroken ? "Repaired and Exported!" : "Exported!", "", IsModelBroken ? 700 : 500, MessageBoxIcon.Information);
+				AutoClosingMessageBox.Show(OGF_V.BrokenType > 0 ? "Repaired and Exported!" : "Exported!", "", OGF_V.BrokenType > 0 ? 700 : 500, MessageBoxIcon.Information);
 		}
 
 		private void objectToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1525,6 +1534,8 @@ namespace OGF_tool
 
 		private void UpdateModelType()
         {
+			if (OGF_V == null) return;
+
 			if (OGF_V.bones.bones == null)
 				OGF_V.m_model_type = 1;
 			else if (Current_OMF == null && MotionRefsBox.Text == "")
@@ -1708,9 +1719,9 @@ namespace OGF_tool
 			BoneNameTextBox.Name = "boneBox_" + idx;
 			BoneNameTextBox.Size = new System.Drawing.Size(326, 58);
 			BoneNameTextBox.Location = new System.Drawing.Point(86, 18);
-			BoneNameTextBox.Text = bone_name;
 			BoneNameTextBox.Tag = "string";
 			BoneNameTextBox.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			BoneNameTextBox.Text = bone_name;
 			BoneNameTextBox.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 			BoneNameTextBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
 
@@ -1739,9 +1750,9 @@ namespace OGF_tool
 			MaterialTextBox.Name = "MaterialBox_" + idx;
 			MaterialTextBox.Size = new System.Drawing.Size(326, 58);
 			MaterialTextBox.Location = new System.Drawing.Point(86, 72);
-			MaterialTextBox.Text = material;
 			MaterialTextBox.Tag = "string";
 			MaterialTextBox.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			MaterialTextBox.Text = material;
 			MaterialTextBox.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 			MaterialTextBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
 
@@ -1755,9 +1766,9 @@ namespace OGF_tool
 			MassTextBox.Name = "MassBox_" + idx;
 			MassTextBox.Size = new System.Drawing.Size(84, 58);
 			MassTextBox.Location = new System.Drawing.Point(86, 99);
-			MassTextBox.Text = mass.ToString();
 			MassTextBox.Tag = "float";
 			MassTextBox.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			MassTextBox.Text = mass.ToString();
 			MassTextBox.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 
 			var MassLabel = new Label();
@@ -1770,27 +1781,27 @@ namespace OGF_tool
 			CenterMassTextBoxX.Name = "CenterBoxX_" + idx;
 			CenterMassTextBoxX.Size = new System.Drawing.Size(84, 58);
 			CenterMassTextBoxX.Location = new System.Drawing.Point(86, 125);
-			CenterMassTextBoxX.Text = center.x.ToString();
 			CenterMassTextBoxX.Tag = "float";
 			CenterMassTextBoxX.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			CenterMassTextBoxX.Text = center.x.ToString();
 			CenterMassTextBoxX.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 
 			var CenterMassTextBoxY = new TextBox();
 			CenterMassTextBoxY.Name = "CenterBoxY_" + idx;
 			CenterMassTextBoxY.Size = new System.Drawing.Size(84, 58);
 			CenterMassTextBoxY.Location = new System.Drawing.Point(182, 125);
-			CenterMassTextBoxY.Text = center.y.ToString();
 			CenterMassTextBoxY.Tag = "float";
 			CenterMassTextBoxY.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			CenterMassTextBoxY.Text = center.y.ToString();
 			CenterMassTextBoxY.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 
 			var CenterMassTextBoxZ = new TextBox();
 			CenterMassTextBoxZ.Name = "CenterBoxZ_" + idx;
 			CenterMassTextBoxZ.Size = new System.Drawing.Size(84, 58);
 			CenterMassTextBoxZ.Location = new System.Drawing.Point(277, 125);
-			CenterMassTextBoxZ.Text = center.z.ToString();
 			CenterMassTextBoxZ.Tag = "float";
 			CenterMassTextBoxZ.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			CenterMassTextBoxZ.Text = center.z.ToString();
 			CenterMassTextBoxZ.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 
 			var CenterMassLabel = new Label();
@@ -1803,27 +1814,27 @@ namespace OGF_tool
 			PositionX.Name = "PositionX_" + idx;
 			PositionX.Size = new System.Drawing.Size(84, 58);
 			PositionX.Location = new System.Drawing.Point(86, 151);
-			PositionX.Text = pos.x.ToString();
 			PositionX.Tag = "float";
 			PositionX.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			PositionX.Text = pos.x.ToString();
 			PositionX.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 
 			var PositionY = new TextBox();
 			PositionY.Name = "PositionY_" + idx;
 			PositionY.Size = new System.Drawing.Size(84, 58);
 			PositionY.Location = new System.Drawing.Point(182, 151);
-			PositionY.Text = pos.y.ToString();
 			PositionY.Tag = "float";
 			PositionY.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			PositionY.Text = pos.y.ToString();
 			PositionY.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 
 			var PositionZ = new TextBox();
 			PositionZ.Name = "PositionZ_" + idx;
 			PositionZ.Size = new System.Drawing.Size(84, 58);
 			PositionZ.Location = new System.Drawing.Point(277, 151);
-			PositionZ.Text = pos.z.ToString();
 			PositionZ.Tag = "float";
 			PositionZ.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			PositionZ.Text = pos.z.ToString();
 			PositionZ.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 
 			var PositionLabel = new Label();
@@ -1836,27 +1847,27 @@ namespace OGF_tool
 			RotationX.Name = "RotationX_" + idx;
 			RotationX.Size = new System.Drawing.Size(84, 58);
 			RotationX.Location = new System.Drawing.Point(86, 177);
-			RotationX.Text = rot.x.ToString();
 			RotationX.Tag = "float";
 			RotationX.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			RotationX.Text = rot.x.ToString();
 			RotationX.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 
 			var RotationY = new TextBox();
 			RotationY.Name = "RotationY_" + idx;
 			RotationY.Size = new System.Drawing.Size(84, 58);
 			RotationY.Location = new System.Drawing.Point(182, 177);
-			RotationY.Text = rot.y.ToString();
 			RotationY.Tag = "float";
 			RotationY.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			RotationY.Text = rot.y.ToString();
 			RotationY.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 
 			var RotationZ = new TextBox();
 			RotationZ.Name = "RotationZ_" + idx;
 			RotationZ.Size = new System.Drawing.Size(84, 58);
 			RotationZ.Location = new System.Drawing.Point(277, 177);
-			RotationZ.Text = rot.z.ToString();
 			RotationZ.Tag = "float";
 			RotationZ.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+			RotationZ.Text = rot.z.ToString();
 			RotationZ.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
 
 			var RotationLabel = new Label();
