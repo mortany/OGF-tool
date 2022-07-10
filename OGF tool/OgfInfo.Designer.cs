@@ -48,6 +48,8 @@
             this.CreationTimeDate = new System.Windows.Forms.DateTimePicker();
             this.ModifedTimeDate = new System.Windows.Forms.DateTimePicker();
             this.ByteLabel = new System.Windows.Forms.Label();
+            this.RepairTimersButton = new System.Windows.Forms.Button();
+            this.label8 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // SourceTextBox
@@ -212,17 +214,38 @@
             // 
             this.ByteLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.ByteLabel.AutoSize = true;
-            this.ByteLabel.Location = new System.Drawing.Point(310, 221);
+            this.ByteLabel.Location = new System.Drawing.Point(310, 188);
             this.ByteLabel.Name = "ByteLabel";
             this.ByteLabel.Size = new System.Drawing.Size(36, 13);
             this.ByteLabel.TabIndex = 24;
             this.ByteLabel.Text = "8 byte";
+            // 
+            // RepairTimersButton
+            // 
+            this.RepairTimersButton.Location = new System.Drawing.Point(261, 207);
+            this.RepairTimersButton.Name = "RepairTimersButton";
+            this.RepairTimersButton.Size = new System.Drawing.Size(85, 23);
+            this.RepairTimersButton.TabIndex = 25;
+            this.RepairTimersButton.Text = "Repair timers";
+            this.RepairTimersButton.UseVisualStyleBackColor = true;
+            this.RepairTimersButton.Click += new System.EventHandler(this.RepairTimersButton_Click);
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(272, 188);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(41, 13);
+            this.label8.TabIndex = 26;
+            this.label8.Text = "Timers:";
             // 
             // OgfInfo
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(358, 238);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.RepairTimersButton);
             this.Controls.Add(this.ByteLabel);
             this.Controls.Add(this.ModifedTimeDate);
             this.Controls.Add(this.CreationTimeDate);
@@ -276,5 +299,7 @@
         private System.Windows.Forms.DateTimePicker CreationTimeDate;
         private System.Windows.Forms.DateTimePicker ModifedTimeDate;
         private System.Windows.Forms.Label ByteLabel;
+        private System.Windows.Forms.Button RepairTimersButton;
+        private System.Windows.Forms.Label label8;
     }
 }

@@ -21,6 +21,7 @@ namespace OGF_tool
             OgfVersLabel.Text = vers.ToString();
             ModelTypeLabel.Text = (type == 1 ? "Object" : type == 3 ? "Animated" : "Rigid");
             ByteLabel.Text = (init_descr.four_byte ? "4 byte" : "8 byte");
+            RepairTimersButton.Enabled = init_descr.four_byte;
 
             SourceTextBox.Text = init_descr.m_source;
             ConverterTextBox.Text = init_descr.m_export_tool;
@@ -49,6 +50,13 @@ namespace OGF_tool
             descr.m_creation_time = Convert.ToUInt32(CreationTimeDate.Value.Subtract(new DateTime(1970, 1, 1)).TotalSeconds);
             descr.m_modified_time = Convert.ToUInt32(ModifedTimeDate.Value.Subtract(new DateTime(1970, 1, 1)).TotalSeconds);
             res = true;
+        }
+
+        private void RepairTimersButton_Click(object sender, EventArgs e)
+        {
+            descr.four_byte = false;
+            RepairTimersButton.Enabled = false;
+            ByteLabel.Text = "8 byte";
         }
     }
 }

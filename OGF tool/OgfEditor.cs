@@ -1005,6 +1005,7 @@ namespace OGF_tool
 				OGF_V.description.m_creation_time = Info.descr.m_creation_time;
 				OGF_V.description.m_export_time = Info.descr.m_export_time;
 				OGF_V.description.m_modified_time = Info.descr.m_modified_time;
+				OGF_V.description.four_byte = Info.descr.four_byte;
 			}
 
 			System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
