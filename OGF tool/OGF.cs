@@ -236,36 +236,39 @@ namespace OGF_tool
 
     public class OGF_Children
     {
-        public byte m_version = 0;
-        public byte m_model_type = 0; // 1 - Without bones, 3 - Animated, 10 - Rigid
-        public bool IsDM = false;
+        public byte m_version;
+        public byte m_model_type; // 1 - Without bones, 3 - Animated, 10 - Rigid
+        public bool IsDM;
+        public uint BrokenType;
 
-        public List<OGF_Child> childs = new List<OGF_Child>();
+        public Description description;
+        public List<OGF_Child> childs;
+        public BoneData bones;
+        public IK_Data ikdata;
+        public UserData userdata;
+        public Lod lod;
+        public MotionRefs motion_refs;
+        public string motions;
 
-        public uint chunk_size = 0;
-
-        public long pos = 0;
-
-        public MotionRefs motion_refs = null;
-
-        public UserData userdata = null;
-
-        public Lod lod = null;
-
-        public BoneData bones = new BoneData();
-
-        public IK_Data ikdata = new IK_Data();
-
-        public Description description = null;
-
-        public string motions = "";
-
-        public uint BrokenType = 0;
-        public bool Descr4Byte = false;
+        public uint chunk_size;
+        public long pos;
 
         public OGF_Children()
         {
-
+            this.pos = 0;
+            this.chunk_size = 0;
+            this.BrokenType = 0;
+            this.motions = "";
+            this.IsDM = false;
+            this.m_model_type = 0;
+            this.m_version = 0;
+            this.description = null;
+            this.childs = new List<OGF_Child>();
+            this.bones = null;
+            this.ikdata = null;
+            this.userdata = null;
+            this.lod = null;
+            this.motion_refs = null;
         }
 
         public bool IsSkeleton()
@@ -400,24 +403,32 @@ namespace OGF_tool
         }
     }
 
-    public struct BoneData
+    public class BoneData
     {
-        public long pos;
         public int old_size;
 
-        public List<string> bones;
-        public List<string> parent_bones;
+        public List<string> bone_names;
+        public List<string> parent_bone_names;
         public List<byte[]> fobb;
         public List<List<int>> bone_childs;
+
+        public BoneData()
+        {
+            this.old_size = 0;
+            this.bone_names = new List<string>();
+            this.parent_bone_names = new List<string>();
+            this.fobb = new List<byte[]>();
+            this.bone_childs = new List<List<int>>();
+        }
 
         public uint chunk_size()
         {
             uint temp = 4;                                  // count byte
 
-            for (int i = 0; i < bones.Count; i++)
+            for (int i = 0; i < bone_names.Count; i++)
             {
-                temp += (uint)bones[i].Length + 1;          // bone name
-                temp += (uint)parent_bones[i].Length + 1;   // parent bone name
+                temp += (uint)bone_names[i].Length + 1;          // bone name
+                temp += (uint)parent_bone_names[i].Length + 1;   // parent bone name
                 temp += 60;                                 // obb
             }
 
@@ -428,13 +439,13 @@ namespace OGF_tool
         {
             List<byte> temp = new List<byte>();
 
-            temp.AddRange(BitConverter.GetBytes(bones.Count));
+            temp.AddRange(BitConverter.GetBytes(bone_names.Count));
 
-            for (int i = 0; i < bones.Count; i++)
+            for (int i = 0; i < bone_names.Count; i++)
             {
-                temp.AddRange(Encoding.Default.GetBytes(bones[i]));       // bone name
+                temp.AddRange(Encoding.Default.GetBytes(bone_names[i]));       // bone name
                 temp.Add(0);
-                temp.AddRange(Encoding.Default.GetBytes(parent_bones[i]));// parent bone name
+                temp.AddRange(Encoding.Default.GetBytes(parent_bone_names[i]));// parent bone name
                 temp.Add(0);
 
                 if (repair)
@@ -457,7 +468,7 @@ namespace OGF_tool
         public float z;
     }
 
-    public struct IK_Data
+    public class IK_Data
     {
         public int old_size;
 
@@ -468,6 +479,18 @@ namespace OGF_tool
         public List<Fvector> position;
         public List<Fvector> rotation;
         public List<List<byte[]>> bytes_1;
+
+        public IK_Data()
+        {
+            this.old_size = 0;
+            this.materials = new List<string>();
+            this.mass = new List<float>();
+            this.version = new List<uint>();
+            this.center_mass = new List<Fvector>();
+            this.position = new List<Fvector>();
+            this.rotation = new List<Fvector>();
+            this.bytes_1 = new List<List<byte[]>>();
+        }
 
         public uint chunk_size()
         {
@@ -533,6 +556,7 @@ namespace OGF_tool
     {
         public long pos;
         public int old_size;
+        public bool four_byte;
 
         public string m_source;
         public string m_export_tool;
@@ -546,9 +570,10 @@ namespace OGF_tool
         {
             this.pos = 0;
             this.old_size = 0;
+            this.four_byte = false;
         }
 
-        public byte[] data(bool four_byte)
+        public byte[] data()
         {
             List<byte> temp = new List<byte>();
 
@@ -576,7 +601,7 @@ namespace OGF_tool
             return temp.ToArray();
         }
 
-        public uint chunk_size(bool four_byte)
+        public uint chunk_size()
         {
             uint time_size = (uint)(four_byte ? 4 : 8);
             uint size = 0;

@@ -20,6 +20,7 @@ namespace OGF_tool
 
             OgfVersLabel.Text = vers.ToString();
             ModelTypeLabel.Text = (type == 1 ? "Object" : type == 3 ? "Animated" : "Rigid");
+            ByteLabel.Text = (init_descr.four_byte ? "4 byte" : "8 byte");
 
             SourceTextBox.Text = init_descr.m_source;
             ConverterTextBox.Text = init_descr.m_export_tool;

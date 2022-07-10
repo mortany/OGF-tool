@@ -185,17 +185,17 @@ namespace OGF_tool
 				}
 
 				// Bones
-				if (OGF_V.bones.bones != null)
+				if (OGF_V.bones != null)
 				{
 					BoneNamesBox.Clear();
 					TabControl.Controls.Add(BoneNamesPage);
 
-					BoneNamesBox.Text += $"Bones count : {OGF_V.bones.bones.Count}\n\n";
-					for (int i = 0; i < OGF_V.bones.bones.Count; i++)
+					BoneNamesBox.Text += $"Bones count : {OGF_V.bones.bone_names.Count}\n\n";
+					for (int i = 0; i < OGF_V.bones.bone_names.Count; i++)
 					{
-						BoneNamesBox.Text += $"{i + 1}. {OGF_V.bones.bones[i]}";
+						BoneNamesBox.Text += $"{i + 1}. {OGF_V.bones.bone_names[i]}";
 
-						if (i != OGF_V.bones.bones.Count - 1)
+						if (i != OGF_V.bones.bone_names.Count - 1)
 							BoneNamesBox.Text += "\n";
 					}
 				}
@@ -230,11 +230,11 @@ namespace OGF_tool
 				}
 			}
 
-			if (OGF_V.bones.bones != null)
+			if (OGF_V.bones != null)
 			{
-				for (int i = 0; i < OGF_V.bones.bones.Count; i++)
+				for (int i = 0; i < OGF_V.bones.bone_names.Count; i++)
 				{
-					CreateBoneGroupBox(i, OGF_V.bones.bones[i], OGF_V.bones.parent_bones[i], OGF_V.ikdata.materials[i], OGF_V.ikdata.mass[i], OGF_V.ikdata.center_mass[i], OGF_V.ikdata.position[i], OGF_V.ikdata.rotation[i]);
+					CreateBoneGroupBox(i, OGF_V.bones.bone_names[i], OGF_V.bones.parent_bone_names[i], OGF_V.ikdata.materials[i], OGF_V.ikdata.mass[i], OGF_V.ikdata.center_mass[i], OGF_V.ikdata.position[i], OGF_V.ikdata.rotation[i]);
 				}
 			}
 
@@ -249,24 +249,8 @@ namespace OGF_tool
 
 			if (main_file && !OGF_V.IsDM)
 			{
-				OGF_V.BrokenType = CatchBrokenModel();
-
-				if (OGF_V.BrokenType == 1)
-				{
-					OGF_V.Descr4Byte = CatchDescr4ByteModel();
-					if (OGF_V.Descr4Byte)
-						OGF_V.BrokenType = 0;
-				}
-
-				if (OGF_V.BrokenType > 0)
-				{
-					OGF_V.description.m_export_time = 0;
-					OGF_V.description.m_creation_time = 0;
-					OGF_V.description.m_modified_time = 0;
-				}
-
-				LabelBroken.Text = OGF_V.BrokenType > 0 ? "Broken " + OGF_V.BrokenType.ToString() : "4 byte";
-				LabelBroken.Visible = OGF_V.BrokenType > 0 || OGF_V.Descr4Byte;
+				LabelBroken.Text = "Broken type: " + OGF_V.BrokenType.ToString();
+				LabelBroken.Visible = OGF_V.BrokenType > 0;
 			}
 		}
 
@@ -276,11 +260,15 @@ namespace OGF_tool
 			{
 				OGF_V.motion_refs.refs.Clear();
 
-				if (MotionRefsBox.Lines.Count() > 0)
+				if (IsTextCorrect(MotionRefsBox.Text))
 				{
-					OGF_V.motion_refs.refs.AddRange(MotionRefsBox.Lines);
+					for (int i = 0; i < MotionRefsBox.Lines.Count(); i++)
+					{
+						if (IsTextCorrect(MotionRefsBox.Lines[i]))
+							OGF_V.motion_refs.refs.Add(GetCorrectString(MotionRefsBox.Lines[i]));
+					}
 
-					if (MotionRefsBox.Lines.Count() > 1)
+					if (OGF_V.motion_refs.refs.Count() > 1)
 						OGF_V.motion_refs.v3 = false;
 				}
 			}
@@ -289,7 +277,7 @@ namespace OGF_tool
 			{
 				OGF_V.userdata.userdata = "";
 
-				if (UserDataBox.Text != "")
+				if (IsTextCorrect(UserDataBox.Text))
 				{
 					for (int i = 0; i < UserDataBox.Lines.Count(); i++)
 					{
@@ -300,130 +288,14 @@ namespace OGF_tool
 			}
 
 			if (OGF_V.lod != null)
-				OGF_V.lod.lod_path = LodPathBox.Text;
+			{
+				OGF_V.lod.lod_path = "";
+
+				if (IsTextCorrect(LodPathBox.Text))
+					OGF_V.lod.lod_path = GetCorrectString(LodPathBox.Text);
+			}
 
 			UpdateModelType();
-		}
-
-		private uint CatchBrokenModel()
-		{
-			if (Current_OGF == null) return 0;
-
-			if (OGF_V.IsSkeleton() && OGF_V.bones.pos < OGF_V.pos)
-				return 2;
-
-			try
-			{
-				using (var fileStream = new BinaryReader(new MemoryStream(Current_OGF)))
-				{
-					fileStream.ReadBytes(8);
-					fileStream.ReadBytes(2);
-					fileStream.ReadBytes((int)(OGF_V.description.pos - fileStream.BaseStream.Position));
-					fileStream.ReadBytes(OGF_V.description.old_size + 8);
-					fileStream.ReadUInt32();
-					fileStream.ReadUInt32();
-
-					foreach (var ch in OGF_V.childs)
-					{
-						fileStream.ReadBytes((int)(ch.parent_pos - fileStream.BaseStream.Position));
-						fileStream.ReadUInt32();
-						fileStream.ReadUInt32();
-						fileStream.ReadBytes((int)(ch.pos - fileStream.BaseStream.Position));
-						fileStream.BaseStream.Position += ch.old_size + 8;
-					}
-				}
-			}
-			catch (Exception)
-			{
-				return 1;
-			}
-
-			return 0;
-		}
-
-		private bool CatchDescr4ByteModel()
-		{
-			if (Current_OGF == null) return false;
-
-			string source = "";
-			string export_tool = "";
-			uint export_time = 0;
-			string owner_name = "";
-			uint creation_time = 0;
-			string export_modif_name_tool = "";
-			uint modified_time = 0;
-
-			int descr_old_size = 0;
-
-			try
-			{
-				var xr_loader = new XRayLoader();
-
-				long descr_pos = 0;
-
-				using (var r = new BinaryReader(new MemoryStream(Current_OGF)))
-				{
-					xr_loader.SetStream(r.BaseStream);
-
-					xr_loader.find_chunk((int)OGF.OGF4_HEADER);
-
-					xr_loader.ReadByte();
-					xr_loader.ReadByte();
-
-					if (!xr_loader.find_chunk((int)OGF.OGF4_S_DESC, false, true))
-						return false;
-
-					descr_pos = xr_loader.chunk_pos;
-
-					source = xr_loader.read_stringZ();
-					export_tool = xr_loader.read_stringZ();
-					export_time = xr_loader.ReadUInt32();
-					owner_name = xr_loader.read_stringZ();
-					creation_time = xr_loader.ReadUInt32();
-					export_modif_name_tool = xr_loader.read_stringZ();
-					modified_time = xr_loader.ReadUInt32();
-
-					descr_old_size = source.Length + 1 + export_tool.Length + 1 + 4 + owner_name.Length + 1 + 4 + export_modif_name_tool.Length + 1 + 4;
-
-					xr_loader.SetStream(r.BaseStream);
-				}
-
-
-				using (var fileStream = new BinaryReader(new MemoryStream(Current_OGF)))
-				{
-					fileStream.ReadBytes(8);
-					fileStream.ReadBytes(2);
-					fileStream.ReadBytes((int)(descr_pos - fileStream.BaseStream.Position));
-					fileStream.ReadBytes((int)descr_old_size + 8);
-					fileStream.ReadUInt32();
-					fileStream.ReadUInt32();
-
-					foreach (var ch in OGF_V.childs)
-					{
-						fileStream.ReadBytes((int)(ch.parent_pos - fileStream.BaseStream.Position));
-						fileStream.ReadUInt32();
-						fileStream.ReadUInt32();
-						fileStream.ReadBytes((int)(ch.pos - fileStream.BaseStream.Position));
-						fileStream.BaseStream.Position += ch.old_size + 8;
-					}
-				}
-			}
-			catch (Exception)
-			{
-				return false;
-			}
-
-			OGF_V.description.m_source = source;
-			OGF_V.description.m_export_tool = export_tool;
-			OGF_V.description.m_export_time = export_time;
-			OGF_V.description.m_owner_name = owner_name;
-			OGF_V.description.m_creation_time = creation_time;
-			OGF_V.description.m_export_modif_name_tool = export_modif_name_tool;
-			OGF_V.description.m_modified_time = modified_time;
-
-			OGF_V.description.old_size = descr_old_size;
-
-			return true;
 		}
 
 		private void WriteFile(string filename)
@@ -492,9 +364,15 @@ namespace OGF_tool
 					file_bytes.AddRange(temp);
 				}
 
+				bool old_byte = OGF_V.description.four_byte;
+				if (OGF_V.BrokenType > 0) // Если модель сломана, то восстанавливаем чанк с 8 байтными таймерами
+					OGF_V.description.four_byte = false;
+
 				file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_DESC));
-				file_bytes.AddRange(BitConverter.GetBytes(OGF_V.description.chunk_size(OGF_V.Descr4Byte)));
-				file_bytes.AddRange(OGF_V.description.data(OGF_V.Descr4Byte));
+				file_bytes.AddRange(BitConverter.GetBytes(OGF_V.description.chunk_size()));
+				file_bytes.AddRange(OGF_V.description.data());
+
+				OGF_V.description.four_byte = old_byte; // Восстанавливаем отображение колличества байтов у таймера
 
 				fileStream.ReadBytes((int)(OGF_V.pos - fileStream.BaseStream.Position));
 
@@ -663,7 +541,8 @@ namespace OGF_tool
 					xr_loader.ReadBytes(42);
 				}
 
-				if (!xr_loader.find_chunk((int)OGF.OGF4_S_DESC, false, true))
+				uint DescriptionSize = xr_loader.find_chunkSize((int)OGF.OGF4_S_DESC, false, true);
+				if (DescriptionSize == 0)
 				{
 					MessageBox.Show("Unsupported OGF format! Can't find description chunk!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 					return false;
@@ -673,6 +552,8 @@ namespace OGF_tool
 					OGF_C.description = new Description();
 					OGF_C.description.pos = xr_loader.chunk_pos;
 
+					// Читаем таймеры в 8 байт
+					long reader_start_pos = xr_loader.reader.BaseStream.Position;
 					OGF_C.description.m_source = xr_loader.read_stringZ();
 					OGF_C.description.m_export_tool = xr_loader.read_stringZ();
 					OGF_C.description.m_export_time = xr_loader.ReadInt64();
@@ -680,8 +561,35 @@ namespace OGF_tool
 					OGF_C.description.m_creation_time = xr_loader.ReadInt64();
 					OGF_C.description.m_export_modif_name_tool = xr_loader.read_stringZ();
 					OGF_C.description.m_modified_time = xr_loader.ReadInt64();
+					long description_end_pos = xr_loader.reader.BaseStream.Position;
 
 					OGF_C.description.old_size = OGF_C.description.m_source.Length + 1 + OGF_C.description.m_export_tool.Length + 1 + 8 + OGF_C.description.m_owner_name.Length + 1 + 8 + OGF_C.description.m_export_modif_name_tool.Length + 1 + 8;
+
+					if ((description_end_pos - reader_start_pos) != DescriptionSize) // Размер не состыковывается, пробуем читать 4 байта
+                    {
+						xr_loader.reader.BaseStream.Position = reader_start_pos;
+						OGF_C.description.m_source = xr_loader.read_stringZ();
+						OGF_C.description.m_export_tool = xr_loader.read_stringZ();
+						OGF_C.description.m_export_time = xr_loader.ReadUInt32();
+						OGF_C.description.m_owner_name = xr_loader.read_stringZ();
+						OGF_C.description.m_creation_time = xr_loader.ReadUInt32();
+						OGF_C.description.m_export_modif_name_tool = xr_loader.read_stringZ();
+						OGF_C.description.m_modified_time = xr_loader.ReadUInt32();
+						description_end_pos = xr_loader.reader.BaseStream.Position;
+
+						OGF_C.description.old_size = OGF_C.description.m_source.Length + 1 + OGF_C.description.m_export_tool.Length + 1 + 4 + OGF_C.description.m_owner_name.Length + 1 + 4 + OGF_C.description.m_export_modif_name_tool.Length + 1 + 4;
+						OGF_C.description.four_byte = true; // Ставим флаг на то что мы прочитали чанк с 4х байтными таймерами, если модель будет сломана то чинить чанк будем в 8 байт
+
+						if ((description_end_pos - reader_start_pos) != DescriptionSize) // Все равно разный размер? Походу модель сломана
+						{
+							OGF_C.BrokenType = 1;
+
+							// Чистим таймеры, так как прочитаны битые байты
+							OGF_C.description.m_export_time = 0;
+							OGF_C.description.m_creation_time = 0;
+							OGF_C.description.m_modified_time = 0;
+						}
+					}
 				}
 
 				if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_CHILDREN, false, true)))
@@ -728,13 +636,10 @@ namespace OGF_tool
 					}
 					else
 					{
-						OGF_C.bones.pos = xr_loader.chunk_pos;
+						OGF_C.bones = new BoneData();
 
-						OGF_C.bones.bones = new List<string>();
-						OGF_C.bones.parent_bones = new List<string>();
-						OGF_C.bones.fobb = new List<byte[]>();
-						OGF_C.bones.bone_childs = new List<List<int>>();
-						OGF_C.bones.old_size = 0;
+						if (xr_loader.chunk_pos < OGF_C.pos)
+							OGF_C.BrokenType = 2;
 
 						uint count = xr_loader.ReadUInt32();
 						OGF_C.bones.old_size += 4;
@@ -744,19 +649,19 @@ namespace OGF_tool
 							string bone_name = xr_loader.read_stringZ();
 							string parent_name = xr_loader.read_stringZ();
 							byte[] obb = xr_loader.ReadBytes(60);    // Fobb
-							OGF_C.bones.bones.Add(bone_name);
-							OGF_C.bones.parent_bones.Add(parent_name);
+							OGF_C.bones.bone_names.Add(bone_name);
+							OGF_C.bones.parent_bone_names.Add(parent_name);
 							OGF_C.bones.fobb.Add(obb);
 
 							OGF_C.bones.old_size += bone_name.Length + 1 + parent_name.Length + 1 + 60;
 						}
 
-						for (int i = 0; i < OGF_C.bones.bones.Count; i++)
+						for (int i = 0; i < OGF_C.bones.bone_names.Count; i++)
 						{
 							List<int> childs = new List<int>();
-							for (int j = 0; j < OGF_C.bones.parent_bones.Count; j++)
+							for (int j = 0; j < OGF_C.bones.parent_bone_names.Count; j++)
 							{
-								if (OGF_C.bones.parent_bones[j] == OGF_C.bones.bones[i])
+								if (OGF_C.bones.parent_bone_names[j] == OGF_C.bones.bone_names[i])
 								{
 									childs.Add(j);
 								}
@@ -773,16 +678,9 @@ namespace OGF_tool
 					}
 					else
 					{
-						OGF_C.ikdata.materials = new List<string>();
-						OGF_C.ikdata.mass = new List<float>();
-						OGF_C.ikdata.version = new List<uint>();
-						OGF_C.ikdata.center_mass = new List<Fvector>();
-						OGF_C.ikdata.position = new List<Fvector>();
-						OGF_C.ikdata.rotation = new List<Fvector>();
-						OGF_C.ikdata.bytes_1 = new List<List<byte[]>>();
-						OGF_C.ikdata.old_size = 0;
+						OGF_C.ikdata = new IK_Data();
 
-						for (int i = 0; i < OGF_C.bones.bones.Count; i++)
+						for (int i = 0; i < OGF_C.bones.bone_names.Count; i++)
 						{
 							List<byte[]> bytes_1 = new List<byte[]>();
 							OGF_C.ikdata.old_size += 4;
@@ -1007,10 +905,10 @@ namespace OGF_tool
 			{
 				case "boneBox":
 					{
-						string old_name = OGF_V.bones.bones[idx];
-						OGF_V.bones.bones[idx] = curBox.Text;
+						string old_name = OGF_V.bones.bone_names[idx];
+						OGF_V.bones.bone_names[idx] = curBox.Text;
 
-						for (int i = 0; i < OGF_V.bones.parent_bones.Count; i++)
+						for (int i = 0; i < OGF_V.bones.parent_bone_names.Count; i++)
                         {
 							if (BoneParamsPage.Controls.Count < i) continue;
 							for (int j = 0; j < OGF_V.bones.bone_childs[idx].Count; j++)
@@ -1018,19 +916,19 @@ namespace OGF_tool
 								if (OGF_V.bones.bone_childs[idx][j] == i)
 								{
 									var MainGroup = BoneParamsPage.Controls[i];
-									OGF_V.bones.parent_bones[i] = curBox.Text;
-									MainGroup.Controls[1].Text = OGF_V.bones.parent_bones[i];
+									OGF_V.bones.parent_bone_names[i] = curBox.Text;
+									MainGroup.Controls[1].Text = OGF_V.bones.parent_bone_names[i];
 								}
 							}
                         }
 
 						BoneNamesBox.Clear();
-						BoneNamesBox.Text += $"Bones count : {OGF_V.bones.bones.Count}\n\n";
+						BoneNamesBox.Text += $"Bones count : {OGF_V.bones.bone_names.Count}\n\n";
 
-						for (int i = 0; i < OGF_V.bones.bones.Count; i++)
+						for (int i = 0; i < OGF_V.bones.bone_names.Count; i++)
 						{
-							BoneNamesBox.Text += $"{i + 1}. {OGF_V.bones.bones[i]}";
-							if (i != OGF_V.bones.bones.Count - 1)
+							BoneNamesBox.Text += $"{i + 1}. {OGF_V.bones.bone_names[i]}";
+							if (i != OGF_V.bones.bone_names.Count - 1)
 								BoneNamesBox.Text += "\n";
 						}
 					}
@@ -1264,6 +1162,7 @@ namespace OGF_tool
         {
 			CreateUserdataButton.Visible = false;
 			UserDataBox.Visible = true;
+			UserDataBox.Clear();
 			if (OGF_V.userdata == null)
 				OGF_V.userdata = new UserData();
 		}
@@ -1285,6 +1184,7 @@ namespace OGF_tool
 				// Обновляем визуал интерфейса моушн рефов
 				CreateMotionRefsButton.Visible = false; 
 				MotionRefsBox.Visible = true;
+				MotionRefsBox.Clear();
 
 				if (OGF_V.motion_refs == null)
 					OGF_V.motion_refs = new MotionRefs();
@@ -1294,6 +1194,7 @@ namespace OGF_tool
 		private void CreateLodButton_Click(object sender, EventArgs e)
 		{
 			CreateLodButton.Visible = false;
+			LodPathBox.Clear();
 			if (OGF_V.lod == null)
 				OGF_V.lod = new Lod();
 		}
@@ -1316,10 +1217,9 @@ namespace OGF_tool
 
 			switch (TabControl.Controls[TabControl.SelectedIndex].Name)
 			{
-
 				case "UserDataPage":
 					{
-						if (UserDataBox.Text == "")
+						if (!IsTextCorrect(UserDataBox.Text))
 						{
 							CreateUserdataButton.Visible = true;
 							UserDataBox.Visible = false;
@@ -1328,7 +1228,7 @@ namespace OGF_tool
 					}
 				case "MotionRefsPage":
 					{
-						if (MotionRefsBox.Text == "")
+						if (!IsTextCorrect(MotionRefsBox.Text))
 						{
 							CreateMotionRefsButton.Visible = true;
 							MotionRefsBox.Visible = false;
@@ -1343,7 +1243,7 @@ namespace OGF_tool
 					}
 				case "LodPage":
 					{
-						if (LodPathBox.Text == "")
+						if (!IsTextCorrect(LodPathBox.Text))
 						{
 							CreateLodButton.Visible = true;
 						}
@@ -1367,7 +1267,7 @@ namespace OGF_tool
 
 		private void AppendOMFButton_Click(object sender, EventArgs e)
         {
-			if (MotionRefsBox.Text == "" && (OGF_V.motion_refs == null || OGF_V.motion_refs.refs.Count() == 0) || (MotionRefsBox.Text != "" || OGF_V.motion_refs != null && OGF_V.motion_refs.refs.Count() > 0) && MessageBox.Show("Build-in motions will remove motion refs, continue?", "OGF Editor", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+			if (!IsTextCorrect(MotionRefsBox.Text) && (OGF_V.motion_refs == null || OGF_V.motion_refs.refs.Count() == 0) || (IsTextCorrect(MotionRefsBox.Text) || OGF_V.motion_refs != null && OGF_V.motion_refs.refs.Count() > 0) && MessageBox.Show("Build-in motions will remove motion refs, continue?", "OGF Editor", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
 				OpenOMFDialog.ShowDialog();
         }
 
@@ -1528,9 +1428,9 @@ namespace OGF_tool
         {
 			if (OGF_V == null) return;
 
-			if (OGF_V.bones.bones == null)
+			if (OGF_V.bones == null)
 				OGF_V.m_model_type = 1;
-			else if (Current_OMF == null && MotionRefsBox.Text == "")
+			else if (Current_OMF == null && !IsTextCorrect(MotionRefsBox.Text))
 				OGF_V.m_model_type = 10;
 			else
 				OGF_V.m_model_type = 3;
@@ -1647,6 +1547,52 @@ namespace OGF_tool
 			if (str == "NaN")
 				str = "0";
 			return str;
+		}
+
+		private void RichTextBoxImgDefender(object sender, KeyEventArgs e)
+		{
+			RichTextBox TextBox = sender as RichTextBox;
+			if (e.Control && e.KeyCode == Keys.V)
+			{
+				if (Clipboard.ContainsText())
+					TextBox.Paste(DataFormats.GetFormat(DataFormats.Text));
+				e.Handled = true;
+			}
+		}
+
+		private bool IsTextCorrect(string text)
+        {
+			foreach (char ch in text)
+            {
+				if (ch > 0x1F && ch != 0x20)
+					return true;
+			}
+			return false;
+        }
+
+		private string GetCorrectString(string text)
+		{
+			string ret_text = "", symbols = "";
+			bool started = false;
+			foreach (char ch in text)
+			{
+				if (started)
+                {
+					if (ch <= 0x1F || ch == 0x20)
+						symbols += ch;
+                    else
+					{
+						ret_text += symbols + ch;
+						symbols = "";
+					}
+				}
+				else if (ch > 0x1F && ch != 0x20)
+				{
+					started = true;
+					ret_text += ch;
+				}
+			}
+			return ret_text;
 		}
 
 		// Interface

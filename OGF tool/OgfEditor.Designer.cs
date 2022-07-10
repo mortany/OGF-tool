@@ -168,6 +168,7 @@ namespace OGF_tool
             this.UserDataBox.Size = new System.Drawing.Size(431, 256);
             this.UserDataBox.TabIndex = 0;
             this.UserDataBox.Text = "";
+            this.UserDataBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.RichTextBoxImgDefender);
             // 
             // MotionRefsPage
             // 
@@ -207,6 +208,7 @@ namespace OGF_tool
             this.MotionRefsBox.Text = "";
             this.MotionRefsBox.WordWrap = false;
             this.MotionRefsBox.TextChanged += new System.EventHandler(this.RichTextBoxTextChanged);
+            this.MotionRefsBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.RichTextBoxImgDefender);
             // 
             // MotionPage
             // 
@@ -582,11 +584,11 @@ namespace OGF_tool
             // 
             this.LabelBroken.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.LabelBroken.AutoSize = true;
-            this.LabelBroken.Location = new System.Drawing.Point(403, 319);
+            this.LabelBroken.Location = new System.Drawing.Point(374, 319);
             this.LabelBroken.Name = "LabelBroken";
-            this.LabelBroken.Size = new System.Drawing.Size(41, 13);
+            this.LabelBroken.Size = new System.Drawing.Size(67, 13);
             this.LabelBroken.TabIndex = 32;
-            this.LabelBroken.Text = "Broken";
+            this.LabelBroken.Text = "Broken type:";
             // 
             // OGF_Editor
             // 

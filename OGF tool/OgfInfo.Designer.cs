@@ -47,6 +47,7 @@
             this.ExportTimeDate = new System.Windows.Forms.DateTimePicker();
             this.CreationTimeDate = new System.Windows.Forms.DateTimePicker();
             this.ModifedTimeDate = new System.Windows.Forms.DateTimePicker();
+            this.ByteLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // SourceTextBox
@@ -207,11 +208,22 @@
             this.ModifedTimeDate.Size = new System.Drawing.Size(126, 20);
             this.ModifedTimeDate.TabIndex = 23;
             // 
+            // ByteLabel
+            // 
+            this.ByteLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.ByteLabel.AutoSize = true;
+            this.ByteLabel.Location = new System.Drawing.Point(310, 221);
+            this.ByteLabel.Name = "ByteLabel";
+            this.ByteLabel.Size = new System.Drawing.Size(36, 13);
+            this.ByteLabel.TabIndex = 24;
+            this.ByteLabel.Text = "8 byte";
+            // 
             // OgfInfo
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(358, 238);
+            this.Controls.Add(this.ByteLabel);
             this.Controls.Add(this.ModifedTimeDate);
             this.Controls.Add(this.CreationTimeDate);
             this.Controls.Add(this.ExportTimeDate);
@@ -263,5 +275,6 @@
         private System.Windows.Forms.DateTimePicker ExportTimeDate;
         private System.Windows.Forms.DateTimePicker CreationTimeDate;
         private System.Windows.Forms.DateTimePicker ModifedTimeDate;
+        private System.Windows.Forms.Label ByteLabel;
     }
 }
