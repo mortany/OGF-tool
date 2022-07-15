@@ -779,9 +779,28 @@ namespace OGF_tool
 						if (v3)
 						{
 							OGF_C.motion_refs.v3 = true;
-							string refs = xr_loader.read_stringZ();
-							OGF_C.motion_refs.refs.Add(refs);
-							OGF_C.motion_refs.old_size = refs.Length + 1;
+
+							string motions = xr_loader.read_stringZ();
+							string motion = "";
+							List<string> refs = new List<string>();
+
+							for (int i = 0; i < motions.Length; i++)
+							{
+								if (motions[i] != ',')
+									motion += motions[i];
+								else
+								{
+									refs.Add(motion);
+									motion = "";
+								}
+
+							}
+
+							if (motion != "")
+								refs.Add(motion);
+
+							OGF_C.motion_refs.refs.AddRange(refs);
+							OGF_C.motion_refs.old_size = motions.Length + 1;
 						}
 						else
 						{
