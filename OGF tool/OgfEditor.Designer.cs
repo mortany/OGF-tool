@@ -337,7 +337,7 @@ namespace OGF_tool
             this.viewToolStripMenuItem});
             this.MenuPanel.Location = new System.Drawing.Point(0, 4);
             this.MenuPanel.Name = "MenuPanel";
-            this.MenuPanel.Size = new System.Drawing.Size(201, 24);
+            this.MenuPanel.Size = new System.Drawing.Size(321, 24);
             this.MenuPanel.TabIndex = 8;
             this.MenuPanel.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
@@ -494,7 +494,7 @@ namespace OGF_tool
             // 
             this.importDataFromModelToolStripMenuItem.Name = "importDataFromModelToolStripMenuItem";
             this.importDataFromModelToolStripMenuItem.Size = new System.Drawing.Size(235, 22);
-            this.importDataFromModelToolStripMenuItem.Text = "Import data from same model";
+            this.importDataFromModelToolStripMenuItem.Text = "Import OGF Params";
             this.importDataFromModelToolStripMenuItem.Click += new System.EventHandler(this.importDataFromModelToolStripMenuItem_Click);
             // 
             // oGFInfoToolStripMenuItem
