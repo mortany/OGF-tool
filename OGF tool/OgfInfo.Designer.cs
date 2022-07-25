@@ -222,6 +222,7 @@
             // 
             // RepairTimersButton
             // 
+            this.RepairTimersButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.RepairTimersButton.Location = new System.Drawing.Point(261, 207);
             this.RepairTimersButton.Name = "RepairTimersButton";
             this.RepairTimersButton.Size = new System.Drawing.Size(85, 23);
@@ -232,6 +233,7 @@
             // 
             // label8
             // 
+            this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label8.AutoSize = true;
             this.label8.Location = new System.Drawing.Point(272, 188);
             this.label8.Name = "label8";
