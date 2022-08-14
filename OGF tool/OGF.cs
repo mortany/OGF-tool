@@ -405,6 +405,7 @@ namespace OGF_tool
 
     public class BoneData
     {
+        public long pos;
         public int old_size;
 
         public List<string> bone_names;
@@ -414,6 +415,7 @@ namespace OGF_tool
 
         public BoneData()
         {
+            this.pos = 0;
             this.old_size = 0;
             this.bone_names = new List<string>();
             this.parent_bone_names = new List<string>();
