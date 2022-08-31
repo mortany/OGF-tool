@@ -325,6 +325,7 @@ namespace OGF_tool
                 string strref = refs[0];
                 if (refs.Count > 1)
                 {
+                    strref += ",";
                     for (int i = 1; i < refs.Count; i++)
                         strref += refs[i] + ",";
                 }
