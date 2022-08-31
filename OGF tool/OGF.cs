@@ -286,7 +286,7 @@ namespace OGF_tool
     {
         public long pos;
         public List<string> refs;
-        public bool v3;
+        public bool soc;
         public int old_size;
 
         public MotionRefs()
@@ -294,7 +294,7 @@ namespace OGF_tool
             this.pos = 0;
             this.old_size = 0;
             this.refs = new List<string>();
-            this.v3 = false;
+            this.soc = false;
         }
 
         public uint chunk_size(bool v3)

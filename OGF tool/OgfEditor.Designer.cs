@@ -33,6 +33,11 @@ namespace OGF_tool
             this.OpenOGFDialog = new System.Windows.Forms.OpenFileDialog();
             this.TabControl = new System.Windows.Forms.TabControl();
             this.TexturesPage = new System.Windows.Forms.TabPage();
+            this.TexturesGropuBox = new System.Windows.Forms.GroupBox();
+            this.ShaderNameLabelEx = new System.Windows.Forms.Label();
+            this.TexturesPathLabelEx = new System.Windows.Forms.Label();
+            this.ShaderTextBoxEx = new System.Windows.Forms.TextBox();
+            this.TexturesTextBoxEx = new System.Windows.Forms.TextBox();
             this.UserDataPage = new System.Windows.Forms.TabPage();
             this.CreateUserdataButton = new System.Windows.Forms.Button();
             this.UserDataBox = new System.Windows.Forms.RichTextBox();
@@ -45,6 +50,28 @@ namespace OGF_tool
             this.BoneNamesPage = new System.Windows.Forms.TabPage();
             this.BoneNamesBox = new System.Windows.Forms.RichTextBox();
             this.BoneParamsPage = new System.Windows.Forms.TabPage();
+            this.BoneParamsGroupBox = new System.Windows.Forms.GroupBox();
+            this.RotationLabelEx = new System.Windows.Forms.Label();
+            this.PositionLabelEx = new System.Windows.Forms.Label();
+            this.CenterOfMassLabelEx = new System.Windows.Forms.Label();
+            this.MassLabelEx = new System.Windows.Forms.Label();
+            this.BonesParamsPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.RotationZTextBox = new System.Windows.Forms.TextBox();
+            this.RotationYTextBox = new System.Windows.Forms.TextBox();
+            this.RotationXTextBox = new System.Windows.Forms.TextBox();
+            this.PositionZTextBox = new System.Windows.Forms.TextBox();
+            this.PositionYTextBox = new System.Windows.Forms.TextBox();
+            this.PositionXTextBox = new System.Windows.Forms.TextBox();
+            this.CenterOfMassZTextBox = new System.Windows.Forms.TextBox();
+            this.CenterOfMassYTextBox = new System.Windows.Forms.TextBox();
+            this.CenterOfMassXTextBox = new System.Windows.Forms.TextBox();
+            this.MassTextBoxEx = new System.Windows.Forms.TextBox();
+            this.MaterialLabelEx = new System.Windows.Forms.Label();
+            this.MaterialTextBoxEx = new System.Windows.Forms.TextBox();
+            this.ParentBoneTextBoxEx = new System.Windows.Forms.TextBox();
+            this.BoneNameTextBoxEx = new System.Windows.Forms.TextBox();
+            this.ParentBoneLabelEx = new System.Windows.Forms.Label();
+            this.BoneNameLabelEx = new System.Windows.Forms.Label();
             this.LodPage = new System.Windows.Forms.TabPage();
             this.CreateLodButton = new System.Windows.Forms.Button();
             this.LodPathBox = new System.Windows.Forms.TextBox();
@@ -63,15 +90,15 @@ namespace OGF_tool
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.reloadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.ToolsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openSkeletonInObjectEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.motionToolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteMotionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editInOMFEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.replaceMotionsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.importDataFromModelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.oGFInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.OgfInfo = new System.Windows.Forms.ToolStripMenuItem();
+            this.View = new System.Windows.Forms.ToolStripMenuItem();
             this.FileLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.StatusFile = new System.Windows.Forms.ToolStripStatusLabel();
             this.StatusPanel = new System.Windows.Forms.StatusStrip();
@@ -85,11 +112,17 @@ namespace OGF_tool
             this.SaveBonesDialog = new System.Windows.Forms.SaveFileDialog();
             this.SaveObjectDialog = new System.Windows.Forms.SaveFileDialog();
             this.LabelBroken = new System.Windows.Forms.Label();
+            this.CurrentFormat = new System.Windows.Forms.ToolStripMenuItem();
             this.TabControl.SuspendLayout();
+            this.TexturesPage.SuspendLayout();
+            this.TexturesGropuBox.SuspendLayout();
             this.UserDataPage.SuspendLayout();
             this.MotionRefsPage.SuspendLayout();
             this.MotionPage.SuspendLayout();
             this.BoneNamesPage.SuspendLayout();
+            this.BoneParamsPage.SuspendLayout();
+            this.BoneParamsGroupBox.SuspendLayout();
+            this.BonesParamsPanel.SuspendLayout();
             this.LodPage.SuspendLayout();
             this.MenuPanel.SuspendLayout();
             this.StatusPanel.SuspendLayout();
@@ -116,7 +149,7 @@ namespace OGF_tool
             this.TabControl.Multiline = true;
             this.TabControl.Name = "TabControl";
             this.TabControl.SelectedIndex = 0;
-            this.TabControl.Size = new System.Drawing.Size(439, 285);
+            this.TabControl.Size = new System.Drawing.Size(439, 310);
             this.TabControl.SizeMode = System.Windows.Forms.TabSizeMode.FillToRight;
             this.TabControl.TabIndex = 7;
             this.TabControl.SelectedIndexChanged += new System.EventHandler(this.TabControl_SelectedIndexChanged);
@@ -125,13 +158,65 @@ namespace OGF_tool
             // TexturesPage
             // 
             this.TexturesPage.AutoScroll = true;
+            this.TexturesPage.Controls.Add(this.TexturesGropuBox);
             this.TexturesPage.Location = new System.Drawing.Point(4, 25);
             this.TexturesPage.Name = "TexturesPage";
             this.TexturesPage.Padding = new System.Windows.Forms.Padding(3);
-            this.TexturesPage.Size = new System.Drawing.Size(431, 256);
+            this.TexturesPage.Size = new System.Drawing.Size(431, 281);
             this.TexturesPage.TabIndex = 0;
             this.TexturesPage.Text = "Textures";
             this.TexturesPage.UseVisualStyleBackColor = true;
+            // 
+            // TexturesGropuBox
+            // 
+            this.TexturesGropuBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TexturesGropuBox.Controls.Add(this.ShaderNameLabelEx);
+            this.TexturesGropuBox.Controls.Add(this.TexturesPathLabelEx);
+            this.TexturesGropuBox.Controls.Add(this.ShaderTextBoxEx);
+            this.TexturesGropuBox.Controls.Add(this.TexturesTextBoxEx);
+            this.TexturesGropuBox.Location = new System.Drawing.Point(3, 3);
+            this.TexturesGropuBox.Name = "TexturesGropuBox";
+            this.TexturesGropuBox.Size = new System.Drawing.Size(425, 110);
+            this.TexturesGropuBox.TabIndex = 0;
+            this.TexturesGropuBox.TabStop = false;
+            this.TexturesGropuBox.Text = "TexturesBoxExample";
+            // 
+            // ShaderNameLabelEx
+            // 
+            this.ShaderNameLabelEx.AutoSize = true;
+            this.ShaderNameLabelEx.Location = new System.Drawing.Point(3, 68);
+            this.ShaderNameLabelEx.Name = "ShaderNameLabelEx";
+            this.ShaderNameLabelEx.Size = new System.Drawing.Size(75, 13);
+            this.ShaderNameLabelEx.TabIndex = 3;
+            this.ShaderNameLabelEx.Text = "Shader Name:";
+            // 
+            // TexturesPathLabelEx
+            // 
+            this.TexturesPathLabelEx.AutoSize = true;
+            this.TexturesPathLabelEx.Location = new System.Drawing.Point(3, 19);
+            this.TexturesPathLabelEx.Name = "TexturesPathLabelEx";
+            this.TexturesPathLabelEx.Size = new System.Drawing.Size(76, 13);
+            this.TexturesPathLabelEx.TabIndex = 2;
+            this.TexturesPathLabelEx.Text = "Textures Path:";
+            // 
+            // ShaderTextBoxEx
+            // 
+            this.ShaderTextBoxEx.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ShaderTextBoxEx.Location = new System.Drawing.Point(6, 84);
+            this.ShaderTextBoxEx.Name = "ShaderTextBoxEx";
+            this.ShaderTextBoxEx.Size = new System.Drawing.Size(413, 20);
+            this.ShaderTextBoxEx.TabIndex = 1;
+            // 
+            // TexturesTextBoxEx
+            // 
+            this.TexturesTextBoxEx.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TexturesTextBoxEx.Location = new System.Drawing.Point(6, 35);
+            this.TexturesTextBoxEx.Name = "TexturesTextBoxEx";
+            this.TexturesTextBoxEx.Size = new System.Drawing.Size(413, 20);
+            this.TexturesTextBoxEx.TabIndex = 0;
             // 
             // UserDataPage
             // 
@@ -140,7 +225,7 @@ namespace OGF_tool
             this.UserDataPage.Location = new System.Drawing.Point(4, 25);
             this.UserDataPage.Name = "UserDataPage";
             this.UserDataPage.Padding = new System.Windows.Forms.Padding(3);
-            this.UserDataPage.Size = new System.Drawing.Size(431, 256);
+            this.UserDataPage.Size = new System.Drawing.Size(431, 281);
             this.UserDataPage.TabIndex = 2;
             this.UserDataPage.Text = "UserData";
             this.UserDataPage.UseVisualStyleBackColor = true;
@@ -152,7 +237,7 @@ namespace OGF_tool
             | System.Windows.Forms.AnchorStyles.Right)));
             this.CreateUserdataButton.Location = new System.Drawing.Point(6, 6);
             this.CreateUserdataButton.Name = "CreateUserdataButton";
-            this.CreateUserdataButton.Size = new System.Drawing.Size(419, 244);
+            this.CreateUserdataButton.Size = new System.Drawing.Size(419, 269);
             this.CreateUserdataButton.TabIndex = 1;
             this.CreateUserdataButton.Text = "Create UserData";
             this.CreateUserdataButton.UseVisualStyleBackColor = true;
@@ -165,7 +250,7 @@ namespace OGF_tool
             | System.Windows.Forms.AnchorStyles.Right)));
             this.UserDataBox.Location = new System.Drawing.Point(0, 0);
             this.UserDataBox.Name = "UserDataBox";
-            this.UserDataBox.Size = new System.Drawing.Size(431, 256);
+            this.UserDataBox.Size = new System.Drawing.Size(431, 281);
             this.UserDataBox.TabIndex = 0;
             this.UserDataBox.Text = "";
             this.UserDataBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.RichTextBoxImgDefender);
@@ -177,7 +262,7 @@ namespace OGF_tool
             this.MotionRefsPage.Location = new System.Drawing.Point(4, 25);
             this.MotionRefsPage.Name = "MotionRefsPage";
             this.MotionRefsPage.Padding = new System.Windows.Forms.Padding(3);
-            this.MotionRefsPage.Size = new System.Drawing.Size(431, 256);
+            this.MotionRefsPage.Size = new System.Drawing.Size(431, 281);
             this.MotionRefsPage.TabIndex = 1;
             this.MotionRefsPage.Text = "Motion Refs";
             this.MotionRefsPage.UseVisualStyleBackColor = true;
@@ -189,7 +274,7 @@ namespace OGF_tool
             | System.Windows.Forms.AnchorStyles.Right)));
             this.CreateMotionRefsButton.Location = new System.Drawing.Point(6, 6);
             this.CreateMotionRefsButton.Name = "CreateMotionRefsButton";
-            this.CreateMotionRefsButton.Size = new System.Drawing.Size(419, 244);
+            this.CreateMotionRefsButton.Size = new System.Drawing.Size(419, 269);
             this.CreateMotionRefsButton.TabIndex = 1;
             this.CreateMotionRefsButton.Text = "Create Motion Refs";
             this.CreateMotionRefsButton.UseVisualStyleBackColor = true;
@@ -203,7 +288,7 @@ namespace OGF_tool
             this.MotionRefsBox.DetectUrls = false;
             this.MotionRefsBox.Location = new System.Drawing.Point(0, 0);
             this.MotionRefsBox.Name = "MotionRefsBox";
-            this.MotionRefsBox.Size = new System.Drawing.Size(431, 256);
+            this.MotionRefsBox.Size = new System.Drawing.Size(431, 281);
             this.MotionRefsBox.TabIndex = 0;
             this.MotionRefsBox.Text = "";
             this.MotionRefsBox.WordWrap = false;
@@ -217,7 +302,7 @@ namespace OGF_tool
             this.MotionPage.Location = new System.Drawing.Point(4, 25);
             this.MotionPage.Name = "MotionPage";
             this.MotionPage.Padding = new System.Windows.Forms.Padding(3);
-            this.MotionPage.Size = new System.Drawing.Size(431, 256);
+            this.MotionPage.Size = new System.Drawing.Size(431, 281);
             this.MotionPage.TabIndex = 4;
             this.MotionPage.Text = "Motions";
             this.MotionPage.UseVisualStyleBackColor = true;
@@ -229,7 +314,7 @@ namespace OGF_tool
             | System.Windows.Forms.AnchorStyles.Right)));
             this.AppendOMFButton.Location = new System.Drawing.Point(6, 6);
             this.AppendOMFButton.Name = "AppendOMFButton";
-            this.AppendOMFButton.Size = new System.Drawing.Size(419, 244);
+            this.AppendOMFButton.Size = new System.Drawing.Size(419, 269);
             this.AppendOMFButton.TabIndex = 4;
             this.AppendOMFButton.Text = "Append OMF";
             this.AppendOMFButton.UseVisualStyleBackColor = true;
@@ -243,7 +328,7 @@ namespace OGF_tool
             this.MotionBox.Location = new System.Drawing.Point(0, 0);
             this.MotionBox.Name = "MotionBox";
             this.MotionBox.ReadOnly = true;
-            this.MotionBox.Size = new System.Drawing.Size(431, 256);
+            this.MotionBox.Size = new System.Drawing.Size(431, 281);
             this.MotionBox.TabIndex = 2;
             this.MotionBox.Text = "";
             // 
@@ -253,7 +338,7 @@ namespace OGF_tool
             this.BoneNamesPage.Location = new System.Drawing.Point(4, 25);
             this.BoneNamesPage.Name = "BoneNamesPage";
             this.BoneNamesPage.Padding = new System.Windows.Forms.Padding(3);
-            this.BoneNamesPage.Size = new System.Drawing.Size(431, 256);
+            this.BoneNamesPage.Size = new System.Drawing.Size(431, 281);
             this.BoneNamesPage.TabIndex = 5;
             this.BoneNamesPage.Text = "Bone Names";
             this.BoneNamesPage.UseVisualStyleBackColor = true;
@@ -267,7 +352,7 @@ namespace OGF_tool
             this.BoneNamesBox.Location = new System.Drawing.Point(0, 0);
             this.BoneNamesBox.Name = "BoneNamesBox";
             this.BoneNamesBox.ReadOnly = true;
-            this.BoneNamesBox.Size = new System.Drawing.Size(431, 256);
+            this.BoneNamesBox.Size = new System.Drawing.Size(431, 281);
             this.BoneNamesBox.TabIndex = 1;
             this.BoneNamesBox.Text = "";
             this.BoneNamesBox.WordWrap = false;
@@ -275,13 +360,245 @@ namespace OGF_tool
             // BoneParamsPage
             // 
             this.BoneParamsPage.AutoScroll = true;
+            this.BoneParamsPage.Controls.Add(this.BoneParamsGroupBox);
             this.BoneParamsPage.Location = new System.Drawing.Point(4, 25);
             this.BoneParamsPage.Name = "BoneParamsPage";
             this.BoneParamsPage.Padding = new System.Windows.Forms.Padding(3);
-            this.BoneParamsPage.Size = new System.Drawing.Size(431, 256);
+            this.BoneParamsPage.Size = new System.Drawing.Size(431, 281);
             this.BoneParamsPage.TabIndex = 3;
             this.BoneParamsPage.Text = "Bone Params";
             this.BoneParamsPage.UseVisualStyleBackColor = true;
+            // 
+            // BoneParamsGroupBox
+            // 
+            this.BoneParamsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.BoneParamsGroupBox.Controls.Add(this.RotationLabelEx);
+            this.BoneParamsGroupBox.Controls.Add(this.PositionLabelEx);
+            this.BoneParamsGroupBox.Controls.Add(this.CenterOfMassLabelEx);
+            this.BoneParamsGroupBox.Controls.Add(this.MassLabelEx);
+            this.BoneParamsGroupBox.Controls.Add(this.BonesParamsPanel);
+            this.BoneParamsGroupBox.Controls.Add(this.MaterialLabelEx);
+            this.BoneParamsGroupBox.Controls.Add(this.MaterialTextBoxEx);
+            this.BoneParamsGroupBox.Controls.Add(this.ParentBoneTextBoxEx);
+            this.BoneParamsGroupBox.Controls.Add(this.BoneNameTextBoxEx);
+            this.BoneParamsGroupBox.Controls.Add(this.ParentBoneLabelEx);
+            this.BoneParamsGroupBox.Controls.Add(this.BoneNameLabelEx);
+            this.BoneParamsGroupBox.Location = new System.Drawing.Point(3, 3);
+            this.BoneParamsGroupBox.Name = "BoneParamsGroupBox";
+            this.BoneParamsGroupBox.Size = new System.Drawing.Size(425, 216);
+            this.BoneParamsGroupBox.TabIndex = 0;
+            this.BoneParamsGroupBox.TabStop = false;
+            this.BoneParamsGroupBox.Text = "BoneParamsExample";
+            // 
+            // RotationLabelEx
+            // 
+            this.RotationLabelEx.AutoSize = true;
+            this.RotationLabelEx.Location = new System.Drawing.Point(7, 184);
+            this.RotationLabelEx.Name = "RotationLabelEx";
+            this.RotationLabelEx.Size = new System.Drawing.Size(50, 13);
+            this.RotationLabelEx.TabIndex = 10;
+            this.RotationLabelEx.Text = "Rotation:";
+            // 
+            // PositionLabelEx
+            // 
+            this.PositionLabelEx.AutoSize = true;
+            this.PositionLabelEx.Location = new System.Drawing.Point(7, 157);
+            this.PositionLabelEx.Name = "PositionLabelEx";
+            this.PositionLabelEx.Size = new System.Drawing.Size(47, 13);
+            this.PositionLabelEx.TabIndex = 9;
+            this.PositionLabelEx.Text = "Position:";
+            // 
+            // CenterOfMassLabelEx
+            // 
+            this.CenterOfMassLabelEx.AutoSize = true;
+            this.CenterOfMassLabelEx.Location = new System.Drawing.Point(7, 130);
+            this.CenterOfMassLabelEx.Name = "CenterOfMassLabelEx";
+            this.CenterOfMassLabelEx.Size = new System.Drawing.Size(81, 13);
+            this.CenterOfMassLabelEx.TabIndex = 8;
+            this.CenterOfMassLabelEx.Text = "Center of Mass:";
+            // 
+            // MassLabelEx
+            // 
+            this.MassLabelEx.AutoSize = true;
+            this.MassLabelEx.Location = new System.Drawing.Point(7, 103);
+            this.MassLabelEx.Name = "MassLabelEx";
+            this.MassLabelEx.Size = new System.Drawing.Size(35, 13);
+            this.MassLabelEx.TabIndex = 7;
+            this.MassLabelEx.Text = "Mass:";
+            // 
+            // BonesParamsPanel
+            // 
+            this.BonesParamsPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.BonesParamsPanel.ColumnCount = 3;
+            this.BonesParamsPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.BonesParamsPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
+            this.BonesParamsPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
+            this.BonesParamsPanel.Controls.Add(this.RotationZTextBox, 2, 3);
+            this.BonesParamsPanel.Controls.Add(this.RotationYTextBox, 1, 3);
+            this.BonesParamsPanel.Controls.Add(this.RotationXTextBox, 0, 3);
+            this.BonesParamsPanel.Controls.Add(this.PositionZTextBox, 2, 2);
+            this.BonesParamsPanel.Controls.Add(this.PositionYTextBox, 1, 2);
+            this.BonesParamsPanel.Controls.Add(this.PositionXTextBox, 0, 2);
+            this.BonesParamsPanel.Controls.Add(this.CenterOfMassZTextBox, 2, 1);
+            this.BonesParamsPanel.Controls.Add(this.CenterOfMassYTextBox, 1, 1);
+            this.BonesParamsPanel.Controls.Add(this.CenterOfMassXTextBox, 0, 1);
+            this.BonesParamsPanel.Controls.Add(this.MassTextBoxEx, 0, 0);
+            this.BonesParamsPanel.Location = new System.Drawing.Point(93, 97);
+            this.BonesParamsPanel.Name = "BonesParamsPanel";
+            this.BonesParamsPanel.RowCount = 4;
+            this.BonesParamsPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.BonesParamsPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.BonesParamsPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.BonesParamsPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.BonesParamsPanel.Size = new System.Drawing.Size(329, 111);
+            this.BonesParamsPanel.TabIndex = 6;
+            // 
+            // RotationZTextBox
+            // 
+            this.RotationZTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.RotationZTextBox.Location = new System.Drawing.Point(221, 84);
+            this.RotationZTextBox.Name = "RotationZTextBox";
+            this.RotationZTextBox.Size = new System.Drawing.Size(105, 20);
+            this.RotationZTextBox.TabIndex = 11;
+            // 
+            // RotationYTextBox
+            // 
+            this.RotationYTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.RotationYTextBox.Location = new System.Drawing.Point(112, 84);
+            this.RotationYTextBox.Name = "RotationYTextBox";
+            this.RotationYTextBox.Size = new System.Drawing.Size(103, 20);
+            this.RotationYTextBox.TabIndex = 10;
+            // 
+            // RotationXTextBox
+            // 
+            this.RotationXTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.RotationXTextBox.Location = new System.Drawing.Point(3, 84);
+            this.RotationXTextBox.Name = "RotationXTextBox";
+            this.RotationXTextBox.Size = new System.Drawing.Size(103, 20);
+            this.RotationXTextBox.TabIndex = 9;
+            // 
+            // PositionZTextBox
+            // 
+            this.PositionZTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.PositionZTextBox.Location = new System.Drawing.Point(221, 57);
+            this.PositionZTextBox.Name = "PositionZTextBox";
+            this.PositionZTextBox.Size = new System.Drawing.Size(105, 20);
+            this.PositionZTextBox.TabIndex = 8;
+            // 
+            // PositionYTextBox
+            // 
+            this.PositionYTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.PositionYTextBox.Location = new System.Drawing.Point(112, 57);
+            this.PositionYTextBox.Name = "PositionYTextBox";
+            this.PositionYTextBox.Size = new System.Drawing.Size(103, 20);
+            this.PositionYTextBox.TabIndex = 7;
+            // 
+            // PositionXTextBox
+            // 
+            this.PositionXTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.PositionXTextBox.Location = new System.Drawing.Point(3, 57);
+            this.PositionXTextBox.Name = "PositionXTextBox";
+            this.PositionXTextBox.Size = new System.Drawing.Size(103, 20);
+            this.PositionXTextBox.TabIndex = 6;
+            // 
+            // CenterOfMassZTextBox
+            // 
+            this.CenterOfMassZTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.CenterOfMassZTextBox.Location = new System.Drawing.Point(221, 30);
+            this.CenterOfMassZTextBox.Name = "CenterOfMassZTextBox";
+            this.CenterOfMassZTextBox.Size = new System.Drawing.Size(105, 20);
+            this.CenterOfMassZTextBox.TabIndex = 5;
+            // 
+            // CenterOfMassYTextBox
+            // 
+            this.CenterOfMassYTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.CenterOfMassYTextBox.Location = new System.Drawing.Point(112, 30);
+            this.CenterOfMassYTextBox.Name = "CenterOfMassYTextBox";
+            this.CenterOfMassYTextBox.Size = new System.Drawing.Size(103, 20);
+            this.CenterOfMassYTextBox.TabIndex = 4;
+            // 
+            // CenterOfMassXTextBox
+            // 
+            this.CenterOfMassXTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.CenterOfMassXTextBox.Location = new System.Drawing.Point(3, 30);
+            this.CenterOfMassXTextBox.Name = "CenterOfMassXTextBox";
+            this.CenterOfMassXTextBox.Size = new System.Drawing.Size(103, 20);
+            this.CenterOfMassXTextBox.TabIndex = 3;
+            // 
+            // MassTextBoxEx
+            // 
+            this.MassTextBoxEx.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.MassTextBoxEx.Location = new System.Drawing.Point(3, 3);
+            this.MassTextBoxEx.Name = "MassTextBoxEx";
+            this.MassTextBoxEx.Size = new System.Drawing.Size(103, 20);
+            this.MassTextBoxEx.TabIndex = 0;
+            // 
+            // MaterialLabelEx
+            // 
+            this.MaterialLabelEx.AutoSize = true;
+            this.MaterialLabelEx.Location = new System.Drawing.Point(7, 76);
+            this.MaterialLabelEx.Name = "MaterialLabelEx";
+            this.MaterialLabelEx.Size = new System.Drawing.Size(47, 13);
+            this.MaterialLabelEx.TabIndex = 5;
+            this.MaterialLabelEx.Text = "Material:";
+            // 
+            // MaterialTextBoxEx
+            // 
+            this.MaterialTextBoxEx.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.MaterialTextBoxEx.Location = new System.Drawing.Point(96, 73);
+            this.MaterialTextBoxEx.Name = "MaterialTextBoxEx";
+            this.MaterialTextBoxEx.Size = new System.Drawing.Size(323, 20);
+            this.MaterialTextBoxEx.TabIndex = 4;
+            // 
+            // ParentBoneTextBoxEx
+            // 
+            this.ParentBoneTextBoxEx.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ParentBoneTextBoxEx.Location = new System.Drawing.Point(96, 46);
+            this.ParentBoneTextBoxEx.Name = "ParentBoneTextBoxEx";
+            this.ParentBoneTextBoxEx.ReadOnly = true;
+            this.ParentBoneTextBoxEx.Size = new System.Drawing.Size(323, 20);
+            this.ParentBoneTextBoxEx.TabIndex = 3;
+            // 
+            // BoneNameTextBoxEx
+            // 
+            this.BoneNameTextBoxEx.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.BoneNameTextBoxEx.Location = new System.Drawing.Point(96, 19);
+            this.BoneNameTextBoxEx.Name = "BoneNameTextBoxEx";
+            this.BoneNameTextBoxEx.Size = new System.Drawing.Size(323, 20);
+            this.BoneNameTextBoxEx.TabIndex = 2;
+            // 
+            // ParentBoneLabelEx
+            // 
+            this.ParentBoneLabelEx.AutoSize = true;
+            this.ParentBoneLabelEx.Location = new System.Drawing.Point(7, 49);
+            this.ParentBoneLabelEx.Name = "ParentBoneLabelEx";
+            this.ParentBoneLabelEx.Size = new System.Drawing.Size(68, 13);
+            this.ParentBoneLabelEx.TabIndex = 1;
+            this.ParentBoneLabelEx.Text = "Parent bone:";
+            // 
+            // BoneNameLabelEx
+            // 
+            this.BoneNameLabelEx.AutoSize = true;
+            this.BoneNameLabelEx.Location = new System.Drawing.Point(7, 22);
+            this.BoneNameLabelEx.Name = "BoneNameLabelEx";
+            this.BoneNameLabelEx.Size = new System.Drawing.Size(64, 13);
+            this.BoneNameLabelEx.TabIndex = 0;
+            this.BoneNameLabelEx.Text = "Bone name:";
             // 
             // LodPage
             // 
@@ -291,7 +608,7 @@ namespace OGF_tool
             this.LodPage.Location = new System.Drawing.Point(4, 25);
             this.LodPage.Name = "LodPage";
             this.LodPage.Padding = new System.Windows.Forms.Padding(3);
-            this.LodPage.Size = new System.Drawing.Size(431, 256);
+            this.LodPage.Size = new System.Drawing.Size(431, 281);
             this.LodPage.TabIndex = 6;
             this.LodPage.Text = "Lod";
             this.LodPage.UseVisualStyleBackColor = true;
@@ -303,7 +620,7 @@ namespace OGF_tool
             | System.Windows.Forms.AnchorStyles.Right)));
             this.CreateLodButton.Location = new System.Drawing.Point(6, 6);
             this.CreateLodButton.Name = "CreateLodButton";
-            this.CreateLodButton.Size = new System.Drawing.Size(419, 244);
+            this.CreateLodButton.Size = new System.Drawing.Size(419, 269);
             this.CreateLodButton.TabIndex = 2;
             this.CreateLodButton.Text = "Create Lod";
             this.CreateLodButton.UseVisualStyleBackColor = true;
@@ -332,12 +649,13 @@ namespace OGF_tool
             this.MenuPanel.Dock = System.Windows.Forms.DockStyle.None;
             this.MenuPanel.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.FileMenuItem,
-            this.toolStripMenuItem1,
-            this.oGFInfoToolStripMenuItem,
-            this.viewToolStripMenuItem});
+            this.ToolsMenuItem,
+            this.OgfInfo,
+            this.View,
+            this.CurrentFormat});
             this.MenuPanel.Location = new System.Drawing.Point(0, 4);
             this.MenuPanel.Name = "MenuPanel";
-            this.MenuPanel.Size = new System.Drawing.Size(321, 24);
+            this.MenuPanel.Size = new System.Drawing.Size(418, 24);
             this.MenuPanel.TabIndex = 8;
             this.MenuPanel.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
@@ -442,15 +760,16 @@ namespace OGF_tool
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
-            // toolStripMenuItem1
+            // ToolsMenuItem
             // 
-            this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ToolsMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openSkeletonInObjectEditorToolStripMenuItem,
             this.motionToolsToolStripMenuItem,
             this.importDataFromModelToolStripMenuItem});
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(46, 20);
-            this.toolStripMenuItem1.Text = "Tools";
+            this.ToolsMenuItem.Name = "ToolsMenuItem";
+            this.ToolsMenuItem.Size = new System.Drawing.Size(46, 20);
+            this.ToolsMenuItem.Text = "Tools";
+            this.ToolsMenuItem.Click += new System.EventHandler(this.ToolsClick);
             // 
             // openSkeletonInObjectEditorToolStripMenuItem
             // 
@@ -472,21 +791,21 @@ namespace OGF_tool
             // deleteMotionsToolStripMenuItem
             // 
             this.deleteMotionsToolStripMenuItem.Name = "deleteMotionsToolStripMenuItem";
-            this.deleteMotionsToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.deleteMotionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.deleteMotionsToolStripMenuItem.Text = "Delete motions";
             this.deleteMotionsToolStripMenuItem.Click += new System.EventHandler(this.deleteChunkToolStripMenuItem_Click);
             // 
             // editInOMFEditorToolStripMenuItem
             // 
             this.editInOMFEditorToolStripMenuItem.Name = "editInOMFEditorToolStripMenuItem";
-            this.editInOMFEditorToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.editInOMFEditorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.editInOMFEditorToolStripMenuItem.Text = "Edit in OMF Editor";
             this.editInOMFEditorToolStripMenuItem.Click += new System.EventHandler(this.editImOMFEditorToolStripMenuItem_Click);
             // 
             // replaceMotionsToolStripMenuItem1
             // 
             this.replaceMotionsToolStripMenuItem1.Name = "replaceMotionsToolStripMenuItem1";
-            this.replaceMotionsToolStripMenuItem1.Size = new System.Drawing.Size(170, 22);
+            this.replaceMotionsToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.replaceMotionsToolStripMenuItem1.Text = "Replace motions";
             this.replaceMotionsToolStripMenuItem1.Click += new System.EventHandler(this.AppendOMFButton_Click);
             // 
@@ -497,19 +816,19 @@ namespace OGF_tool
             this.importDataFromModelToolStripMenuItem.Text = "Import OGF Params";
             this.importDataFromModelToolStripMenuItem.Click += new System.EventHandler(this.importDataFromModelToolStripMenuItem_Click);
             // 
-            // oGFInfoToolStripMenuItem
+            // OgfInfo
             // 
-            this.oGFInfoToolStripMenuItem.Name = "oGFInfoToolStripMenuItem";
-            this.oGFInfoToolStripMenuItem.Size = new System.Drawing.Size(66, 20);
-            this.oGFInfoToolStripMenuItem.Text = "OGF Info";
-            this.oGFInfoToolStripMenuItem.Click += new System.EventHandler(this.oGFInfoToolStripMenuItem_Click);
+            this.OgfInfo.Name = "OgfInfo";
+            this.OgfInfo.Size = new System.Drawing.Size(66, 20);
+            this.OgfInfo.Text = "OGF Info";
+            this.OgfInfo.Click += new System.EventHandler(this.oGFInfoToolStripMenuItem_Click);
             // 
-            // viewToolStripMenuItem
+            // View
             // 
-            this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
-            this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
-            this.viewToolStripMenuItem.Text = "View";
-            this.viewToolStripMenuItem.Click += new System.EventHandler(this.viewToolStripMenuItem_Click);
+            this.View.Name = "View";
+            this.View.Size = new System.Drawing.Size(44, 20);
+            this.View.Text = "View";
+            this.View.Click += new System.EventHandler(this.viewToolStripMenuItem_Click);
             // 
             // FileLabel
             // 
@@ -528,7 +847,7 @@ namespace OGF_tool
             this.StatusPanel.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.FileLabel,
             this.StatusFile});
-            this.StatusPanel.Location = new System.Drawing.Point(0, 315);
+            this.StatusPanel.Location = new System.Drawing.Point(0, 340);
             this.StatusPanel.Name = "StatusPanel";
             this.StatusPanel.Size = new System.Drawing.Size(463, 22);
             this.StatusPanel.TabIndex = 30;
@@ -538,7 +857,7 @@ namespace OGF_tool
             // 
             this.BkpCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.BkpCheckBox.AutoSize = true;
-            this.BkpCheckBox.Location = new System.Drawing.Point(351, 7);
+            this.BkpCheckBox.Location = new System.Drawing.Point(360, 7);
             this.BkpCheckBox.Name = "BkpCheckBox";
             this.BkpCheckBox.Size = new System.Drawing.Size(96, 17);
             this.BkpCheckBox.TabIndex = 31;
@@ -584,17 +903,24 @@ namespace OGF_tool
             // 
             this.LabelBroken.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.LabelBroken.AutoSize = true;
-            this.LabelBroken.Location = new System.Drawing.Point(374, 319);
+            this.LabelBroken.Location = new System.Drawing.Point(374, 344);
             this.LabelBroken.Name = "LabelBroken";
             this.LabelBroken.Size = new System.Drawing.Size(67, 13);
             this.LabelBroken.TabIndex = 32;
             this.LabelBroken.Text = "Broken type:";
             // 
+            // CurrentFormat
+            // 
+            this.CurrentFormat.Name = "CurrentFormat";
+            this.CurrentFormat.Size = new System.Drawing.Size(97, 20);
+            this.CurrentFormat.Text = "Model Format:";
+            this.CurrentFormat.Click += new System.EventHandler(this.ChangeRefsFormat);
+            // 
             // OGF_Editor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(463, 337);
+            this.ClientSize = new System.Drawing.Size(463, 362);
             this.Controls.Add(this.LabelBroken);
             this.Controls.Add(this.MenuPanel);
             this.Controls.Add(this.BkpCheckBox);
@@ -603,17 +929,25 @@ namespace OGF_tool
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.MenuPanel;
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(550, 880);
+            this.MaximumSize = new System.Drawing.Size(600, 880);
             this.MinimumSize = new System.Drawing.Size(479, 251);
             this.Name = "OGF_Editor";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "OGF Params Editor";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.TabControl.ResumeLayout(false);
+            this.TexturesPage.ResumeLayout(false);
+            this.TexturesGropuBox.ResumeLayout(false);
+            this.TexturesGropuBox.PerformLayout();
             this.UserDataPage.ResumeLayout(false);
             this.MotionRefsPage.ResumeLayout(false);
             this.MotionPage.ResumeLayout(false);
             this.BoneNamesPage.ResumeLayout(false);
+            this.BoneParamsPage.ResumeLayout(false);
+            this.BoneParamsGroupBox.ResumeLayout(false);
+            this.BoneParamsGroupBox.PerformLayout();
+            this.BonesParamsPanel.ResumeLayout(false);
+            this.BonesParamsPanel.PerformLayout();
             this.LodPage.ResumeLayout(false);
             this.LodPage.PerformLayout();
             this.MenuPanel.ResumeLayout(false);
@@ -640,7 +974,7 @@ namespace OGF_tool
         private System.Windows.Forms.ToolStripStatusLabel FileLabel;
         private System.Windows.Forms.ToolStripStatusLabel StatusFile;
         private System.Windows.Forms.StatusStrip StatusPanel;
-        private System.Windows.Forms.ToolStripMenuItem oGFInfoToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem OgfInfo;
         private System.Windows.Forms.CheckBox BkpCheckBox;
         private System.Windows.Forms.TabPage BoneParamsPage;
         private System.Windows.Forms.TabPage MotionPage;
@@ -651,14 +985,14 @@ namespace OGF_tool
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.SaveFileDialog SaveAsDialog;
-        private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem View;
         private System.Windows.Forms.Button CreateUserdataButton;
         private System.Windows.Forms.Button CreateMotionRefsButton;
         private System.Windows.Forms.ToolStripMenuItem reloadToolStripMenuItem;
         private System.Windows.Forms.Button AppendOMFButton;
         private System.Windows.Forms.OpenFileDialog OpenOMFDialog;
         private System.Windows.Forms.OpenFileDialog OpenProgramDialog;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem ToolsMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openSkeletonInObjectEditorToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem motionToolsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem deleteMotionsToolStripMenuItem;
@@ -681,6 +1015,34 @@ namespace OGF_tool
         private System.Windows.Forms.SaveFileDialog SaveBonesDialog;
         private System.Windows.Forms.SaveFileDialog SaveObjectDialog;
         private System.Windows.Forms.Label LabelBroken;
+        private System.Windows.Forms.GroupBox BoneParamsGroupBox;
+        private System.Windows.Forms.TextBox BoneNameTextBoxEx;
+        private System.Windows.Forms.Label ParentBoneLabelEx;
+        private System.Windows.Forms.Label BoneNameLabelEx;
+        private System.Windows.Forms.TextBox ParentBoneTextBoxEx;
+        private System.Windows.Forms.Label MaterialLabelEx;
+        private System.Windows.Forms.TextBox MaterialTextBoxEx;
+        private System.Windows.Forms.TableLayoutPanel BonesParamsPanel;
+        private System.Windows.Forms.TextBox RotationZTextBox;
+        private System.Windows.Forms.TextBox RotationYTextBox;
+        private System.Windows.Forms.TextBox RotationXTextBox;
+        private System.Windows.Forms.TextBox PositionZTextBox;
+        private System.Windows.Forms.TextBox PositionYTextBox;
+        private System.Windows.Forms.TextBox PositionXTextBox;
+        private System.Windows.Forms.TextBox CenterOfMassZTextBox;
+        private System.Windows.Forms.TextBox CenterOfMassYTextBox;
+        private System.Windows.Forms.TextBox CenterOfMassXTextBox;
+        private System.Windows.Forms.TextBox MassTextBoxEx;
+        private System.Windows.Forms.Label RotationLabelEx;
+        private System.Windows.Forms.Label PositionLabelEx;
+        private System.Windows.Forms.Label CenterOfMassLabelEx;
+        private System.Windows.Forms.Label MassLabelEx;
+        private System.Windows.Forms.GroupBox TexturesGropuBox;
+        private System.Windows.Forms.Label TexturesPathLabelEx;
+        private System.Windows.Forms.TextBox ShaderTextBoxEx;
+        private System.Windows.Forms.TextBox TexturesTextBoxEx;
+        private System.Windows.Forms.Label ShaderNameLabelEx;
+        private System.Windows.Forms.ToolStripMenuItem CurrentFormat;
     }
 }
 
