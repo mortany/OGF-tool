@@ -644,24 +644,28 @@ namespace OGF_tool
         public string m_texture;
         public string m_shader;
 
-        public OGF_Child(long _pos, int _parent_id, long _parent_pos, int _old_size, string texture, string shader)
+        public OGF_Child(long _pos, long _parent_pos, uint _chunk_size, int _old_size, string texture, string shader)
         {
             pos = _pos;
-            parent_id = _parent_id;
             parent_pos = _parent_pos;
             m_texture = texture;
             m_shader = shader;
             old_size = _old_size;
+            chunk_size = _chunk_size;
             link_type = 0;
+            faces = 0;
+            verts = 0;
+            to_delete = false;
         }
 
         public long pos;
-
         public long parent_pos;
-        public int parent_id;
-        public uint link_type;
-
+        public uint chunk_size;
         public int old_size;
+
+        public uint link_type;
+        public long faces, verts;
+        public bool to_delete;
 
         public uint NewSize()
         {

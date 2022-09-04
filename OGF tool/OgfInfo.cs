@@ -14,23 +14,94 @@ namespace OGF_tool
     {
         public Description descr = new Description();
         public bool res = false;
-        public OgfInfo(Description init_descr, byte vers, byte type)
+        public OgfInfo(OGF_Children OGF, bool refs_correct, List<byte> motions_flags)
         {
             InitializeComponent();
 
-            OgfVersLabel.Text = vers.ToString();
-            ModelTypeLabel.Text = (type == 1 ? "Object" : type == 3 ? "Animated" : "Rigid");
-            ByteLabel.Text = (init_descr.four_byte ? "4 byte" : "8 byte");
-            RepairTimersButton.Enabled = init_descr.four_byte;
+            uint links = 0;
+            bool cop_links = false;
 
-            SourceTextBox.Text = init_descr.m_source;
-            ConverterTextBox.Text = init_descr.m_export_tool;
-            CreatorTextBox.Text = init_descr.m_owner_name;
-            EditorTextBox.Text = init_descr.m_export_modif_name_tool;
+            long verts = 0, faces = 0;
+            foreach (var ch in OGF.childs)
+            {
+                if (ch.to_delete) continue;
 
-            System.DateTime dt_e = new System.DateTime(1970, 1, 1).AddSeconds(init_descr.m_export_time);
-            System.DateTime dt_c = new System.DateTime(1970, 1, 1).AddSeconds(init_descr.m_creation_time);
-            System.DateTime dt_m = new System.DateTime(1970, 1, 1).AddSeconds(init_descr.m_modified_time);
+                if (ch.link_type >= 100)
+                    links = Math.Max(links, ch.link_type / 0x12071980);
+                else
+                {
+                    links = Math.Max(links, ch.link_type);
+                    cop_links = true;
+                }
+
+                verts += ch.verts;
+                faces = ch.faces;
+            }
+
+            OgfVersLabel.Text = OGF.m_version.ToString();
+            ModelTypeLabel.Text = (OGF.m_model_type == 1 ? "Object" : OGF.m_model_type == 3 ? "Animated" : "Rigid");
+            LinksLabel.Text = links > 0 ? links.ToString() + ", " + (cop_links ? "CoP" : "SoC") : "None";
+            MotionRefsTypeLabel.Text = (OGF.motion_refs == null || !refs_correct) ? "None" : (OGF.motion_refs.soc ? "SoC" : "CoP");
+
+            bool bit8 = false;
+            bool bit16 = false;
+            bool no_bit = false;
+
+            if (motions_flags.Count > 0)
+            {
+                for (int i = 0; i < motions_flags.Count; i++)
+                {
+                    byte flag = motions_flags[i];
+
+                    bool key16bit = (flag & (int)MotionKeyFlags.flTKey16IsBit) == (int)MotionKeyFlags.flTKey16IsBit;
+                    bool keynocompressbit = (flag & (int)MotionKeyFlags.flTKeyFFT_Bit) == (int)MotionKeyFlags.flTKeyFFT_Bit;
+
+                    if (!key16bit && !keynocompressbit && !bit8)
+                        bit8 = true;
+                    else if (key16bit && !keynocompressbit && !bit16)
+                        bit16 = true;
+                    else if (keynocompressbit && !no_bit)
+                        no_bit = true;
+                }
+
+                MotionsLabel.Text = "";
+
+                if (bit8)
+                    MotionsLabel.Text += "8 bit";
+
+                if (bit16)
+                {
+                    if (MotionsLabel.Text != "")
+                        MotionsLabel.Text += " | ";
+
+                    MotionsLabel.Text += "16 bit";
+                }
+
+                if (no_bit)
+                {
+                    if (MotionsLabel.Text != "")
+                        MotionsLabel.Text += " | ";
+
+                    MotionsLabel.Text += "no compress";
+                }
+            }
+            else
+                MotionsLabel.Text = "None";
+
+            VertsLabel.Text = verts.ToString();
+            FacesLabel.Text = faces.ToString();
+
+            ByteLabel.Text = (OGF.description.four_byte ? "4 byte" : "8 byte");
+            RepairTimersButton.Enabled = OGF.description.four_byte;
+
+            SourceTextBox.Text = OGF.description.m_source;
+            ConverterTextBox.Text = OGF.description.m_export_tool;
+            CreatorTextBox.Text = OGF.description.m_owner_name;
+            EditorTextBox.Text = OGF.description.m_export_modif_name_tool;
+
+            System.DateTime dt_e = new System.DateTime(1970, 1, 1).AddSeconds(OGF.description.m_export_time);
+            System.DateTime dt_c = new System.DateTime(1970, 1, 1).AddSeconds(OGF.description.m_creation_time);
+            System.DateTime dt_m = new System.DateTime(1970, 1, 1).AddSeconds(OGF.description.m_modified_time);
 
             ExportTimeDate.Value = dt_e;
             CreationTimeDate.Value = dt_c;

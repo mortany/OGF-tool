@@ -363,7 +363,6 @@ namespace OGF_tool
 				else
 					file_bytes.AddRange(temp);
 
-				uint last_child_size = 0;
 				if (OGF_V.description != null)
 				{
 					bool old_byte = OGF_V.description.four_byte;
@@ -382,36 +381,54 @@ namespace OGF_tool
 					uint new_size = fileStream.ReadUInt32();
 
 					foreach (var ch in OGF_V.childs)
-						new_size += ch.NewSize();
+					{
+						if (ch.to_delete)
+							new_size -= ch.chunk_size + 8;
+						else
+							new_size += ch.NewSize();
+					}
 
 					file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_CHILDREN));
 					file_bytes.AddRange(BitConverter.GetBytes(new_size));
 
+					int child_id = 0;
 					foreach (var ch in OGF_V.childs)
 					{
-						temp = fileStream.ReadBytes((int)(ch.parent_pos - fileStream.BaseStream.Position));
-						file_bytes.AddRange(temp);
-
 						fileStream.ReadUInt32();
-						last_child_size = new_size = fileStream.ReadUInt32();
-						new_size += ch.NewSize();
+						uint size = fileStream.ReadUInt32();
+						long old_pos = fileStream.BaseStream.Position; // «аписываем начальную позицию чанка
 
-						file_bytes.AddRange(BitConverter.GetBytes(ch.parent_id));
-						file_bytes.AddRange(BitConverter.GetBytes(new_size));
+						if (!ch.to_delete)
+						{
+							new_size = size + ch.NewSize();
+							file_bytes.AddRange(BitConverter.GetBytes(child_id));
+							file_bytes.AddRange(BitConverter.GetBytes(new_size));
 
-						last_child_size -= (uint)(ch.pos - fileStream.BaseStream.Position);
+							child_id++;
+						}
+
 						temp = fileStream.ReadBytes((int)(ch.pos - fileStream.BaseStream.Position));
-						file_bytes.AddRange(temp);
-						file_bytes.AddRange(ch.data());
 
-						last_child_size -= (uint)(ch.old_size + 8);
+						if (!ch.to_delete)
+						{
+							file_bytes.AddRange(temp);
+							file_bytes.AddRange(ch.data());
+						}
+
 						fileStream.BaseStream.Position += ch.old_size + 8;
-
                         temp = fileStream.ReadBytes(8);
-                        file_bytes.AddRange(temp);
                         fileStream.ReadUInt32();
-                        file_bytes.AddRange(BitConverter.GetBytes(ch.link_type));
-						last_child_size -= 12;
+
+						if (!ch.to_delete)
+						{
+							file_bytes.AddRange(temp);
+							file_bytes.AddRange(BitConverter.GetBytes(ch.link_type));
+						}
+
+						temp = fileStream.ReadBytes((int)ch.chunk_size - (int)(fileStream.BaseStream.Position - old_pos)); // „итаем все до конца чанка
+
+						if (!ch.to_delete) // ƒописываем чанк если он не претендент на удаление
+							file_bytes.AddRange(temp);
 					}
 				}
 				else
@@ -422,9 +439,6 @@ namespace OGF_tool
 
 				if (OGF_V.IsSkeleton())
                 {
-                    temp = fileStream.ReadBytes((int)(last_child_size));
-                    file_bytes.AddRange(temp);
-
 					file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_BONE_NAMES));
 					file_bytes.AddRange(BitConverter.GetBytes(OGF_V.bones.chunk_size()));
 					file_bytes.AddRange(OGF_V.bones.data(false));
@@ -539,7 +553,12 @@ namespace OGF_tool
                 {
 					string shader = xr_loader.read_stringZ();
 					string texture = xr_loader.read_stringZ();
-					OGF_Child chld = new OGF_Child(0, 0, 0, shader.Length + texture.Length + 2, texture, shader);
+					xr_loader.ReadUInt32();
+					xr_loader.ReadFloat();
+					xr_loader.ReadFloat();
+					OGF_Child chld = new OGF_Child( 0, 0, 0, shader.Length + texture.Length + 2, texture, shader);
+					chld.verts = xr_loader.ReadUInt32();
+					chld.faces = xr_loader.ReadUInt32() / 3;
 					OGF_C.childs.Add(chld);
 					return true;
 				}
@@ -614,7 +633,8 @@ namespace OGF_tool
 				{
 					while (true)
 					{
-						if (!xr_loader.find_chunk(id)) break;
+						uint chunk_size = xr_loader.find_chunkSize(id);
+						if (chunk_size == 0) break;
 
 						Stream temp = xr_loader.reader.BaseStream;
 
@@ -625,10 +645,18 @@ namespace OGF_tool
 
 						if (size == 0) break;
 
-						OGF_Child chld = new OGF_Child(xr_loader.chunk_pos + pos, id, pos - 8, (int)size, xr_loader.read_stringZ(), xr_loader.read_stringZ());
+						OGF_Child chld = new OGF_Child(xr_loader.chunk_pos + pos, pos - 8, chunk_size,(int)size, xr_loader.read_stringZ(), xr_loader.read_stringZ());
 
-						if (xr_loader.find_chunk((int)OGF.OGF4_VERTICES))
+						if (xr_loader.find_chunk((int)OGF.OGF4_VERTICES, false, true))
+						{
 							chld.link_type = xr_loader.ReadUInt32();
+							chld.verts = xr_loader.ReadUInt32();
+						}
+
+						if (xr_loader.find_chunk((int)OGF.OGF4_INDICES, false, true))
+						{
+							chld.faces = xr_loader.ReadUInt32() / 3;
+						}
 
 						OGF_C.childs.Add(chld);
 
@@ -643,6 +671,18 @@ namespace OGF_tool
 					if (size != 0)
 					{
 						OGF_Child chld = new OGF_Child(0, 0, 0, (int)size, xr_loader.read_stringZ(), xr_loader.read_stringZ());
+
+						if (xr_loader.find_chunk((int)OGF.OGF4_VERTICES, false, true))
+						{
+							xr_loader.ReadUInt32();
+							chld.verts = xr_loader.ReadUInt32();
+						}
+
+						if (xr_loader.find_chunk((int)OGF.OGF4_INDICES, false, true))
+						{
+							chld.faces = xr_loader.ReadUInt32() / 3;
+						}
+
 						OGF_C.childs.Add(chld);
 					}
 				}
@@ -885,6 +925,36 @@ namespace OGF_tool
 			bKeyIsDown = true;
 		}
 
+		private void ButtonFilter(object sender, EventArgs e)
+		{
+			Button curBox = sender as Button;
+
+			string currentField = curBox.Name.ToString().Split('_')[0];
+			int idx = Convert.ToInt32(curBox.Name.ToString().Split('_')[1]);
+
+			switch (currentField)
+			{
+				case "DeleteButton":
+					int chld_cnt = OGF_V.childs.Count;
+
+					foreach (var ch in OGF_V.childs)
+                    {
+						if (ch.to_delete) chld_cnt--;
+					}
+
+					if (chld_cnt > 1 || OGF_V.childs[idx].to_delete)
+					{
+						OGF_V.childs[idx].to_delete = !OGF_V.childs[idx].to_delete;
+						curBox.Text = (OGF_V.childs[idx].to_delete ? "Return Mesh" : "Delete Mesh");
+					}
+					else
+                    {
+						MessageBox.Show("Can't delete last mesh!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					}
+					break;
+			}
+		}
+
 		private void TextBoxFilter(object sender, EventArgs e)
 		{
 			TextBox curBox = sender as TextBox;
@@ -1042,7 +1112,43 @@ namespace OGF_tool
         {
 			System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("ru-RU");
 
-			OgfInfo Info = new OgfInfo(OGF_V.description, OGF_V.m_version, OGF_V.m_model_type);
+			List<byte> flags = new List<byte>();
+			if (Current_OMF != null)
+			{
+				var xr_loader = new XRayLoader();
+				using (var fileStream = new BinaryReader(new MemoryStream(Current_OMF)))
+				{
+					xr_loader.SetStream(fileStream.BaseStream);
+
+					if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_S_MOTIONS, false, true)))
+					{
+						int id = 0;
+
+						while (true)
+						{
+							if (!xr_loader.find_chunk(id)) break;
+
+							Stream temp = xr_loader.reader.BaseStream;
+
+							if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk(id, false, true))) break;
+
+							if (id == 0)
+								xr_loader.ReadUInt32();
+							else
+							{
+								xr_loader.read_stringZ();
+								xr_loader.ReadUInt32();
+								flags.Add(xr_loader.ReadByte());
+							}
+
+							id++;
+							xr_loader.SetStream(temp);
+						}
+					}
+				}
+			}
+
+			OgfInfo Info = new OgfInfo(OGF_V, IsTextCorrect(MotionRefsBox.Text), flags);
             Info.ShowDialog();
 
 			if (Info.res)
@@ -1540,8 +1646,8 @@ namespace OGF_tool
 										xr_loader.ReadUInt32();
 										byte flags = xr_loader.ReadByte();
 
-										bool key16bit = (flags & (byte)MotionKeyFlags.flTKey16IsBit) == (byte)MotionKeyFlags.flTKey16IsBit;
-										bool keynocompressbit = (flags & (byte)MotionKeyFlags.flTKeyFFT_Bit) == (byte)MotionKeyFlags.flTKeyFFT_Bit;
+										bool key16bit = (flags & (int)MotionKeyFlags.flTKey16IsBit) == (int)MotionKeyFlags.flTKey16IsBit;
+										bool keynocompressbit = (flags & (int)MotionKeyFlags.flTKeyFFT_Bit) == (int)MotionKeyFlags.flTKeyFFT_Bit;
 
 										if (key16bit || keynocompressbit)
                                         {
@@ -1768,7 +1874,7 @@ namespace OGF_tool
 			var GroupBox = new GroupBox();
 			GroupBox.Location = new System.Drawing.Point(TexturesGropuBox.Location.X, TexturesGropuBox.Location.Y + (TexturesGropuBox.Size.Height + 2) * idx);
 			GroupBox.Size = TexturesGropuBox.Size;
-			GroupBox.Text = "Set: [" + idx + "]";
+			GroupBox.Text = "Mesh: [" + idx + "]";
 			GroupBox.Name = "TextureGrpBox_" + idx;
 			GroupBox.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
 			CreateTextureBoxes(idx, GroupBox);
@@ -1790,9 +1896,19 @@ namespace OGF_tool
 			newTextBox2.Size = ShaderTextBoxEx.Size;
 			newTextBox2.Location = ShaderTextBoxEx.Location;
 			newTextBox2.TextChanged += new System.EventHandler(this.TextBoxFilter);
-			newTextBox2.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+			newTextBox2.Anchor = AnchorStyles.Left | AnchorStyles.Right;;
+
+			var newButton = new Button();
+			newButton.Name = "DeleteButton_" + idx;
+			newButton.Size = DeleteMesh.Size;
+			newButton.Location = DeleteMesh.Location;
+			newButton.Click += new System.EventHandler(this.ButtonFilter);
+			newButton.Anchor = AnchorStyles.Left | AnchorStyles.Top;
+			newButton.Text = DeleteMesh.Text;
+
 			box.Controls.Add(newTextBox);
 			box.Controls.Add(newTextBox2);
+			box.Controls.Add(newButton);
 		}
 
 		private void CreateTextureLabels(int idx, GroupBox box)
@@ -1807,8 +1923,26 @@ namespace OGF_tool
 			newLbl2.Text = "Shader Name:";
 			newLbl2.Location = ShaderNameLabelEx.Location;
 
+			var newLbl3 = new Label();
+			newLbl3.Name = "FacesLbl_" + idx;
+			newLbl3.Text = FaceLabel.Text + OGF_V.childs[idx].faces.ToString();
+			newLbl3.Size = new Size(FaceLabel.Size.Width + (OGF_V.childs[idx].faces.ToString().Length * 6), FaceLabel.Size.Height);
+			newLbl3.Location = new Point(FaceLabel.Location.X - (OGF_V.childs[idx].faces.ToString().Length * 6), FaceLabel.Location.Y);
+			newLbl3.Anchor = FaceLabel.Anchor;
+			newLbl3.TextAlign = FaceLabel.TextAlign;
+
+			var newLbl4 = new Label();
+			newLbl4.Name = "VertsLbl_" + idx;
+			newLbl4.Text = VertsLabel.Text + OGF_V.childs[idx].verts.ToString();
+			newLbl4.Size = new Size(VertsLabel.Size.Width + (OGF_V.childs[idx].verts.ToString().Length * 6), VertsLabel.Size.Height);
+			newLbl4.Location = new Point(VertsLabel.Location.X - (OGF_V.childs[idx].verts.ToString().Length * 6) - (OGF_V.childs[idx].faces.ToString().Length * 6), VertsLabel.Location.Y);
+			newLbl4.Anchor = VertsLabel.Anchor;
+			newLbl4.TextAlign = VertsLabel.TextAlign;
+
 			box.Controls.Add(newLbl);
 			box.Controls.Add(newLbl2);
+			box.Controls.Add(newLbl3);
+			box.Controls.Add(newLbl4);
 		}
 
 		private void CreateBoneGroupBox(int idx, string bone_name, string parent_bone_name, string material, float mass, Fvector center, Fvector pos, Fvector rot)

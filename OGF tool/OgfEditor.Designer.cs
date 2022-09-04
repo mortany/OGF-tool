@@ -113,6 +113,9 @@ namespace OGF_tool
             this.SaveBonesDialog = new System.Windows.Forms.SaveFileDialog();
             this.SaveObjectDialog = new System.Windows.Forms.SaveFileDialog();
             this.LabelBroken = new System.Windows.Forms.Label();
+            this.FaceLabel = new System.Windows.Forms.Label();
+            this.VertsLabel = new System.Windows.Forms.Label();
+            this.DeleteMesh = new System.Windows.Forms.Button();
             this.TabControl.SuspendLayout();
             this.TexturesPage.SuspendLayout();
             this.TexturesGropuBox.SuspendLayout();
@@ -171,13 +174,16 @@ namespace OGF_tool
             // 
             this.TexturesGropuBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.TexturesGropuBox.Controls.Add(this.DeleteMesh);
+            this.TexturesGropuBox.Controls.Add(this.VertsLabel);
+            this.TexturesGropuBox.Controls.Add(this.FaceLabel);
             this.TexturesGropuBox.Controls.Add(this.ShaderNameLabelEx);
             this.TexturesGropuBox.Controls.Add(this.TexturesPathLabelEx);
             this.TexturesGropuBox.Controls.Add(this.ShaderTextBoxEx);
             this.TexturesGropuBox.Controls.Add(this.TexturesTextBoxEx);
             this.TexturesGropuBox.Location = new System.Drawing.Point(3, 3);
             this.TexturesGropuBox.Name = "TexturesGropuBox";
-            this.TexturesGropuBox.Size = new System.Drawing.Size(425, 107);
+            this.TexturesGropuBox.Size = new System.Drawing.Size(425, 127);
             this.TexturesGropuBox.TabIndex = 0;
             this.TexturesGropuBox.TabStop = false;
             this.TexturesGropuBox.Text = "TexturesBoxExample";
@@ -185,7 +191,7 @@ namespace OGF_tool
             // ShaderNameLabelEx
             // 
             this.ShaderNameLabelEx.AutoSize = true;
-            this.ShaderNameLabelEx.Location = new System.Drawing.Point(3, 62);
+            this.ShaderNameLabelEx.Location = new System.Drawing.Point(3, 60);
             this.ShaderNameLabelEx.Name = "ShaderNameLabelEx";
             this.ShaderNameLabelEx.Size = new System.Drawing.Size(75, 13);
             this.ShaderNameLabelEx.TabIndex = 3;
@@ -194,7 +200,7 @@ namespace OGF_tool
             // TexturesPathLabelEx
             // 
             this.TexturesPathLabelEx.AutoSize = true;
-            this.TexturesPathLabelEx.Location = new System.Drawing.Point(3, 19);
+            this.TexturesPathLabelEx.Location = new System.Drawing.Point(3, 17);
             this.TexturesPathLabelEx.Name = "TexturesPathLabelEx";
             this.TexturesPathLabelEx.Size = new System.Drawing.Size(76, 13);
             this.TexturesPathLabelEx.TabIndex = 2;
@@ -204,7 +210,7 @@ namespace OGF_tool
             // 
             this.ShaderTextBoxEx.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.ShaderTextBoxEx.Location = new System.Drawing.Point(6, 78);
+            this.ShaderTextBoxEx.Location = new System.Drawing.Point(6, 76);
             this.ShaderTextBoxEx.Name = "ShaderTextBoxEx";
             this.ShaderTextBoxEx.Size = new System.Drawing.Size(413, 20);
             this.ShaderTextBoxEx.TabIndex = 1;
@@ -213,7 +219,7 @@ namespace OGF_tool
             // 
             this.TexturesTextBoxEx.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.TexturesTextBoxEx.Location = new System.Drawing.Point(6, 35);
+            this.TexturesTextBoxEx.Location = new System.Drawing.Point(6, 33);
             this.TexturesTextBoxEx.Name = "TexturesTextBoxEx";
             this.TexturesTextBoxEx.Size = new System.Drawing.Size(413, 20);
             this.TexturesTextBoxEx.TabIndex = 0;
@@ -916,6 +922,37 @@ namespace OGF_tool
             this.LabelBroken.TabIndex = 32;
             this.LabelBroken.Text = "Broken type:";
             // 
+            // FaceLabel
+            // 
+            this.FaceLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.FaceLabel.AutoSize = true;
+            this.FaceLabel.Location = new System.Drawing.Point(377, 104);
+            this.FaceLabel.Name = "FaceLabel";
+            this.FaceLabel.Size = new System.Drawing.Size(42, 13);
+            this.FaceLabel.TabIndex = 4;
+            this.FaceLabel.Text = "Faces: ";
+            this.FaceLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // VertsLabel
+            // 
+            this.VertsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.VertsLabel.AutoSize = true;
+            this.VertsLabel.Location = new System.Drawing.Point(338, 104);
+            this.VertsLabel.Name = "VertsLabel";
+            this.VertsLabel.Size = new System.Drawing.Size(37, 13);
+            this.VertsLabel.TabIndex = 5;
+            this.VertsLabel.Text = "Verts: ";
+            this.VertsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // DeleteMesh
+            // 
+            this.DeleteMesh.Location = new System.Drawing.Point(6, 99);
+            this.DeleteMesh.Name = "DeleteMesh";
+            this.DeleteMesh.Size = new System.Drawing.Size(82, 23);
+            this.DeleteMesh.TabIndex = 6;
+            this.DeleteMesh.Text = "Delete Mesh";
+            this.DeleteMesh.UseVisualStyleBackColor = true;
+            // 
             // OGF_Editor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -1043,6 +1080,9 @@ namespace OGF_tool
         private System.Windows.Forms.TextBox TexturesTextBoxEx;
         private System.Windows.Forms.Label ShaderNameLabelEx;
         private System.Windows.Forms.ToolStripMenuItem CurrentFormat;
+        private System.Windows.Forms.Label FaceLabel;
+        private System.Windows.Forms.Label VertsLabel;
+        private System.Windows.Forms.Button DeleteMesh;
     }
 }
 
