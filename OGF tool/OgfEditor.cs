@@ -1036,7 +1036,7 @@ namespace OGF_tool
 								{
 									var MainGroup = BoneParamsPage.Controls[i];
 									OGF_V.bones.parent_bone_names[i] = curBox.Text;
-									MainGroup.Controls[1].Text = OGF_V.bones.parent_bone_names[i];
+									MainGroup.Controls[2].Text = OGF_V.bones.parent_bone_names[i];
 								}
 							}
                         }
