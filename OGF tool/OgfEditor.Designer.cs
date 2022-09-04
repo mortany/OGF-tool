@@ -179,7 +179,6 @@ namespace OGF_tool
             this.TexturesGropuBox.Controls.Add(this.TexturesPathLabelEx);
             this.TexturesGropuBox.Controls.Add(this.ShaderTextBoxEx);
             this.TexturesGropuBox.Controls.Add(this.TexturesTextBoxEx);
-            this.TexturesGropuBox.Dock = System.Windows.Forms.DockStyle.Top;
             this.TexturesGropuBox.Location = new System.Drawing.Point(3, 3);
             this.TexturesGropuBox.Name = "TexturesGropuBox";
             this.TexturesGropuBox.Size = new System.Drawing.Size(425, 127);
@@ -418,7 +417,6 @@ namespace OGF_tool
             this.BoneParamsGroupBox.Controls.Add(this.BoneNameTextBoxEx);
             this.BoneParamsGroupBox.Controls.Add(this.ParentBoneLabelEx);
             this.BoneParamsGroupBox.Controls.Add(this.BoneNameLabelEx);
-            this.BoneParamsGroupBox.Dock = System.Windows.Forms.DockStyle.Top;
             this.BoneParamsGroupBox.Location = new System.Drawing.Point(3, 3);
             this.BoneParamsGroupBox.Name = "BoneParamsGroupBox";
             this.BoneParamsGroupBox.Size = new System.Drawing.Size(425, 216);
