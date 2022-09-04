@@ -10,6 +10,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Diagnostics;
 
 
 namespace OGF_tool
@@ -31,6 +33,8 @@ namespace OGF_tool
 
 		[DllImport("converter.dll")]
 		private static extern int CSharpStartAgent(string path, string out_path, int mode, int convert_to_mode, string motion_list);
+
+		delegate void TriangleParser(XRayLoader loader, OGF_Child child);
 
 		private int RunConverter(string path, string out_path, int mode, int convert_to_mode)
 		{
@@ -82,6 +86,11 @@ namespace OGF_tool
 
 			if (Directory.Exists(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp"))
 				Directory.Delete(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp", true);
+		}
+
+		public string AppPath()
+		{
+			return Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\'));
 		}
 
 		private void Clear(bool ui_only)
@@ -559,6 +568,28 @@ namespace OGF_tool
 					OGF_Child chld = new OGF_Child( 0, 0, 0, shader.Length + texture.Length + 2, texture, shader);
 					chld.verts = xr_loader.ReadUInt32();
 					chld.faces = xr_loader.ReadUInt32() / 3;
+
+					for (int i = 0; i < chld.verts; i++)
+					{
+						SSkelVert Vert = new SSkelVert();
+						Vert.offs[0] = xr_loader.ReadFloat();
+						Vert.offs[1] = xr_loader.ReadFloat();
+						Vert.offs[2] = xr_loader.ReadFloat();
+
+						Vert.uv[0] = xr_loader.ReadFloat();
+						Vert.uv[1] = xr_loader.ReadFloat();
+						chld.Vertices.Add(Vert);
+					}
+
+					for (int i = 0; i < chld.faces; i++)
+					{
+						SSkelFace Face = new SSkelFace();
+						Face.v[0] = (ushort)xr_loader.ReadUInt16();
+						Face.v[1] = (ushort)xr_loader.ReadUInt16();
+						Face.v[2] = (ushort)xr_loader.ReadUInt16();
+						chld.Faces.Add(Face);
+					}
+
 					OGF_C.childs.Add(chld);
 					return true;
 				}
@@ -621,6 +652,130 @@ namespace OGF_tool
 					}
 				}
 
+				TriangleParser LoadTriangles = (loader, child) =>
+				{
+					if (loader.find_chunk((int)OGF.OGF4_VERTICES, false, true))
+					{
+						child.link_type = loader.ReadUInt32();
+						child.verts = loader.ReadUInt32();
+
+						uint temp_link = child.link_type;
+
+						if (temp_link >= 0x12071980)
+							temp_link /= 0x12071980;
+
+						for (int i = 0; i < child.verts; i++)
+						{
+							SSkelVert Vert = new SSkelVert();
+							switch (temp_link)
+							{
+								case 1:
+									Vert.offs[0] = loader.ReadFloat();
+									Vert.offs[1] = loader.ReadFloat();
+									Vert.offs[2] = loader.ReadFloat();
+
+									Vert.norm[0] = loader.ReadFloat();
+									Vert.norm[1] = loader.ReadFloat();
+									Vert.norm[2] = loader.ReadFloat();
+
+									Vert.tang[0] = loader.ReadFloat();
+									Vert.tang[1] = loader.ReadFloat();
+									Vert.tang[2] = loader.ReadFloat();
+
+									Vert.binorm[0] = loader.ReadFloat();
+									Vert.binorm[1] = loader.ReadFloat();
+									Vert.binorm[2] = loader.ReadFloat();
+
+									Vert.uv[0] = loader.ReadFloat();
+									Vert.uv[1] = loader.ReadFloat();
+
+									loader.ReadUInt32();
+									break;
+								case 2:
+									loader.ReadUInt16();
+									loader.ReadUInt16();
+
+									Vert.offs[0] = loader.ReadFloat();
+									Vert.offs[1] = loader.ReadFloat();
+									Vert.offs[2] = loader.ReadFloat();
+
+									Vert.norm[0] = loader.ReadFloat();
+									Vert.norm[1] = loader.ReadFloat();
+									Vert.norm[2] = loader.ReadFloat();
+
+									Vert.tang[0] = loader.ReadFloat();
+									Vert.tang[1] = loader.ReadFloat();
+									Vert.tang[2] = loader.ReadFloat();
+
+									Vert.binorm[0] = loader.ReadFloat();
+									Vert.binorm[1] = loader.ReadFloat();
+									Vert.binorm[2] = loader.ReadFloat();
+
+									loader.ReadFloat();
+
+									Vert.uv[0] = loader.ReadFloat();
+									Vert.uv[1] = loader.ReadFloat();
+									break;
+								case 3:
+								case 4:
+									loader.ReadUInt16();
+
+									Vert.offs[0] = loader.ReadFloat();
+									Vert.offs[1] = loader.ReadFloat();
+									Vert.offs[2] = loader.ReadFloat();
+
+									Vert.norm[0] = loader.ReadFloat();
+									Vert.norm[1] = loader.ReadFloat();
+									Vert.norm[2] = loader.ReadFloat();
+
+									Vert.tang[0] = loader.ReadFloat();
+									Vert.tang[1] = loader.ReadFloat();
+									Vert.tang[2] = loader.ReadFloat();
+
+									Vert.binorm[0] = loader.ReadFloat();
+									Vert.binorm[1] = loader.ReadFloat();
+									Vert.binorm[2] = loader.ReadFloat();
+
+									for (i = 0; i < temp_link - 1; ++i)
+									{
+										loader.ReadFloat();
+									}
+
+									Vert.uv[0] = loader.ReadFloat();
+									Vert.uv[1] = loader.ReadFloat();
+									break;
+								default:
+									Vert.offs[0] = loader.ReadFloat();
+									Vert.offs[1] = loader.ReadFloat();
+									Vert.offs[2] = loader.ReadFloat();
+
+									Vert.norm[0] = loader.ReadFloat();
+									Vert.norm[1] = loader.ReadFloat();
+									Vert.norm[2] = loader.ReadFloat();
+
+									Vert.uv[0] = loader.ReadFloat();
+									Vert.uv[1] = loader.ReadFloat();
+									break;
+							}
+							child.Vertices.Add(Vert);
+						}
+					}
+
+					if (loader.find_chunk((int)OGF.OGF4_INDICES, false, true))
+					{
+						child.faces = loader.ReadUInt32() / 3;
+
+						for (uint i = 0; i < child.faces; i++)
+						{
+							SSkelFace Face = new SSkelFace();
+							Face.v[0] = (ushort)loader.ReadUInt16();
+							Face.v[1] = (ushort)loader.ReadUInt16();
+							Face.v[2] = (ushort)loader.ReadUInt16();
+							child.Faces.Add(Face);
+						}
+					}
+				};
+
 				bool bFindChunk = xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_CHILDREN, false, true));
 
 				OGF_C.pos = xr_loader.chunk_pos;
@@ -647,16 +802,7 @@ namespace OGF_tool
 
 						OGF_Child chld = new OGF_Child(xr_loader.chunk_pos + pos, pos - 8, chunk_size,(int)size, xr_loader.read_stringZ(), xr_loader.read_stringZ());
 
-						if (xr_loader.find_chunk((int)OGF.OGF4_VERTICES, false, true))
-						{
-							chld.link_type = xr_loader.ReadUInt32();
-							chld.verts = xr_loader.ReadUInt32();
-						}
-
-						if (xr_loader.find_chunk((int)OGF.OGF4_INDICES, false, true))
-						{
-							chld.faces = xr_loader.ReadUInt32() / 3;
-						}
+						LoadTriangles(xr_loader, chld);
 
 						OGF_C.childs.Add(chld);
 
@@ -672,16 +818,7 @@ namespace OGF_tool
 					{
 						OGF_Child chld = new OGF_Child(0, 0, 0, (int)size, xr_loader.read_stringZ(), xr_loader.read_stringZ());
 
-						if (xr_loader.find_chunk((int)OGF.OGF4_VERTICES, false, true))
-						{
-							xr_loader.ReadUInt32();
-							chld.verts = xr_loader.ReadUInt32();
-						}
-
-						if (xr_loader.find_chunk((int)OGF.OGF4_INDICES, false, true))
-						{
-							chld.faces = xr_loader.ReadUInt32() / 3;
-						}
+						LoadTriangles(xr_loader, chld);
 
 						OGF_C.childs.Add(chld);
 					}
@@ -920,6 +1057,116 @@ namespace OGF_tool
 			return true;
 		}
 
+
+		private void SaveAsObj(string filename)
+		{
+			using (StreamWriter writer = File.CreateText(filename))
+			{
+				uint v_offs = 0;
+				uint childs = 0;
+
+				string mtl_name = Path.ChangeExtension(filename, ".mtl");
+				SaveMtl(mtl_name);
+
+				writer.WriteLine("# This file uses meters as units for non-parametric coordinates.");
+				writer.WriteLine("mtllib " + Path.GetFileName(mtl_name));
+				foreach (var ch in OGF_V.childs)
+				{
+					if (ch.to_delete) continue;
+
+					writer.WriteLine("g " + childs.ToString());
+					writer.WriteLine("usemtl " + Path.GetFileName(ch.m_texture));
+					childs++;
+
+					for (int i = 0; i < ch.verts; i++)
+                    {
+						writer.WriteLine("v " + vPUSH(transform_tiny_Z(ch.Vertices[i].offs)));
+					}
+
+					for (int i = 0; i < ch.verts; i++)
+					{
+						float x = ch.Vertices[i].uv[0];
+						float y = Math.Abs(1.0f - ch.Vertices[i].uv[1]);
+						writer.WriteLine("vt " + x.ToString("0.000000") + " " + y.ToString("0.000000"));
+					}
+
+					for (int i = 0; i < ch.verts; i++)
+					{
+						writer.WriteLine("vn " + vPUSH(transform_dir_Z(ch.Vertices[i].norm)));
+					}
+
+					for (int i = 0; i < ch.verts; i++)
+					{
+						writer.WriteLine("vg "+ vPUSH(transform_dir_Z(ch.Vertices[i].tang)));
+					}
+
+					for (int i = 0; i < ch.verts; i++)
+					{
+						writer.WriteLine("vb "+ vPUSH(transform_dir_Z(ch.Vertices[i].binorm)));
+					}
+
+					foreach (var f_it in ch.Faces)
+					{
+						string tmp = "f " + (v_offs+f_it.v[2]+1).ToString() + "/" + (v_offs+f_it.v[2]+1).ToString() + "/" + (v_offs+f_it.v[2]+1).ToString() + " " + (v_offs+f_it.v[1]+1).ToString() + "/" + (v_offs+f_it.v[1]+1).ToString() + "/" + (v_offs+f_it.v[1]+1).ToString() + " " + (v_offs+f_it.v[0]+1).ToString() + "/" + (v_offs+f_it.v[0]+1).ToString() + "/" + (v_offs+f_it.v[0]+1).ToString();
+						writer.WriteLine(tmp);
+					}
+					v_offs += (uint)ch.verts;
+				}
+				writer.Close();
+			}
+		}
+
+		private void SaveMtl(string filename)
+        {
+			using (StreamWriter writer = File.CreateText(filename))
+			{
+				foreach (var ch in OGF_V.childs)
+				{
+					if (ch.to_delete) continue;
+
+					writer.WriteLine("newmtl " + Path.GetFileName(ch.m_texture));
+					writer.WriteLine("Ka  0 0 0");
+					writer.WriteLine("Kd  1 1 1");
+					writer.WriteLine("Ks  0 0 0");
+					writer.WriteLine("map_Kd " + Path.GetFileName(ch.m_texture) + ".png\n");
+				}
+				writer.Close();
+			}
+		}
+
+		private float[] transform_tiny_Z(float[] vec)
+        {
+			float[] dest = new float[3];
+			dest[0] = vec[0];
+			dest[1] = vec[1];
+			dest[2] = vec[2] * -1.0f;
+			return dest;
+		}
+
+		private float[] transform_dir_Z(float[] vec)
+		{
+			float[] dest = new float[3];
+			dest[0] = vec[0];
+			dest[1] = vec[1];
+			dest[2] = vec[2] * -1.0f;
+			return dest;
+		}
+
+		private string vPUSH(float[] vec)
+        {
+			return vec[0].ToString("0.000000") + " " + vec[1].ToString("0.000000") + " " + vec[2].ToString("0.000000");
+        }
+
+		private byte[] w_string(string str)
+		{
+			List<byte> temp = new List<byte>();
+
+			temp.AddRange(Encoding.Default.GetBytes(str));
+			temp.Add(0);
+
+			return temp.ToArray();
+		}
+
 		private void TextBoxKeyDown(object sender, KeyEventArgs e)
 		{
 			bKeyIsDown = true;
@@ -1024,7 +1271,6 @@ namespace OGF_tool
 			{
 				case "boneBox":
 					{
-						string old_name = OGF_V.bones.bone_names[idx];
 						OGF_V.bones.bone_names[idx] = curBox.Text;
 
 						for (int i = 0; i < OGF_V.bones.parent_bone_names.Count; i++)
@@ -1243,6 +1489,8 @@ namespace OGF_tool
 					fileStream.Write(Current_OMF, 0, Current_OMF.Length);
 				}
 			}
+			else if (format == 6)
+				SaveAsObj(filename);
 			if (!has_msg)
 				AutoClosingMessageBox.Show(OGF_V.BrokenType > 0 ? "Repaired and Exported!" : "Exported!", "", OGF_V.BrokenType > 0 ? 700 : 500, MessageBoxIcon.Information);
 		}
@@ -1271,6 +1519,15 @@ namespace OGF_tool
 			{
 				SaveTools(SaveOmfDialog.FileName, 5);
 				SaveOmfDialog.InitialDirectory = "";
+			}
+		}
+
+		private void objToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (SaveObjDialog.ShowDialog() == DialogResult.OK)
+			{
+				SaveTools(SaveObjDialog.FileName, 6);
+				SaveObjDialog.InitialDirectory = "";
 			}
 		}
 
@@ -1596,7 +1853,7 @@ namespace OGF_tool
 
 					foreach (var ch in OGF_V.childs)
 					{
-						if (ch.link_type >= 100)
+						if (ch.link_type > 0x12071980)
 							ch.link_type /= 0x12071980;
 					}
 				}
@@ -1606,7 +1863,7 @@ namespace OGF_tool
 
 					foreach (var ch in OGF_V.childs)
 					{
-						if (ch.link_type >= 100)
+						if (ch.link_type >= 0x12071980)
 							links = Math.Max(links, ch.link_type / 0x12071980);
 						else
 							links = Math.Max(links, ch.link_type);
@@ -1668,7 +1925,7 @@ namespace OGF_tool
 
 					foreach (var ch in OGF_V.childs)
 					{
-						if (ch.link_type < 100)
+						if (ch.link_type < 0x12071980)
 							ch.link_type *= 0x12071980;
 					}
 				}
@@ -1709,7 +1966,7 @@ namespace OGF_tool
 			foreach (var ch in OGF_V.childs)
 				links = Math.Max(links, ch.link_type);
 
-			OGF_V.IsCopModel = (IsTextCorrect(MotionRefsBox.Text) && OGF_V.motion_refs != null && !OGF_V.motion_refs.soc || !IsTextCorrect(MotionRefsBox.Text)) && links <= 100;
+			OGF_V.IsCopModel = (IsTextCorrect(MotionRefsBox.Text) && OGF_V.motion_refs != null && !OGF_V.motion_refs.soc || !IsTextCorrect(MotionRefsBox.Text)) && links < 0x12071980;
 
 			CurrentFormat.Text = "Model Format: " + (OGF_V.IsCopModel ? "CoP" : "SoC");
 		}

@@ -26,7 +26,7 @@ namespace OGF_tool
             {
                 if (ch.to_delete) continue;
 
-                if (ch.link_type >= 100)
+                if (ch.link_type >= 0x12071980)
                     links = Math.Max(links, ch.link_type / 0x12071980);
                 else
                 {

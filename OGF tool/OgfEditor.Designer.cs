@@ -87,6 +87,7 @@ namespace OGF_tool
             this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.objectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bonesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.objToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.omfToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sklToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sklsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -116,6 +117,7 @@ namespace OGF_tool
             this.SaveBonesDialog = new System.Windows.Forms.SaveFileDialog();
             this.SaveObjectDialog = new System.Windows.Forms.SaveFileDialog();
             this.LabelBroken = new System.Windows.Forms.Label();
+            this.SaveObjDialog = new System.Windows.Forms.SaveFileDialog();
             this.TabControl.SuspendLayout();
             this.TexturesPage.SuspendLayout();
             this.TexturesGropuBox.SuspendLayout();
