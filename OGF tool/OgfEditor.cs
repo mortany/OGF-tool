@@ -361,9 +361,7 @@ namespace OGF_tool
 						file_bytes.Add(0);
 				}
 				else
-                {
 					file_bytes.AddRange(temp);
-				}
 
 				uint last_child_size = 0;
 				if (OGF_V.description != null)
@@ -393,10 +391,11 @@ namespace OGF_tool
 					{
 						temp = fileStream.ReadBytes((int)(ch.parent_pos - fileStream.BaseStream.Position));
 						file_bytes.AddRange(temp);
+
 						fileStream.ReadUInt32();
-						new_size = fileStream.ReadUInt32();
+						last_child_size = new_size = fileStream.ReadUInt32();
 						new_size += ch.NewSize();
-						last_child_size = new_size;
+
 						file_bytes.AddRange(BitConverter.GetBytes(ch.parent_id));
 						file_bytes.AddRange(BitConverter.GetBytes(new_size));
 
@@ -404,8 +403,15 @@ namespace OGF_tool
 						temp = fileStream.ReadBytes((int)(ch.pos - fileStream.BaseStream.Position));
 						file_bytes.AddRange(temp);
 						file_bytes.AddRange(ch.data());
+
 						last_child_size -= (uint)(ch.old_size + 8);
 						fileStream.BaseStream.Position += ch.old_size + 8;
+
+                        temp = fileStream.ReadBytes(8);
+                        file_bytes.AddRange(temp);
+                        fileStream.ReadUInt32();
+                        file_bytes.AddRange(BitConverter.GetBytes(ch.link_type));
+						last_child_size -= 12;
 					}
 				}
 				else
@@ -416,16 +422,8 @@ namespace OGF_tool
 
 				if (OGF_V.IsSkeleton())
                 {
-                    if (OGF_V.BrokenType != 0 || OGF_V.bones.pos == 0)
-                    {
-                        temp = fileStream.ReadBytes((int)(last_child_size));
-                        file_bytes.AddRange(temp);
-                    }
-                    else
-                    {
-                        temp = fileStream.ReadBytes((int)(OGF_V.bones.pos - fileStream.BaseStream.Position));
-                        file_bytes.AddRange(temp);
-                    }
+                    temp = fileStream.ReadBytes((int)(last_child_size));
+                    file_bytes.AddRange(temp);
 
 					file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_BONE_NAMES));
 					file_bytes.AddRange(BitConverter.GetBytes(OGF_V.bones.chunk_size()));
@@ -628,6 +626,10 @@ namespace OGF_tool
 						if (size == 0) break;
 
 						OGF_Child chld = new OGF_Child(xr_loader.chunk_pos + pos, id, pos - 8, (int)size, xr_loader.read_stringZ(), xr_loader.read_stringZ());
+
+						if (xr_loader.find_chunk((int)OGF.OGF4_VERTICES))
+							chld.link_type = xr_loader.ReadUInt32();
+
 						OGF_C.childs.Add(chld);
 
 						id++;
@@ -1477,9 +1479,94 @@ namespace OGF_tool
 
 		private void ChangeRefsFormat(object sender, EventArgs e)
 		{
-			if (IsTextCorrect(MotionRefsBox.Text) && OGF_V != null && OGF_V.motion_refs != null)
+			if (OGF_V != null)
 			{
-				OGF_V.motion_refs.soc = !OGF_V.motion_refs.soc;
+				OGF_V.IsCopModel = !OGF_V.IsCopModel;
+
+				if (OGF_V.IsCopModel)
+                {
+					if (OGF_V.motion_refs != null)
+						OGF_V.motion_refs.soc = false;
+
+					foreach (var ch in OGF_V.childs)
+					{
+						if (ch.link_type >= 100)
+							ch.link_type /= 0x12071980;
+					}
+				}
+				else
+                {
+					uint links = 0;
+
+					foreach (var ch in OGF_V.childs)
+					{
+						if (ch.link_type >= 100)
+							links = Math.Max(links, ch.link_type / 0x12071980);
+						else
+							links = Math.Max(links, ch.link_type);
+					}
+
+					if (links > 2)
+                    {
+						MessageBox.Show("Can't convert to SoC. Model has more than 2 links!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+						OGF_V.IsCopModel = !OGF_V.IsCopModel;
+						return;
+					}
+
+					if (Current_OMF != null)
+					{
+						var xr_loader = new XRayLoader();
+						using (var fileStream = new BinaryReader(new MemoryStream(Current_OMF)))
+						{
+							xr_loader.SetStream(fileStream.BaseStream);
+
+							if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_S_MOTIONS, false, true)))
+							{
+								int id = 0;
+
+								while (true)
+								{
+									if (!xr_loader.find_chunk(id)) break;
+
+									Stream temp = xr_loader.reader.BaseStream;
+
+									if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk(id, false, true))) break;
+
+									if (id == 0)
+										xr_loader.ReadUInt32();
+									else
+									{
+										xr_loader.read_stringZ();
+										xr_loader.ReadUInt32();
+										byte flags = xr_loader.ReadByte();
+
+										bool key16bit = (flags & (byte)MotionKeyFlags.flTKey16IsBit) == (byte)MotionKeyFlags.flTKey16IsBit;
+										bool keynocompressbit = (flags & (byte)MotionKeyFlags.flTKeyFFT_Bit) == (byte)MotionKeyFlags.flTKeyFFT_Bit;
+
+										if (key16bit || keynocompressbit)
+                                        {
+											MessageBox.Show("Build-in motions are in " + (keynocompressbit ? "no compression" : "16 bit compression") + " format, not supported in SoC.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+											break;
+										}
+									}
+
+									id++;
+									xr_loader.SetStream(temp);
+								}
+							}
+						}
+					}
+
+					if (OGF_V.motion_refs != null)
+						OGF_V.motion_refs.soc = true;
+
+					foreach (var ch in OGF_V.childs)
+					{
+						if (ch.link_type < 100)
+							ch.link_type *= 0x12071980;
+					}
+				}
+
 				UpdateModelFormat();
 			}
 		}
@@ -1503,15 +1590,22 @@ namespace OGF_tool
 
 		private void UpdateModelFormat()
 		{
-			CurrentFormat.Enabled = IsTextCorrect(MotionRefsBox.Text);
+			CurrentFormat.Enabled = (OGF_V != null && !OGF_V.IsDM && OGF_V.IsSkeleton());
 
-			if (OGF_V == null || OGF_V.motion_refs == null)
+			if (!CurrentFormat.Enabled)
 			{
 				CurrentFormat.Text = "Model Format: All";
 				return;
 			}
 
-			CurrentFormat.Text = "Model Format: " + (IsTextCorrect(MotionRefsBox.Text) ? (OGF_V.motion_refs.soc ? "SoC" : "CoP") : "All");
+			uint links = 0;
+
+			foreach (var ch in OGF_V.childs)
+				links = Math.Max(links, ch.link_type);
+
+			OGF_V.IsCopModel = (IsTextCorrect(MotionRefsBox.Text) && OGF_V.motion_refs != null && !OGF_V.motion_refs.soc || !IsTextCorrect(MotionRefsBox.Text)) && links <= 100;
+
+			CurrentFormat.Text = "Model Format: " + (OGF_V.IsCopModel ? "CoP" : "SoC");
 		}
 
 		private void editImOMFEditorToolStripMenuItem_Click(object sender, EventArgs e)

@@ -99,6 +99,7 @@ namespace OGF_tool
             this.importDataFromModelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.OgfInfo = new System.Windows.Forms.ToolStripMenuItem();
             this.View = new System.Windows.Forms.ToolStripMenuItem();
+            this.CurrentFormat = new System.Windows.Forms.ToolStripMenuItem();
             this.FileLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.StatusFile = new System.Windows.Forms.ToolStripStatusLabel();
             this.StatusPanel = new System.Windows.Forms.StatusStrip();
@@ -112,7 +113,6 @@ namespace OGF_tool
             this.SaveBonesDialog = new System.Windows.Forms.SaveFileDialog();
             this.SaveObjectDialog = new System.Windows.Forms.SaveFileDialog();
             this.LabelBroken = new System.Windows.Forms.Label();
-            this.CurrentFormat = new System.Windows.Forms.ToolStripMenuItem();
             this.TabControl.SuspendLayout();
             this.TexturesPage.SuspendLayout();
             this.TexturesGropuBox.SuspendLayout();
@@ -177,7 +177,7 @@ namespace OGF_tool
             this.TexturesGropuBox.Controls.Add(this.TexturesTextBoxEx);
             this.TexturesGropuBox.Location = new System.Drawing.Point(3, 3);
             this.TexturesGropuBox.Name = "TexturesGropuBox";
-            this.TexturesGropuBox.Size = new System.Drawing.Size(425, 110);
+            this.TexturesGropuBox.Size = new System.Drawing.Size(425, 107);
             this.TexturesGropuBox.TabIndex = 0;
             this.TexturesGropuBox.TabStop = false;
             this.TexturesGropuBox.Text = "TexturesBoxExample";
@@ -185,7 +185,7 @@ namespace OGF_tool
             // ShaderNameLabelEx
             // 
             this.ShaderNameLabelEx.AutoSize = true;
-            this.ShaderNameLabelEx.Location = new System.Drawing.Point(3, 68);
+            this.ShaderNameLabelEx.Location = new System.Drawing.Point(3, 62);
             this.ShaderNameLabelEx.Name = "ShaderNameLabelEx";
             this.ShaderNameLabelEx.Size = new System.Drawing.Size(75, 13);
             this.ShaderNameLabelEx.TabIndex = 3;
@@ -204,7 +204,7 @@ namespace OGF_tool
             // 
             this.ShaderTextBoxEx.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.ShaderTextBoxEx.Location = new System.Drawing.Point(6, 84);
+            this.ShaderTextBoxEx.Location = new System.Drawing.Point(6, 78);
             this.ShaderTextBoxEx.Name = "ShaderTextBoxEx";
             this.ShaderTextBoxEx.Size = new System.Drawing.Size(413, 20);
             this.ShaderTextBoxEx.TabIndex = 1;
@@ -655,7 +655,7 @@ namespace OGF_tool
             this.CurrentFormat});
             this.MenuPanel.Location = new System.Drawing.Point(0, 4);
             this.MenuPanel.Name = "MenuPanel";
-            this.MenuPanel.Size = new System.Drawing.Size(418, 24);
+            this.MenuPanel.Size = new System.Drawing.Size(298, 24);
             this.MenuPanel.TabIndex = 8;
             this.MenuPanel.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             // 
@@ -791,21 +791,21 @@ namespace OGF_tool
             // deleteMotionsToolStripMenuItem
             // 
             this.deleteMotionsToolStripMenuItem.Name = "deleteMotionsToolStripMenuItem";
-            this.deleteMotionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteMotionsToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.deleteMotionsToolStripMenuItem.Text = "Delete motions";
             this.deleteMotionsToolStripMenuItem.Click += new System.EventHandler(this.deleteChunkToolStripMenuItem_Click);
             // 
             // editInOMFEditorToolStripMenuItem
             // 
             this.editInOMFEditorToolStripMenuItem.Name = "editInOMFEditorToolStripMenuItem";
-            this.editInOMFEditorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.editInOMFEditorToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.editInOMFEditorToolStripMenuItem.Text = "Edit in OMF Editor";
             this.editInOMFEditorToolStripMenuItem.Click += new System.EventHandler(this.editImOMFEditorToolStripMenuItem_Click);
             // 
             // replaceMotionsToolStripMenuItem1
             // 
             this.replaceMotionsToolStripMenuItem1.Name = "replaceMotionsToolStripMenuItem1";
-            this.replaceMotionsToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.replaceMotionsToolStripMenuItem1.Size = new System.Drawing.Size(170, 22);
             this.replaceMotionsToolStripMenuItem1.Text = "Replace motions";
             this.replaceMotionsToolStripMenuItem1.Click += new System.EventHandler(this.AppendOMFButton_Click);
             // 
@@ -829,6 +829,13 @@ namespace OGF_tool
             this.View.Size = new System.Drawing.Size(44, 20);
             this.View.Text = "View";
             this.View.Click += new System.EventHandler(this.viewToolStripMenuItem_Click);
+            // 
+            // CurrentFormat
+            // 
+            this.CurrentFormat.Name = "CurrentFormat";
+            this.CurrentFormat.Size = new System.Drawing.Size(97, 20);
+            this.CurrentFormat.Text = "Model Format:";
+            this.CurrentFormat.Click += new System.EventHandler(this.ChangeRefsFormat);
             // 
             // FileLabel
             // 
@@ -908,13 +915,6 @@ namespace OGF_tool
             this.LabelBroken.Size = new System.Drawing.Size(67, 13);
             this.LabelBroken.TabIndex = 32;
             this.LabelBroken.Text = "Broken type:";
-            // 
-            // CurrentFormat
-            // 
-            this.CurrentFormat.Name = "CurrentFormat";
-            this.CurrentFormat.Size = new System.Drawing.Size(97, 20);
-            this.CurrentFormat.Text = "Model Format:";
-            this.CurrentFormat.Click += new System.EventHandler(this.ChangeRefsFormat);
             // 
             // OGF_Editor
             // 

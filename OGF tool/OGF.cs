@@ -34,6 +34,24 @@ namespace OGF_tool
         OGF4_COLLISION_VERTICES = 25,
         OGF4_COLLISION_INDICES = 26,
     };
+
+    public enum OGF_SkeletonVertType
+    {
+        OGF_VERTEXFORMAT_FVF_1L = 1*0x12071980,
+        OGF_VERTEXFORMAT_FVF_2L = 2*0x12071980,
+        OGF_VERTEXFORMAT_FVF_3L = 4*0x12071980,
+        OGF_VERTEXFORMAT_FVF_4L = 5*0x12071980,
+        OGF_VERTEXFORMAT_FVF_NL = 3*0x12071980,
+    };
+
+    public enum MotionKeyFlags
+    {
+        flTKeyPresent = (1<<0),
+        flRKeyAbsent  = (1<<1),
+        flTKey16IsBit = (1<<2),
+        flTKeyFFT_Bit = (1<<3),
+    };
+
     public class XRayLoader
     {
         public long chunk_pos = 0;
@@ -240,6 +258,7 @@ namespace OGF_tool
         public byte m_model_type; // 1 - Without bones, 3 - Animated, 10 - Rigid
         public bool IsDM;
         public uint BrokenType;
+        public bool IsCopModel;
 
         public Description description;
         public List<OGF_Child> childs;
@@ -269,6 +288,7 @@ namespace OGF_tool
             this.userdata = null;
             this.lod = null;
             this.motion_refs = null;
+            this.IsCopModel = false;
         }
 
         public bool IsSkeleton()
@@ -622,7 +642,6 @@ namespace OGF_tool
     public class OGF_Child
     {
         public string m_texture;
-
         public string m_shader;
 
         public OGF_Child(long _pos, int _parent_id, long _parent_pos, int _old_size, string texture, string shader)
@@ -633,12 +652,14 @@ namespace OGF_tool
             m_texture = texture;
             m_shader = shader;
             old_size = _old_size;
+            link_type = 0;
         }
 
         public long pos;
 
         public long parent_pos;
         public int parent_id;
+        public uint link_type;
 
         public int old_size;
 
