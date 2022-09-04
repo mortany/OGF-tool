@@ -1876,7 +1876,8 @@ namespace OGF_tool
 			GroupBox.Size = TexturesGropuBox.Size;
 			GroupBox.Text = "Mesh: [" + idx + "]";
 			GroupBox.Name = "TextureGrpBox_" + idx;
-			GroupBox.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
+			GroupBox.Anchor = TexturesGropuBox.Anchor;
+			GroupBox.Dock = TexturesGropuBox.Dock;
 			CreateTextureBoxes(idx, GroupBox);
 			CreateTextureLabels(idx, GroupBox);
 			TexturesPage.Controls.Add(GroupBox);
@@ -1952,7 +1953,8 @@ namespace OGF_tool
 			GroupBox.Size = BoneParamsGroupBox.Size;
 			GroupBox.Text = "Bone id: [" + idx + "]";
 			GroupBox.Name = "BoneGrpBox_" + idx;
-			GroupBox.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
+			GroupBox.Anchor = BoneParamsGroupBox.Anchor;
+			GroupBox.Dock = BoneParamsGroupBox.Dock;
 
 			CreateBoneTextBox(idx, GroupBox, bone_name, parent_bone_name, material, mass, center, pos, rot);
 			BoneParamsPage.Controls.Add(GroupBox);
