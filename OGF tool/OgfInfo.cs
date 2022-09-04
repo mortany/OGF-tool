@@ -35,7 +35,7 @@ namespace OGF_tool
                 }
 
                 verts += ch.verts;
-                faces = ch.faces;
+                faces += ch.faces;
             }
 
             OgfVersLabel.Text = OGF.m_version.ToString();

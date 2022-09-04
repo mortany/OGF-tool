@@ -397,6 +397,7 @@
             this.Controls.Add(this.CreatorTextBox);
             this.Controls.Add(this.ConverterTextBox);
             this.Controls.Add(this.SourceTextBox);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(500, 323);
