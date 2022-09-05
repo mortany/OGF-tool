@@ -30,6 +30,7 @@ namespace OGF_tool
 		// Input
 		public bool bKeyIsDown = false;
 		string number_mask = "";
+		Size DefaultSize;
 
 		[DllImport("converter.dll")]
 		private static extern int CSharpStartAgent(string path, string out_path, int mode, int convert_to_mode, string motion_list);
@@ -51,6 +52,8 @@ namespace OGF_tool
 		public OGF_Editor()
 		{
 			InitializeComponent();
+
+			DefaultSize = Size;
 
 			number_mask = @"^-[0-9.]*$";
 			System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
@@ -113,6 +116,9 @@ namespace OGF_tool
 
 		private void AfterLoad(bool main_file)
 		{
+			Size OldSize = Size;
+			Size = DefaultSize;
+
 			if (main_file)
 			{
 				StatusFile.Text = FILE_NAME.Substring(FILE_NAME.LastIndexOf('\\') + 1);
@@ -265,6 +271,8 @@ namespace OGF_tool
 			}
 
 			UpdateModelFormat();
+
+			Size = OldSize;
 		}
 
 		private void CopyParams()
