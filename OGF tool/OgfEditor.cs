@@ -32,6 +32,35 @@ namespace OGF_tool
 		string number_mask = "";
 		Size DefaultSize;
 
+		Process ViewerProcess = new Process();
+		public bool ViewerWorking = false;
+		public Thread ViewerThread = null;
+
+		const int GWL_STYLE = -16;
+		const int WS_CAPTION = 0x00C00000;
+		const int WS_THICKFRAME = 0x00040000;
+		const int SWP_NOACTIVATE = 0x0010;
+		const int SWP_NOZORDER = 0x0004;
+
+		[DllImport("user32.dll")]
+		private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+		[DllImport("user32.dll", SetLastError = true)]
+		private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+		[DllImport("user32")]
+		private static extern IntPtr SetParent(IntPtr hWnd, IntPtr hWndParent);
+
+		[DllImport("user32")]
+		private static extern bool SetWindowPos(
+		  IntPtr hWnd,
+		  IntPtr hWndInsertAfter,
+		  int X,
+		  int Y,
+		  int cx,
+		  int cy,
+		  int uFlags);
+
 		[DllImport("converter.dll")]
 		private static extern int CSharpStartAgent(string path, string out_path, int mode, int convert_to_mode, string motion_list);
 
@@ -59,7 +88,6 @@ namespace OGF_tool
 			System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
 			OgfInfo.Enabled = false;
-			View.Enabled = false;
 			SaveMenuParam.Enabled = false;
 			saveAsToolStripMenuItem.Enabled = false;
 			motionToolsToolStripMenuItem.Enabled = false;
@@ -87,13 +115,26 @@ namespace OGF_tool
 				TabControl.Controls.Clear();
 			}
 
-			if (Directory.Exists(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp"))
-				Directory.Delete(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp", true);
+			if (!Directory.Exists(TempFolder()))
+				Directory.CreateDirectory(TempFolder());
 		}
 
 		public string AppPath()
 		{
 			return Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\'));
+		}
+
+		public string TempFolder(bool check = true)
+		{
+			if (check)
+				CheckTempFolder();
+			return Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp";
+		}
+
+		public void CheckTempFolder()
+		{
+			if (!Directory.Exists(TempFolder(false)))
+				Directory.CreateDirectory(TempFolder(false));
 		}
 
 		private void Clear(bool ui_only)
@@ -129,7 +170,6 @@ namespace OGF_tool
 				ToolsMenuItem.Enabled = !OGF_V.IsDM;
 				OgfInfo.Enabled = !OGF_V.IsDM;
 				openSkeletonInObjectEditorToolStripMenuItem.Enabled = OGF_V.IsSkeleton();
-				View.Enabled = OGF_V.IsSkeleton();
 				exportToolStripMenuItem.Enabled = true;
 				bonesToolStripMenuItem.Enabled = OGF_V.IsSkeleton();
 				omfToolStripMenuItem.Enabled = Current_OMF != null;
@@ -271,6 +311,9 @@ namespace OGF_tool
 			}
 
 			UpdateModelFormat();
+
+			// View
+			TabControl.Controls.Add(ViewPage);
 
 			Size = OldSize;
 		}
@@ -1301,20 +1344,6 @@ namespace OGF_tool
 			}
 		}
 
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
-        {
-			if (e.Control && e.KeyCode == Keys.S)
-				saveToolStripMenuItem_Click(null, null);
-
-			switch (e.KeyData)
-			{
-				case Keys.F3: reloadToolStripMenuItem_Click(null, null); break;
-				case Keys.F4: loadToolStripMenuItem_Click(null, null); break;
-				case Keys.F5: saveToolStripMenuItem_Click(null, null); break;
-				case Keys.F6: saveAsToolStripMenuItem_Click(null, null); break;
-			}
-		}
-
         private void oGFInfoToolStripMenuItem_Click(object sender, EventArgs e)
         {
 			System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("ru-RU");
@@ -1387,7 +1416,7 @@ namespace OGF_tool
 			}
 		}
 
-		private void SaveTools(string filename, int format)
+		private void SaveTools(string filename, int format, bool silent = false)
 		{
 			bool has_msg = false;
 
@@ -1407,7 +1436,6 @@ namespace OGF_tool
 
 				CopyParams();
 				SaveFile(filename);
-				AutoClosingMessageBox.Show(OGF_V.BrokenType > 0 ? "Repaired and Saved!" : "Saved!", "", OGF_V.BrokenType > 0 ? 700 : 500, MessageBoxIcon.Information);
 				has_msg = true;
 			}
 			else if (format == 1)
@@ -1452,7 +1480,7 @@ namespace OGF_tool
 			}
 			else if (format == 6)
 				SaveAsObj(filename);
-			if (!has_msg)
+			if (!has_msg && !silent)
 				AutoClosingMessageBox.Show(OGF_V.BrokenType > 0 ? "Repaired and Exported!" : "Exported!", "", OGF_V.BrokenType > 0 ? 700 : 500, MessageBoxIcon.Information);
 		}
 
@@ -1514,22 +1542,6 @@ namespace OGF_tool
         {
 			if (MessageBox.Show("Are you sure you want to exit?", "OGF Editor", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
 				Close();
-		}
-
-        private void viewToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-			string exe_path = Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\OGFViewer.exe";
-			if (File.Exists(exe_path))
-			{
-				System.Diagnostics.Process p = new System.Diagnostics.Process();
-				p.StartInfo.FileName = exe_path;
-				p.StartInfo.Arguments += FILE_NAME;
-				p.Start();
-			}
-			else
-            {
-				MessageBox.Show("Can't find OGFViewer.exe in program folder.\nDownload OGF Viewer 1.0.2 or later!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-			}
 		}
 
         private void CreateUserdataButton_Click(object sender, EventArgs e)
@@ -1615,6 +1627,11 @@ namespace OGF_tool
 						{
 							CreateLodButton.Visible = true;
 						}
+						break;
+					}
+				case "ViewPage":
+					{
+						InitViewPort();
 						break;
 					}
 			}
@@ -1934,10 +1951,7 @@ namespace OGF_tool
 
 		private void editImOMFEditorToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (!Directory.Exists(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp"))
-				Directory.CreateDirectory(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp");
-
-			string Filename = Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + $"\\temp\\{StatusFile.Text}_temp.omf";
+			string Filename = TempFolder() + $"\\{StatusFile.Text}_temp.omf";
 			string OmfEditor = GetOmfEditorPath();
 
 			if (OmfEditor == null)
@@ -1962,17 +1976,11 @@ namespace OGF_tool
 			OpenOMFDialog.FileName = "";
 
 			File.Delete(Filename);
-
-			if (Directory.Exists(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp"))
-				Directory.Delete(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp", true);
 		}
 
 		private void openSkeletonInObjectEditorToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (!Directory.Exists(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp"))
-				Directory.CreateDirectory(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp");
-
-			string Filename = Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + $"\\temp\\{StatusFile.Text}_temp.ogf";
+			string Filename = TempFolder() + $"\\{StatusFile.Text}_temp.ogf";
 			string ObjectName = Filename.Substring(0, Filename.LastIndexOf('.'));
 			ObjectName = ObjectName.Substring(0, ObjectName.LastIndexOf('.')) + ".object";
 
@@ -1994,9 +2002,6 @@ namespace OGF_tool
             proc.StartInfo.Arguments += $"\"{ObjectName}\" skeleton_only \"{FILE_NAME}\"";
             proc.Start();
 			proc.WaitForExit();
-
-			if (Directory.Exists(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp"))
-                Directory.Delete(Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\temp", true);
         }
 
 		private string GetOmfEditorPath()
@@ -2086,7 +2091,72 @@ namespace OGF_tool
 			return ret_text;
 		}
 
+		private void ClosingForm(object sender, FormClosingEventArgs e)
+		{
+			if (Directory.Exists(TempFolder()))
+				Directory.Delete(TempFolder(), true);
+		}
+
 		// Interface
+		private void InitViewPort()
+        {
+			if (ViewerWorking) return;
+
+			if (ViewerThread != null && ViewerThread.ThreadState != System.Threading.ThreadState.Stopped)
+				ViewerThread.Abort();
+
+			ViewerThread = new Thread(() => {
+				string ObjName = TempFolder() + "\\" + Path.GetFileName(Path.ChangeExtension(FILE_NAME, ".obj"));
+				string exe_path = AppPath() + "\\f3d.exe";
+
+				if (!File.Exists(exe_path))
+				{
+					MessageBox.Show("Can't find Viewport module.\nPlease, reinstall the app.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					return;
+				}
+
+				if (ViewerWorking)
+				{
+					ViewerProcess.Kill();
+					ViewerProcess.Close();
+				}
+
+				string image_path = "";
+
+				bool first_load = true;
+
+				SaveTools(ObjName, 6, true);
+
+				ViewerProcess.StartInfo.FileName = exe_path;
+				ViewerProcess.StartInfo.Arguments = $"--input=\"{ObjName}\" --output=\"{image_path}\"" + (first_load ? " --filename" : "");
+				ViewerProcess.StartInfo.UseShellExecute = false;
+				ViewerProcess.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
+
+				ViewerProcess.Start();
+				ViewerWorking = true;
+
+				ViewerProcess.WaitForInputIdle();
+				this.Invoke((MethodInvoker)delegate ()
+				{
+					SetParent(ViewerProcess.MainWindowHandle, ViewPage.Handle);
+					int style = GetWindowLong(ViewerProcess.MainWindowHandle, GWL_STYLE);
+					style = style & ~WS_CAPTION & ~WS_THICKFRAME;
+					SetWindowLong(ViewerProcess.MainWindowHandle, GWL_STYLE, style);
+					ResizeEmbeddedApp(null, null);
+				});
+			});
+			ViewerThread.Start();
+		}
+
+		private void ResizeEmbeddedApp(object sender, EventArgs e)
+		{
+			if (ViewerProcess == null || !ViewerWorking)
+				return;
+			int width = ViewPage.Width;
+			int height = ViewPage.Height;
+			SetWindowPos(ViewerProcess.MainWindowHandle, IntPtr.Zero, 0, 0, width, height, SWP_NOACTIVATE | SWP_NOZORDER);
+		}
+
 		private void CreateTextureGroupBox(int idx)
 		{
 			var GroupBox = new GroupBox();

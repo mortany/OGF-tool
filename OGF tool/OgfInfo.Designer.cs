@@ -274,7 +274,7 @@
             // LinksTextLabel
             // 
             this.LinksTextLabel.AutoSize = true;
-            this.LinksTextLabel.Location = new System.Drawing.Point(199, 9);
+            this.LinksTextLabel.Location = new System.Drawing.Point(142, 9);
             this.LinksTextLabel.Name = "LinksTextLabel";
             this.LinksTextLabel.Size = new System.Drawing.Size(35, 13);
             this.LinksTextLabel.TabIndex = 27;
@@ -283,7 +283,7 @@
             // LinksLabel
             // 
             this.LinksLabel.AutoSize = true;
-            this.LinksLabel.Location = new System.Drawing.Point(235, 9);
+            this.LinksLabel.Location = new System.Drawing.Point(178, 9);
             this.LinksLabel.Name = "LinksLabel";
             this.LinksLabel.Size = new System.Drawing.Size(10, 13);
             this.LinksLabel.TabIndex = 28;
@@ -292,7 +292,7 @@
             // MotionRefsTypeTextLabel
             // 
             this.MotionRefsTypeTextLabel.AutoSize = true;
-            this.MotionRefsTypeTextLabel.Location = new System.Drawing.Point(12, 84);
+            this.MotionRefsTypeTextLabel.Location = new System.Drawing.Point(12, 59);
             this.MotionRefsTypeTextLabel.Name = "MotionRefsTypeTextLabel";
             this.MotionRefsTypeTextLabel.Size = new System.Drawing.Size(67, 13);
             this.MotionRefsTypeTextLabel.TabIndex = 29;
@@ -301,7 +301,7 @@
             // MotionRefsTypeLabel
             // 
             this.MotionRefsTypeLabel.AutoSize = true;
-            this.MotionRefsTypeLabel.Location = new System.Drawing.Point(77, 84);
+            this.MotionRefsTypeLabel.Location = new System.Drawing.Point(77, 59);
             this.MotionRefsTypeLabel.Name = "MotionRefsTypeLabel";
             this.MotionRefsTypeLabel.Size = new System.Drawing.Size(10, 13);
             this.MotionRefsTypeLabel.TabIndex = 30;
@@ -310,7 +310,7 @@
             // MotionsTextLabel
             // 
             this.MotionsTextLabel.AutoSize = true;
-            this.MotionsTextLabel.Location = new System.Drawing.Point(12, 59);
+            this.MotionsTextLabel.Location = new System.Drawing.Point(12, 84);
             this.MotionsTextLabel.Name = "MotionsTextLabel";
             this.MotionsTextLabel.Size = new System.Drawing.Size(47, 13);
             this.MotionsTextLabel.TabIndex = 31;
@@ -319,7 +319,7 @@
             // MotionsLabel
             // 
             this.MotionsLabel.AutoSize = true;
-            this.MotionsLabel.Location = new System.Drawing.Point(58, 59);
+            this.MotionsLabel.Location = new System.Drawing.Point(58, 84);
             this.MotionsLabel.Name = "MotionsLabel";
             this.MotionsLabel.Size = new System.Drawing.Size(10, 13);
             this.MotionsLabel.TabIndex = 32;
@@ -328,7 +328,7 @@
             // VertsLabel
             // 
             this.VertsLabel.AutoSize = true;
-            this.VertsLabel.Location = new System.Drawing.Point(235, 35);
+            this.VertsLabel.Location = new System.Drawing.Point(178, 35);
             this.VertsLabel.Name = "VertsLabel";
             this.VertsLabel.Size = new System.Drawing.Size(10, 13);
             this.VertsLabel.TabIndex = 34;
@@ -337,7 +337,7 @@
             // VertsTextLabel
             // 
             this.VertsTextLabel.AutoSize = true;
-            this.VertsTextLabel.Location = new System.Drawing.Point(199, 35);
+            this.VertsTextLabel.Location = new System.Drawing.Point(142, 35);
             this.VertsTextLabel.Name = "VertsTextLabel";
             this.VertsTextLabel.Size = new System.Drawing.Size(34, 13);
             this.VertsTextLabel.TabIndex = 33;
@@ -346,7 +346,7 @@
             // FacesLabel
             // 
             this.FacesLabel.AutoSize = true;
-            this.FacesLabel.Location = new System.Drawing.Point(235, 59);
+            this.FacesLabel.Location = new System.Drawing.Point(178, 59);
             this.FacesLabel.Name = "FacesLabel";
             this.FacesLabel.Size = new System.Drawing.Size(10, 13);
             this.FacesLabel.TabIndex = 36;
@@ -355,7 +355,7 @@
             // FacesTextLabel
             // 
             this.FacesTextLabel.AutoSize = true;
-            this.FacesTextLabel.Location = new System.Drawing.Point(199, 59);
+            this.FacesTextLabel.Location = new System.Drawing.Point(142, 59);
             this.FacesTextLabel.Name = "FacesTextLabel";
             this.FacesTextLabel.Size = new System.Drawing.Size(39, 13);
             this.FacesTextLabel.TabIndex = 35;
