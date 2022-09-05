@@ -505,13 +505,6 @@ namespace OGF_tool
         }
     }
 
-    public struct Fvector
-    {
-        public float x;
-        public float y;
-        public float z;
-    }
-
     public class IK_Data
     {
         public int old_size;
@@ -519,9 +512,9 @@ namespace OGF_tool
         public List<string> materials;
         public List<float> mass;
         public List<uint> version;
-        public List<Fvector> center_mass;
-        public List<Fvector> position;
-        public List<Fvector> rotation;
+        public List<float[]> center_mass;
+        public List<float[]> position;
+        public List<float[]> rotation;
         public List<List<byte[]>> bytes_1;
 
         public IK_Data()
@@ -530,9 +523,9 @@ namespace OGF_tool
             this.materials = new List<string>();
             this.mass = new List<float>();
             this.version = new List<uint>();
-            this.center_mass = new List<Fvector>();
-            this.position = new List<Fvector>();
-            this.rotation = new List<Fvector>();
+            this.center_mass = new List<float[]>();
+            this.position = new List<float[]>();
+            this.rotation = new List<float[]>();
             this.bytes_1 = new List<List<byte[]>>();
         }
 
@@ -577,19 +570,19 @@ namespace OGF_tool
                 for (int j = 0; j < bytes_1[i].Count; j++)
                     temp.AddRange(bytes_1[i][j]);
 
-                temp.AddRange(BitConverter.GetBytes(rotation[i].x));
-                temp.AddRange(BitConverter.GetBytes(rotation[i].y));
-                temp.AddRange(BitConverter.GetBytes(rotation[i].z));
+                temp.AddRange(BitConverter.GetBytes(rotation[i][0]));
+                temp.AddRange(BitConverter.GetBytes(rotation[i][1]));
+                temp.AddRange(BitConverter.GetBytes(rotation[i][2]));
 
-                temp.AddRange(BitConverter.GetBytes(position[i].x));
-                temp.AddRange(BitConverter.GetBytes(position[i].y));
-                temp.AddRange(BitConverter.GetBytes(position[i].z));
+                temp.AddRange(BitConverter.GetBytes(position[i][0]));
+                temp.AddRange(BitConverter.GetBytes(position[i][1]));
+                temp.AddRange(BitConverter.GetBytes(position[i][2]));
 
                 temp.AddRange(BitConverter.GetBytes(mass[i]));
 
-                temp.AddRange(BitConverter.GetBytes(center_mass[i].x));
-                temp.AddRange(BitConverter.GetBytes(center_mass[i].y));
-                temp.AddRange(BitConverter.GetBytes(center_mass[i].z));
+                temp.AddRange(BitConverter.GetBytes(center_mass[i][0]));
+                temp.AddRange(BitConverter.GetBytes(center_mass[i][1]));
+                temp.AddRange(BitConverter.GetBytes(center_mass[i][2]));
             }
 
             return temp.ToArray();

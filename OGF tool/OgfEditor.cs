@@ -931,22 +931,16 @@ namespace OGF_tool
 								}
 							}
 
-							Fvector rotation = new Fvector();
-							rotation.x = xr_loader.ReadFloat();
-							rotation.y = xr_loader.ReadFloat();
-							rotation.z = xr_loader.ReadFloat();
+							float[] rotation = new float[3];
+							rotation = xr_loader.ReadVector();
 
-							Fvector position = new Fvector();
-							position.x = xr_loader.ReadFloat();
-							position.y = xr_loader.ReadFloat();
-							position.z = xr_loader.ReadFloat();
+							float[] position = new float[3];
+							position = xr_loader.ReadVector();
 
 							float mass = xr_loader.ReadFloat();
 
-							Fvector center = new Fvector();
-							center.x = xr_loader.ReadFloat();
-							center.y = xr_loader.ReadFloat();
-							center.z = xr_loader.ReadFloat();
+							float[] center = new float[3];
+							center = xr_loader.ReadVector();
 
 							OGF_C.ikdata.old_size += 12 + 12 + 4 + 12;
 
@@ -1249,15 +1243,15 @@ namespace OGF_tool
 								switch (currentField)
 								{
 									case "MassBox": curBox.Text = OGF_V.ikdata.mass[idx].ToString(); break;
-									case "CenterBoxX": curBox.Text = OGF_V.ikdata.center_mass[idx].x.ToString(); break;
-									case "CenterBoxY": curBox.Text = OGF_V.ikdata.center_mass[idx].y.ToString(); break;
-									case "CenterBoxZ": curBox.Text = OGF_V.ikdata.center_mass[idx].z.ToString(); break;
-									case "PositionX": curBox.Text = OGF_V.ikdata.position[idx].x.ToString(); break;
-									case "PositionY": curBox.Text = OGF_V.ikdata.position[idx].y.ToString(); break;
-									case "PositionZ": curBox.Text = OGF_V.ikdata.position[idx].z.ToString(); break;
-									case "RotationX": curBox.Text = OGF_V.ikdata.rotation[idx].x.ToString(); break;
-									case "RotationY": curBox.Text = OGF_V.ikdata.rotation[idx].y.ToString(); break;
-									case "RotationZ": curBox.Text = OGF_V.ikdata.rotation[idx].z.ToString(); break;
+									case "CenterBoxX": curBox.Text = OGF_V.ikdata.center_mass[idx][0].ToString(); break;
+									case "CenterBoxY": curBox.Text = OGF_V.ikdata.center_mass[idx][1].ToString(); break;
+									case "CenterBoxZ": curBox.Text = OGF_V.ikdata.center_mass[idx][2].ToString(); break;
+									case "PositionX": curBox.Text = OGF_V.ikdata.position[idx][0].ToString(); break;
+									case "PositionY": curBox.Text = OGF_V.ikdata.position[idx][1].ToString(); break;
+									case "PositionZ": curBox.Text = OGF_V.ikdata.position[idx][2].ToString(); break;
+									case "RotationX": curBox.Text = OGF_V.ikdata.rotation[idx][0].ToString(); break;
+									case "RotationY": curBox.Text = OGF_V.ikdata.rotation[idx][1].ToString(); break;
+									case "RotationZ": curBox.Text = OGF_V.ikdata.rotation[idx][2].ToString(); break;
 								}
 
 								if (curBox.SelectionStart < 1)
@@ -1270,7 +1264,6 @@ namespace OGF_tool
 					break;
 			}
 
-			Fvector vec = new Fvector();
 			switch (currentField)
 			{
 				case "boneBox":
@@ -1304,15 +1297,15 @@ namespace OGF_tool
 					break;
 				case "MaterialBox": OGF_V.ikdata.materials[idx] = curBox.Text; break;
 				case "MassBox": OGF_V.ikdata.mass[idx] = Convert.ToSingle(curBox.Text); break;
-				case "CenterBoxX": vec.x = Convert.ToSingle(curBox.Text); vec.y = OGF_V.ikdata.center_mass[idx].y; vec.z = OGF_V.ikdata.center_mass[idx].z; OGF_V.ikdata.center_mass[idx] = vec; break;
-				case "CenterBoxY": vec.x = OGF_V.ikdata.center_mass[idx].x; vec.y = Convert.ToSingle(curBox.Text); vec.z = OGF_V.ikdata.center_mass[idx].z; OGF_V.ikdata.center_mass[idx] = vec; break;
-				case "CenterBoxZ": vec.x = OGF_V.ikdata.center_mass[idx].x; vec.y = OGF_V.ikdata.center_mass[idx].y; vec.z = Convert.ToSingle(curBox.Text); OGF_V.ikdata.center_mass[idx] = vec; break;
-				case "PositionX": vec.x = Convert.ToSingle(curBox.Text); vec.y = OGF_V.ikdata.position[idx].y; vec.z = OGF_V.ikdata.position[idx].z; OGF_V.ikdata.position[idx] = vec; break;
-				case "PositionY": vec.x = OGF_V.ikdata.position[idx].x; vec.y = Convert.ToSingle(curBox.Text); vec.z = OGF_V.ikdata.position[idx].z; OGF_V.ikdata.position[idx] = vec; break;
-				case "PositionZ": vec.x = OGF_V.ikdata.position[idx].x; vec.y = OGF_V.ikdata.position[idx].y; vec.z = Convert.ToSingle(curBox.Text); OGF_V.ikdata.position[idx] = vec; break;
-				case "RotationX": vec.x = Convert.ToSingle(curBox.Text); vec.y = OGF_V.ikdata.rotation[idx].y; vec.z = OGF_V.ikdata.rotation[idx].z; OGF_V.ikdata.rotation[idx] = vec; break;
-				case "RotationY": vec.x = OGF_V.ikdata.rotation[idx].x; vec.y = Convert.ToSingle(curBox.Text); vec.z = OGF_V.ikdata.rotation[idx].z; OGF_V.ikdata.rotation[idx] = vec; break;
-				case "RotationZ": vec.x = OGF_V.ikdata.rotation[idx].x; vec.y = OGF_V.ikdata.rotation[idx].y; vec.z = Convert.ToSingle(curBox.Text); OGF_V.ikdata.rotation[idx] = vec; break;
+				case "CenterBoxX": OGF_V.ikdata.center_mass[idx][0] = Convert.ToSingle(curBox.Text); break;
+				case "CenterBoxY": OGF_V.ikdata.center_mass[idx][1] = Convert.ToSingle(curBox.Text); break;
+				case "CenterBoxZ": OGF_V.ikdata.center_mass[idx][2] = Convert.ToSingle(curBox.Text); break;
+				case "PositionX": OGF_V.ikdata.position[idx][0] = Convert.ToSingle(curBox.Text); break;
+				case "PositionY": OGF_V.ikdata.position[idx][1] = Convert.ToSingle(curBox.Text); break;
+				case "PositionZ": OGF_V.ikdata.position[idx][2] = Convert.ToSingle(curBox.Text); break;
+				case "RotationX": OGF_V.ikdata.rotation[idx][0] = Convert.ToSingle(curBox.Text); break;
+				case "RotationY": OGF_V.ikdata.rotation[idx][1] = Convert.ToSingle(curBox.Text); break;
+				case "RotationZ": OGF_V.ikdata.rotation[idx][2] = Convert.ToSingle(curBox.Text); break;
 			}
 
 			bKeyIsDown = false;
@@ -1480,6 +1473,7 @@ namespace OGF_tool
 			}
 			else if (format == 6)
 				SaveAsObj(filename);
+
 			if (!has_msg && !silent)
 				AutoClosingMessageBox.Show(OGF_V.BrokenType > 0 ? "Repaired and Exported!" : "Exported!", "", OGF_V.BrokenType > 0 ? 700 : 500, MessageBoxIcon.Information);
 		}
@@ -1808,7 +1802,7 @@ namespace OGF_tool
 				}
 				else
                 {
-					AutoClosingMessageBox.Show("OGF Params don't changed!", "", 1000, MessageBoxIcon.Error);
+					AutoClosingMessageBox.Show("OGF Params don't changed!", "", 1000, MessageBoxIcon.Warning);
 				}
 			}
 		}
@@ -2234,7 +2228,7 @@ namespace OGF_tool
 			box.Controls.Add(newLbl4);
 		}
 
-		private void CreateBoneGroupBox(int idx, string bone_name, string parent_bone_name, string material, float mass, Fvector center, Fvector pos, Fvector rot)
+		private void CreateBoneGroupBox(int idx, string bone_name, string parent_bone_name, string material, float mass, float[] center, float[] pos, float[] rot)
 		{
 			var GroupBox = new GroupBox();
 			GroupBox.Location = new System.Drawing.Point(BoneParamsGroupBox.Location.X, BoneParamsGroupBox.Location.Y + (BoneParamsGroupBox.Size.Height + 2) * idx);
@@ -2248,7 +2242,7 @@ namespace OGF_tool
 			BoneParamsPage.Controls.Add(GroupBox);
 		}
 
-		private void CreateBoneTextBox(int idx, GroupBox box, string bone_name, string parent_bone_name, string material, float mass, Fvector center, Fvector pos, Fvector rot)
+		private void CreateBoneTextBox(int idx, GroupBox box, string bone_name, string parent_bone_name, string material, float mass, float[] center, float[] pos, float[] rot)
 		{
 			var BoneNameTextBox = new TextBox();
 			BoneNameTextBox.Name = "boneBox_" + idx;
@@ -2331,7 +2325,7 @@ namespace OGF_tool
 			CenterMassTextBoxX.Name = "CenterBoxX_" + idx;
 			CenterMassTextBoxX.Size = CenterOfMassXTextBox.Size;
 			CenterMassTextBoxX.Location = CenterOfMassXTextBox.Location;
-			CenterMassTextBoxX.Text = CheckNaN(center.x);
+			CenterMassTextBoxX.Text = CheckNaN(center[0]);
 			CenterMassTextBoxX.Tag = "float";
 			CenterMassTextBoxX.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
 			CenterMassTextBoxX.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
@@ -2341,7 +2335,7 @@ namespace OGF_tool
 			CenterMassTextBoxY.Name = "CenterBoxY_" + idx;
 			CenterMassTextBoxY.Size = CenterOfMassYTextBox.Size;
 			CenterMassTextBoxY.Location = CenterOfMassYTextBox.Location;
-			CenterMassTextBoxY.Text = CheckNaN(center.y);
+			CenterMassTextBoxY.Text = CheckNaN(center[1]);
 			CenterMassTextBoxY.Tag = "float";
 			CenterMassTextBoxY.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
 			CenterMassTextBoxY.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
@@ -2351,7 +2345,7 @@ namespace OGF_tool
 			CenterMassTextBoxZ.Name = "CenterBoxZ_" + idx;
 			CenterMassTextBoxZ.Size = CenterOfMassZTextBox.Size;
 			CenterMassTextBoxZ.Location = CenterOfMassZTextBox.Location;
-			CenterMassTextBoxZ.Text = CheckNaN(center.z);
+			CenterMassTextBoxZ.Text = CheckNaN(center[2]);
 			CenterMassTextBoxZ.Tag = "float";
 			CenterMassTextBoxZ.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
 			CenterMassTextBoxZ.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
@@ -2367,7 +2361,7 @@ namespace OGF_tool
 			PositionX.Name = "PositionX_" + idx;
 			PositionX.Size = PositionXTextBox.Size;
 			PositionX.Location = PositionXTextBox.Location;
-			PositionX.Text = CheckNaN(pos.x);
+			PositionX.Text = CheckNaN(pos[0]);
 			PositionX.Tag = "float";
 			PositionX.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
 			PositionX.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
@@ -2377,7 +2371,7 @@ namespace OGF_tool
 			PositionY.Name = "PositionY_" + idx;
 			PositionY.Size = PositionYTextBox.Size;
 			PositionY.Location = PositionYTextBox.Location;
-			PositionY.Text = CheckNaN(pos.y);
+			PositionY.Text = CheckNaN(pos[1]);
 			PositionY.Tag = "float";
 			PositionY.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
 			PositionY.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
@@ -2387,7 +2381,7 @@ namespace OGF_tool
 			PositionZ.Name = "PositionZ_" + idx;
 			PositionZ.Size = PositionZTextBox.Size;
 			PositionZ.Location = PositionZTextBox.Location;
-			PositionZ.Text = CheckNaN(pos.z);
+			PositionZ.Text = CheckNaN(pos[2]);
 			PositionZ.Tag = "float";
 			PositionZ.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
 			PositionZ.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
@@ -2403,7 +2397,7 @@ namespace OGF_tool
 			RotationX.Name = "RotationX_" + idx;
 			RotationX.Size = RotationXTextBox.Size;
 			RotationX.Location = RotationXTextBox.Location;
-			RotationX.Text = CheckNaN(rot.x);
+			RotationX.Text = CheckNaN(rot[0]);
 			RotationX.Tag = "float";
 			RotationX.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
 			RotationX.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
@@ -2413,7 +2407,7 @@ namespace OGF_tool
 			RotationY.Name = "RotationY_" + idx;
 			RotationY.Size = RotationYTextBox.Size;
 			RotationY.Location = RotationYTextBox.Location;
-			RotationY.Text = CheckNaN(rot.y);
+			RotationY.Text = CheckNaN(rot[1]);
 			RotationY.Tag = "float";
 			RotationY.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
 			RotationY.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
@@ -2423,7 +2417,7 @@ namespace OGF_tool
 			RotationZ.Name = "RotationZ_" + idx;
 			RotationZ.Size = RotationZTextBox.Size;
 			RotationZ.Location = RotationZTextBox.Location;
-			RotationZ.Text = CheckNaN(rot.z);
+			RotationZ.Text = CheckNaN(rot[2]);
 			RotationZ.Tag = "float";
 			RotationZ.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
 			RotationZ.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);

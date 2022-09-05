@@ -404,7 +404,7 @@ namespace OGF_tool
             this.BoneParamsGroupBox.Controls.Add(this.BoneNameLabelEx);
             this.BoneParamsGroupBox.Location = new System.Drawing.Point(3, 3);
             this.BoneParamsGroupBox.Name = "BoneParamsGroupBox";
-            this.BoneParamsGroupBox.Size = new System.Drawing.Size(470, 216);
+            this.BoneParamsGroupBox.Size = new System.Drawing.Size(470, 213);
             this.BoneParamsGroupBox.TabIndex = 0;
             this.BoneParamsGroupBox.TabStop = false;
             this.BoneParamsGroupBox.Text = "BoneParamsExample";
@@ -680,7 +680,7 @@ namespace OGF_tool
             this.CurrentFormat});
             this.MenuPanel.Location = new System.Drawing.Point(0, 4);
             this.MenuPanel.Name = "MenuPanel";
-            this.MenuPanel.Size = new System.Drawing.Size(374, 24);
+            this.MenuPanel.Size = new System.Drawing.Size(254, 24);
             this.MenuPanel.TabIndex = 8;
             // 
             // FileMenuItem
