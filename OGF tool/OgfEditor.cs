@@ -1853,7 +1853,7 @@ namespace OGF_tool
 
 					foreach (var ch in OGF_V.childs)
 					{
-						if (ch.link_type > 0x12071980)
+						if (ch.link_type >= 0x12071980)
 							ch.link_type /= 0x12071980;
 					}
 				}
