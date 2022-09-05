@@ -88,6 +88,27 @@ namespace OGF_tool
             return reader.ReadSingle();
         }
 
+        public float[] ReadVector()
+        {
+            float[] vec = new float[3];
+
+            vec[0] = reader.ReadSingle();
+            vec[1] = reader.ReadSingle();
+            vec[2] = reader.ReadSingle();
+
+            return vec;
+        }
+
+        public float[] ReadVector2()
+        {
+            float[] vec = new float[2];
+
+            vec[0] = reader.ReadSingle();
+            vec[1] = reader.ReadSingle();
+
+            return vec;
+        }
+
         public uint ReadUInt16()
         {
             return reader.ReadUInt16();
@@ -639,6 +660,33 @@ namespace OGF_tool
         }
     }
 
+    public class SSkelVert
+    {
+        public float[] uv;
+        public float[] offs;
+        public float[] norm;
+        public float[] tang;
+        public float[] binorm;
+
+        public SSkelVert()
+        {
+            uv = new float[2];
+            offs = new float[3];
+            norm = new float[3];
+            tang = new float[3];
+            binorm = new float[3];
+        }
+    };
+
+    public class SSkelFace
+    {
+	    public ushort[] v;
+        public SSkelFace()
+        {
+            v = new ushort[3];
+        }
+    };
+
     public class OGF_Child
     {
         public string m_texture;
@@ -646,6 +694,8 @@ namespace OGF_tool
 
         public OGF_Child(long _pos, long _parent_pos, uint _chunk_size, int _old_size, string texture, string shader)
         {
+            Vertices = new List<SSkelVert>();
+            Faces = new List<SSkelFace>();
             pos = _pos;
             parent_pos = _parent_pos;
             m_texture = texture;
@@ -666,6 +716,9 @@ namespace OGF_tool
         public uint link_type;
         public long faces, verts;
         public bool to_delete;
+
+        public List<SSkelVert> Vertices;
+        public List<SSkelFace> Faces;
 
         public uint NewSize()
         {

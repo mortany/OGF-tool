@@ -572,12 +572,8 @@ namespace OGF_tool
 					for (int i = 0; i < chld.verts; i++)
 					{
 						SSkelVert Vert = new SSkelVert();
-						Vert.offs[0] = xr_loader.ReadFloat();
-						Vert.offs[1] = xr_loader.ReadFloat();
-						Vert.offs[2] = xr_loader.ReadFloat();
-
-						Vert.uv[0] = xr_loader.ReadFloat();
-						Vert.uv[1] = xr_loader.ReadFloat();
+						Vert.offs = xr_loader.ReadVector();
+						Vert.uv = xr_loader.ReadVector2();
 						chld.Vertices.Add(Vert);
 					}
 
@@ -670,24 +666,11 @@ namespace OGF_tool
 							switch (temp_link)
 							{
 								case 1:
-									Vert.offs[0] = loader.ReadFloat();
-									Vert.offs[1] = loader.ReadFloat();
-									Vert.offs[2] = loader.ReadFloat();
-
-									Vert.norm[0] = loader.ReadFloat();
-									Vert.norm[1] = loader.ReadFloat();
-									Vert.norm[2] = loader.ReadFloat();
-
-									Vert.tang[0] = loader.ReadFloat();
-									Vert.tang[1] = loader.ReadFloat();
-									Vert.tang[2] = loader.ReadFloat();
-
-									Vert.binorm[0] = loader.ReadFloat();
-									Vert.binorm[1] = loader.ReadFloat();
-									Vert.binorm[2] = loader.ReadFloat();
-
-									Vert.uv[0] = loader.ReadFloat();
-									Vert.uv[1] = loader.ReadFloat();
+									Vert.offs = loader.ReadVector();
+									Vert.norm = loader.ReadVector();
+									Vert.tang = loader.ReadVector();
+									Vert.binorm = loader.ReadVector();
+									Vert.uv = loader.ReadVector2();
 
 									loader.ReadUInt32();
 									break;
@@ -695,66 +678,36 @@ namespace OGF_tool
 									loader.ReadUInt16();
 									loader.ReadUInt16();
 
-									Vert.offs[0] = loader.ReadFloat();
-									Vert.offs[1] = loader.ReadFloat();
-									Vert.offs[2] = loader.ReadFloat();
-
-									Vert.norm[0] = loader.ReadFloat();
-									Vert.norm[1] = loader.ReadFloat();
-									Vert.norm[2] = loader.ReadFloat();
-
-									Vert.tang[0] = loader.ReadFloat();
-									Vert.tang[1] = loader.ReadFloat();
-									Vert.tang[2] = loader.ReadFloat();
-
-									Vert.binorm[0] = loader.ReadFloat();
-									Vert.binorm[1] = loader.ReadFloat();
-									Vert.binorm[2] = loader.ReadFloat();
-
+									Vert.offs = loader.ReadVector();
+									Vert.norm = loader.ReadVector();
+									Vert.tang = loader.ReadVector();
+									Vert.binorm = loader.ReadVector();
 									loader.ReadFloat();
-
-									Vert.uv[0] = loader.ReadFloat();
-									Vert.uv[1] = loader.ReadFloat();
+									Vert.uv = loader.ReadVector2();
 									break;
 								case 3:
 								case 4:
-									loader.ReadUInt16();
+                                    for (int j = 0; j < temp_link; j++)
+                                    {
+                                        loader.ReadUInt16();
+                                    }
 
-									Vert.offs[0] = loader.ReadFloat();
-									Vert.offs[1] = loader.ReadFloat();
-									Vert.offs[2] = loader.ReadFloat();
+                                    Vert.offs = loader.ReadVector();
+									Vert.norm = loader.ReadVector();
+									Vert.tang = loader.ReadVector();
+									Vert.binorm = loader.ReadVector();
 
-									Vert.norm[0] = loader.ReadFloat();
-									Vert.norm[1] = loader.ReadFloat();
-									Vert.norm[2] = loader.ReadFloat();
+                                    for (int j = 0; j < temp_link - 1; j++)
+                                    {
+                                        loader.ReadFloat();
+                                    }
 
-									Vert.tang[0] = loader.ReadFloat();
-									Vert.tang[1] = loader.ReadFloat();
-									Vert.tang[2] = loader.ReadFloat();
-
-									Vert.binorm[0] = loader.ReadFloat();
-									Vert.binorm[1] = loader.ReadFloat();
-									Vert.binorm[2] = loader.ReadFloat();
-
-									for (i = 0; i < temp_link - 1; ++i)
-									{
-										loader.ReadFloat();
-									}
-
-									Vert.uv[0] = loader.ReadFloat();
-									Vert.uv[1] = loader.ReadFloat();
+                                    Vert.uv = loader.ReadVector2();
 									break;
 								default:
-									Vert.offs[0] = loader.ReadFloat();
-									Vert.offs[1] = loader.ReadFloat();
-									Vert.offs[2] = loader.ReadFloat();
-
-									Vert.norm[0] = loader.ReadFloat();
-									Vert.norm[1] = loader.ReadFloat();
-									Vert.norm[2] = loader.ReadFloat();
-
-									Vert.uv[0] = loader.ReadFloat();
-									Vert.uv[1] = loader.ReadFloat();
+									Vert.offs = loader.ReadVector();
+									Vert.norm = loader.ReadVector();
+									Vert.uv = loader.ReadVector2();
 									break;
 							}
 							child.Vertices.Add(Vert);
