@@ -856,10 +856,9 @@ namespace OGF_tool
 
             VIPM_SWR SWR = SWI[(int)lod];
 
-            for (int i = (int)SWR.offset / 3; i < Faces.Count; i++)
+            for (int i = (int)SWR.offset / 3; i < ((int)SWR.offset / 3) + SWR.num_tris; i++)
             {
                 sSkelFaces.Add(Faces[i]);
-                if (sSkelFaces.Count >= SWR.num_tris) break;
             }
 
             return sSkelFaces;
