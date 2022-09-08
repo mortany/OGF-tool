@@ -123,6 +123,7 @@ namespace OGF_tool
 			ToolsMenuItem.Enabled = false;
 			exportToolStripMenuItem.Enabled = false;
 			LabelBroken.Visible = false;
+			viewPortToolStripMenuItem.Visible = false;
 
 			SaveSklDialog = new FolderSelectDialog();
 
@@ -1598,6 +1599,7 @@ namespace OGF_tool
         private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
 			if (TabControl.SelectedIndex < 0) return;
+			bool ViewPortItemVisible = false;
 
 			switch (TabControl.Controls[TabControl.SelectedIndex].Name)
 			{
@@ -1629,10 +1631,13 @@ namespace OGF_tool
 					}
 				case "ViewPage":
 					{
-						InitViewPort();
+						ViewPortItemVisible = true;
+						if (!ViewerWorking)
+							InitViewPort();
 						break;
 					}
 			}
+			viewPortToolStripMenuItem.Visible = ViewPortItemVisible;
 		}
 
 		private void RichTextBoxTextChanged(object sender, EventArgs e)
@@ -2134,6 +2139,9 @@ namespace OGF_tool
 				}
 
 				if (ViewerWorking)
+					pSettings.Save("FirstLoad", false);
+
+				if (ViewerWorking)
 				{
 					ViewerProcess.Kill();
 					ViewerProcess.Close();
@@ -2142,8 +2150,6 @@ namespace OGF_tool
 
 				if (Directory.Exists(TempFolder(false)))
 					Directory.Delete(TempFolder(false), true);
-
-				pSettings.Save("FirstLoad", false);
 			}
 			catch (Exception) { }
 		}
@@ -2154,9 +2160,9 @@ namespace OGF_tool
 		}
 
 		// Interface
-		private void InitViewPort()
+		private void InitViewPort(bool create_model = true)
         {
-			if (ViewerWorking || OGF_V == null) return;
+			if (OGF_V == null) return;
 
 			if (ViewerThread != null && ViewerThread.ThreadState != System.Threading.ThreadState.Stopped)
 				ViewerThread.Abort();
@@ -2204,7 +2210,8 @@ namespace OGF_tool
 				bool first_load = true;
 				pSettings.Load("FirstLoad", ref first_load, true);
 
-				SaveTools(ObjName, 6, true);
+				if (create_model)
+					SaveTools(ObjName, 6, true);
 
 				ViewerProcess.StartInfo.FileName = exe_path;
 				ViewerProcess.StartInfo.Arguments = $"--input=\"{ObjName}\" --output=\"{image_path}\"" + (first_load ? " --filename" : "");
@@ -2225,6 +2232,16 @@ namespace OGF_tool
 				});
 			});
 			ViewerThread.Start();
+		}
+
+		private void reloadToolStripMenuItem1_Click(object sender, EventArgs e)
+		{
+			InitViewPort();
+		}
+
+		private void refreshTexturesToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			InitViewPort(false);
 		}
 
 		private void ResizeEmbeddedApp(object sender, EventArgs e)
@@ -2575,6 +2592,24 @@ namespace OGF_tool
 			box.Controls.Add(CenterMassLabel);
 			box.Controls.Add(PositionLabel);
 			box.Controls.Add(RotationLabel);
+		}
+
+        private void openImageFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+			string image_path = "";
+			pSettings.Load("ImagePath", ref image_path);
+
+			if (image_path != "" && Directory.Exists(image_path))
+			{
+				Process PrFolder = new Process();
+				ProcessStartInfo psi = new ProcessStartInfo();
+				psi.CreateNoWindow = true;
+				psi.WindowStyle = ProcessWindowStyle.Normal;
+				psi.FileName = "explorer";
+				psi.Arguments = image_path;
+				PrFolder.StartInfo = psi;
+				PrFolder.Start();
+			}
 		}
     }
 }

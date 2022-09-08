@@ -27,7 +27,6 @@ namespace OGF_tool
             pSettings.Save(GameMtlPath);
             pSettings.Save(FSLtxPath);
             pSettings.Save(TexturesPath);
-            pSettings.Save(ForceViewport);
             pSettings.Save(ImagePath);
             pSettings.Save(OmfEditorPath);
             pSettings.Save(ObjectEditorPath);
@@ -38,7 +37,6 @@ namespace OGF_tool
             pSettings.Load(GameMtlPath);
             pSettings.Load(FSLtxPath);
             pSettings.Load(TexturesPath);
-            pSettings.Load(ForceViewport, true);
             pSettings.Load(ImagePath);
             pSettings.Load(OmfEditorPath);
             pSettings.Load(ObjectEditorPath);

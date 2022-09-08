@@ -38,7 +38,6 @@
             this.button3 = new System.Windows.Forms.Button();
             this.TexturesPath = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.ForceViewport = new System.Windows.Forms.CheckBox();
             this.button4 = new System.Windows.Forms.Button();
             this.ImagePath = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -53,7 +52,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(7, 110);
+            this.label1.Location = new System.Drawing.Point(7, 87);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(79, 13);
             this.label1.TabIndex = 4;
@@ -61,14 +60,14 @@
             // 
             // GameMtlPath
             // 
-            this.GameMtlPath.Location = new System.Drawing.Point(102, 107);
+            this.GameMtlPath.Location = new System.Drawing.Point(102, 84);
             this.GameMtlPath.Name = "GameMtlPath";
             this.GameMtlPath.Size = new System.Drawing.Size(234, 20);
             this.GameMtlPath.TabIndex = 5;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(342, 105);
+            this.button1.Location = new System.Drawing.Point(342, 82);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(42, 23);
             this.button1.TabIndex = 6;
@@ -78,7 +77,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(342, 52);
+            this.button2.Location = new System.Drawing.Point(342, 29);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(42, 23);
             this.button2.TabIndex = 10;
@@ -88,7 +87,7 @@
             // 
             // FSLtxPath
             // 
-            this.FSLtxPath.Location = new System.Drawing.Point(102, 54);
+            this.FSLtxPath.Location = new System.Drawing.Point(102, 31);
             this.FSLtxPath.Name = "FSLtxPath";
             this.FSLtxPath.Size = new System.Drawing.Size(234, 20);
             this.FSLtxPath.TabIndex = 9;
@@ -97,7 +96,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(7, 57);
+            this.label2.Location = new System.Drawing.Point(7, 34);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(64, 13);
             this.label2.TabIndex = 8;
@@ -105,7 +104,7 @@
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(342, 78);
+            this.button3.Location = new System.Drawing.Point(342, 55);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(42, 23);
             this.button3.TabIndex = 13;
@@ -115,7 +114,7 @@
             // 
             // TexturesPath
             // 
-            this.TexturesPath.Location = new System.Drawing.Point(102, 80);
+            this.TexturesPath.Location = new System.Drawing.Point(102, 57);
             this.TexturesPath.Name = "TexturesPath";
             this.TexturesPath.Size = new System.Drawing.Size(234, 20);
             this.TexturesPath.TabIndex = 12;
@@ -123,25 +122,15 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(7, 83);
+            this.label3.Location = new System.Drawing.Point(7, 60);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(75, 13);
             this.label3.TabIndex = 11;
             this.label3.Text = "Textures path:";
             // 
-            // ForceViewport
-            // 
-            this.ForceViewport.AutoSize = true;
-            this.ForceViewport.Location = new System.Drawing.Point(9, 6);
-            this.ForceViewport.Name = "ForceViewport";
-            this.ForceViewport.Size = new System.Drawing.Size(119, 17);
-            this.ForceViewport.TabIndex = 14;
-            this.ForceViewport.Text = "Force viewport load";
-            this.ForceViewport.UseVisualStyleBackColor = true;
-            // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(342, 26);
+            this.button4.Location = new System.Drawing.Point(342, 3);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(42, 23);
             this.button4.TabIndex = 17;
@@ -151,7 +140,7 @@
             // 
             // ImagePath
             // 
-            this.ImagePath.Location = new System.Drawing.Point(102, 28);
+            this.ImagePath.Location = new System.Drawing.Point(102, 5);
             this.ImagePath.Name = "ImagePath";
             this.ImagePath.Size = new System.Drawing.Size(234, 20);
             this.ImagePath.TabIndex = 16;
@@ -159,7 +148,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(7, 31);
+            this.label4.Location = new System.Drawing.Point(7, 8);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(63, 13);
             this.label4.TabIndex = 15;
@@ -167,7 +156,7 @@
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(342, 131);
+            this.button5.Location = new System.Drawing.Point(342, 108);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(42, 23);
             this.button5.TabIndex = 20;
@@ -177,7 +166,7 @@
             // 
             // OmfEditorPath
             // 
-            this.OmfEditorPath.Location = new System.Drawing.Point(102, 133);
+            this.OmfEditorPath.Location = new System.Drawing.Point(102, 110);
             this.OmfEditorPath.Name = "OmfEditorPath";
             this.OmfEditorPath.Size = new System.Drawing.Size(234, 20);
             this.OmfEditorPath.TabIndex = 19;
@@ -185,7 +174,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(7, 136);
+            this.label5.Location = new System.Drawing.Point(7, 113);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(87, 13);
             this.label5.TabIndex = 18;
@@ -193,7 +182,7 @@
             // 
             // button6
             // 
-            this.button6.Location = new System.Drawing.Point(342, 157);
+            this.button6.Location = new System.Drawing.Point(342, 134);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(42, 23);
             this.button6.TabIndex = 23;
@@ -203,7 +192,7 @@
             // 
             // ObjectEditorPath
             // 
-            this.ObjectEditorPath.Location = new System.Drawing.Point(102, 159);
+            this.ObjectEditorPath.Location = new System.Drawing.Point(102, 136);
             this.ObjectEditorPath.Name = "ObjectEditorPath";
             this.ObjectEditorPath.Size = new System.Drawing.Size(234, 20);
             this.ObjectEditorPath.TabIndex = 22;
@@ -211,7 +200,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(7, 162);
+            this.label6.Location = new System.Drawing.Point(7, 139);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(95, 13);
             this.label6.TabIndex = 21;
@@ -221,7 +210,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(386, 183);
+            this.ClientSize = new System.Drawing.Size(386, 160);
             this.Controls.Add(this.button6);
             this.Controls.Add(this.ObjectEditorPath);
             this.Controls.Add(this.label6);
@@ -231,7 +220,6 @@
             this.Controls.Add(this.button4);
             this.Controls.Add(this.ImagePath);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.ForceViewport);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.TexturesPath);
             this.Controls.Add(this.label3);
@@ -263,7 +251,6 @@
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.TextBox TexturesPath;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.CheckBox ForceViewport;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.TextBox ImagePath;
         private System.Windows.Forms.Label label4;

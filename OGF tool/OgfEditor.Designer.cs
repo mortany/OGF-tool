@@ -120,6 +120,10 @@ namespace OGF_tool
             this.SaveObjectDialog = new System.Windows.Forms.SaveFileDialog();
             this.LabelBroken = new System.Windows.Forms.Label();
             this.SaveObjDialog = new System.Windows.Forms.SaveFileDialog();
+            this.viewPortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.reloadToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.refreshTexturesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openImageFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.TabControl.SuspendLayout();
             this.TexturesPage.SuspendLayout();
             this.TexturesGropuBox.SuspendLayout();
@@ -157,7 +161,7 @@ namespace OGF_tool
             this.TabControl.Multiline = true;
             this.TabControl.Name = "TabControl";
             this.TabControl.SelectedIndex = 0;
-            this.TabControl.Size = new System.Drawing.Size(484, 310);
+            this.TabControl.Size = new System.Drawing.Size(496, 310);
             this.TabControl.SizeMode = System.Windows.Forms.TabSizeMode.FillToRight;
             this.TabControl.TabIndex = 7;
             this.TabControl.SelectedIndexChanged += new System.EventHandler(this.TabControl_SelectedIndexChanged);
@@ -170,7 +174,7 @@ namespace OGF_tool
             this.TexturesPage.Location = new System.Drawing.Point(4, 25);
             this.TexturesPage.Margin = new System.Windows.Forms.Padding(0);
             this.TexturesPage.Name = "TexturesPage";
-            this.TexturesPage.Size = new System.Drawing.Size(476, 281);
+            this.TexturesPage.Size = new System.Drawing.Size(488, 281);
             this.TexturesPage.TabIndex = 0;
             this.TexturesPage.Text = "Textures";
             // 
@@ -188,7 +192,7 @@ namespace OGF_tool
             this.TexturesGropuBox.Controls.Add(this.TexturesTextBoxEx);
             this.TexturesGropuBox.Location = new System.Drawing.Point(3, 3);
             this.TexturesGropuBox.Name = "TexturesGropuBox";
-            this.TexturesGropuBox.Size = new System.Drawing.Size(470, 127);
+            this.TexturesGropuBox.Size = new System.Drawing.Size(482, 127);
             this.TexturesGropuBox.TabIndex = 0;
             this.TexturesGropuBox.TabStop = false;
             this.TexturesGropuBox.Text = "Mesh: [-]";
@@ -197,7 +201,7 @@ namespace OGF_tool
             // 
             this.LinksLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.LinksLabel.AutoSize = true;
-            this.LinksLabel.Location = new System.Drawing.Point(342, 104);
+            this.LinksLabel.Location = new System.Drawing.Point(354, 104);
             this.LinksLabel.Name = "LinksLabel";
             this.LinksLabel.Size = new System.Drawing.Size(38, 13);
             this.LinksLabel.TabIndex = 7;
@@ -217,7 +221,7 @@ namespace OGF_tool
             // 
             this.VertsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.VertsLabel.AutoSize = true;
-            this.VertsLabel.Location = new System.Drawing.Point(383, 104);
+            this.VertsLabel.Location = new System.Drawing.Point(395, 104);
             this.VertsLabel.Name = "VertsLabel";
             this.VertsLabel.Size = new System.Drawing.Size(37, 13);
             this.VertsLabel.TabIndex = 5;
@@ -228,7 +232,7 @@ namespace OGF_tool
             // 
             this.FaceLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.FaceLabel.AutoSize = true;
-            this.FaceLabel.Location = new System.Drawing.Point(422, 104);
+            this.FaceLabel.Location = new System.Drawing.Point(434, 104);
             this.FaceLabel.Name = "FaceLabel";
             this.FaceLabel.Size = new System.Drawing.Size(42, 13);
             this.FaceLabel.TabIndex = 4;
@@ -259,7 +263,7 @@ namespace OGF_tool
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ShaderTextBoxEx.Location = new System.Drawing.Point(6, 76);
             this.ShaderTextBoxEx.Name = "ShaderTextBoxEx";
-            this.ShaderTextBoxEx.Size = new System.Drawing.Size(458, 20);
+            this.ShaderTextBoxEx.Size = new System.Drawing.Size(470, 20);
             this.ShaderTextBoxEx.TabIndex = 1;
             // 
             // TexturesTextBoxEx
@@ -268,7 +272,7 @@ namespace OGF_tool
             | System.Windows.Forms.AnchorStyles.Right)));
             this.TexturesTextBoxEx.Location = new System.Drawing.Point(6, 33);
             this.TexturesTextBoxEx.Name = "TexturesTextBoxEx";
-            this.TexturesTextBoxEx.Size = new System.Drawing.Size(458, 20);
+            this.TexturesTextBoxEx.Size = new System.Drawing.Size(470, 20);
             this.TexturesTextBoxEx.TabIndex = 0;
             // 
             // UserDataPage
@@ -676,12 +680,12 @@ namespace OGF_tool
             // ViewPage
             // 
             this.ViewPage.BackColor = System.Drawing.Color.Transparent;
-            this.ViewPage.Location = new System.Drawing.Point(4, 25);
+            this.ViewPage.Location = new System.Drawing.Point(4, 49);
             this.ViewPage.Margin = new System.Windows.Forms.Padding(0);
             this.ViewPage.Name = "ViewPage";
-            this.ViewPage.Size = new System.Drawing.Size(476, 281);
+            this.ViewPage.Size = new System.Drawing.Size(476, 257);
             this.ViewPage.TabIndex = 7;
-            this.ViewPage.Text = "View";
+            this.ViewPage.Text = "ViewPort";
             this.ViewPage.Resize += new System.EventHandler(this.ResizeEmbeddedApp);
             // 
             // MenuPanel
@@ -692,10 +696,11 @@ namespace OGF_tool
             this.ToolsMenuItem,
             this.OgfInfo,
             this.settingsToolStripMenuItem,
-            this.CurrentFormat});
+            this.CurrentFormat,
+            this.viewPortToolStripMenuItem});
             this.MenuPanel.Location = new System.Drawing.Point(0, 2);
             this.MenuPanel.Name = "MenuPanel";
-            this.MenuPanel.Size = new System.Drawing.Size(315, 24);
+            this.MenuPanel.Size = new System.Drawing.Size(501, 24);
             this.MenuPanel.TabIndex = 8;
             // 
             // FileMenuItem
@@ -907,7 +912,7 @@ namespace OGF_tool
             this.StatusFile});
             this.StatusPanel.Location = new System.Drawing.Point(0, 340);
             this.StatusPanel.Name = "StatusPanel";
-            this.StatusPanel.Size = new System.Drawing.Size(508, 22);
+            this.StatusPanel.Size = new System.Drawing.Size(520, 22);
             this.StatusPanel.TabIndex = 30;
             this.StatusPanel.Text = "statusStrip1";
             // 
@@ -915,7 +920,7 @@ namespace OGF_tool
             // 
             this.BkpCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.BkpCheckBox.AutoSize = true;
-            this.BkpCheckBox.Location = new System.Drawing.Point(405, 7);
+            this.BkpCheckBox.Location = new System.Drawing.Point(417, 7);
             this.BkpCheckBox.Name = "BkpCheckBox";
             this.BkpCheckBox.Size = new System.Drawing.Size(96, 17);
             this.BkpCheckBox.TabIndex = 31;
@@ -960,7 +965,7 @@ namespace OGF_tool
             // 
             this.LabelBroken.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.LabelBroken.AutoSize = true;
-            this.LabelBroken.Location = new System.Drawing.Point(419, 344);
+            this.LabelBroken.Location = new System.Drawing.Point(431, 344);
             this.LabelBroken.Name = "LabelBroken";
             this.LabelBroken.Size = new System.Drawing.Size(67, 13);
             this.LabelBroken.TabIndex = 32;
@@ -970,11 +975,42 @@ namespace OGF_tool
             // 
             this.SaveObjDialog.Filter = "Obj file|*.obj";
             // 
+            // viewPortToolStripMenuItem
+            // 
+            this.viewPortToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.reloadToolStripMenuItem1,
+            this.refreshTexturesToolStripMenuItem,
+            this.openImageFolderToolStripMenuItem});
+            this.viewPortToolStripMenuItem.Name = "viewPortToolStripMenuItem";
+            this.viewPortToolStripMenuItem.Size = new System.Drawing.Size(66, 20);
+            this.viewPortToolStripMenuItem.Text = "ViewPort";
+            // 
+            // reloadToolStripMenuItem1
+            // 
+            this.reloadToolStripMenuItem1.Name = "reloadToolStripMenuItem1";
+            this.reloadToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.reloadToolStripMenuItem1.Text = "Reload";
+            this.reloadToolStripMenuItem1.Click += new System.EventHandler(this.reloadToolStripMenuItem1_Click);
+            // 
+            // refreshTexturesToolStripMenuItem
+            // 
+            this.refreshTexturesToolStripMenuItem.Name = "refreshTexturesToolStripMenuItem";
+            this.refreshTexturesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.refreshTexturesToolStripMenuItem.Text = "Refresh textures";
+            this.refreshTexturesToolStripMenuItem.Click += new System.EventHandler(this.refreshTexturesToolStripMenuItem_Click);
+            // 
+            // openImageFolderToolStripMenuItem
+            // 
+            this.openImageFolderToolStripMenuItem.Name = "openImageFolderToolStripMenuItem";
+            this.openImageFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openImageFolderToolStripMenuItem.Text = "Open image folder";
+            this.openImageFolderToolStripMenuItem.Click += new System.EventHandler(this.openImageFolderToolStripMenuItem_Click);
+            // 
             // OGF_Editor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(508, 362);
+            this.ClientSize = new System.Drawing.Size(520, 362);
             this.Controls.Add(this.LabelBroken);
             this.Controls.Add(this.MenuPanel);
             this.Controls.Add(this.BkpCheckBox);
@@ -982,7 +1018,7 @@ namespace OGF_tool
             this.Controls.Add(this.TabControl);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.MenuPanel;
-            this.MinimumSize = new System.Drawing.Size(524, 251);
+            this.MinimumSize = new System.Drawing.Size(536, 251);
             this.Name = "OGF_Editor";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "OGF Params Editor";
@@ -1103,6 +1139,10 @@ namespace OGF_tool
         private System.Windows.Forms.SaveFileDialog SaveObjDialog;
         private System.Windows.Forms.Label LinksLabel;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem viewPortToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem reloadToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem refreshTexturesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem openImageFolderToolStripMenuItem;
     }
 }
 
