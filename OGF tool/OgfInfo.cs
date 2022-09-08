@@ -26,11 +26,11 @@ namespace OGF_tool
             {
                 if (ch.to_delete) continue;
 
-                if (ch.link_type >= 0x12071980)
-                    links = Math.Max(links, ch.link_type / 0x12071980);
+                if (ch.links >= 0x12071980)
+                    links = Math.Max(links, ch.links / 0x12071980);
                 else
                 {
-                    links = Math.Max(links, ch.link_type);
+                    links = Math.Max(links, ch.links);
                     cop_links = true;
                 }
 

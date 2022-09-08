@@ -8,6 +8,44 @@ namespace OGF_tool
     public enum OGF
     {
         OGF4_HEADER = 1,
+
+        //build 729
+        OGF2_TEXTURE = 2,
+        OGF2_TEXTURE_L = 3,
+        OGF2_BBOX = 6,
+        OGF2_VERTICES = 7,
+        OGF2_INDICES = 8,
+        OGF2_VCONTAINER = 11,
+        OGF2_BSPHERE = 12,
+
+        OGF3_TEXTURE = 2,
+        OGF3_TEXTURE_L = 3,
+        OGF3_CHILD_REFS = 5,
+        OGF3_BBOX = 6,
+        OGF3_VERTICES = 7,
+        OGF3_INDICES = 8,
+        OGF3_LODDATA = 9, // not sure
+        OGF3_VCONTAINER = 10,
+        OGF3_BSPHERE = 11,
+        OGF3_CHILDREN_L = 12,
+        OGF3_S_BONE_NAMES = 13,
+        OGF3_S_MOTIONS = 14,// build 1469 - 1580
+        OGF3_DPATCH = 15,  // guessed name
+        OGF3_LODS = 16,   // guessed name
+        OGF3_CHILDREN = 17,
+        OGF3_S_SMPARAMS = 18,// build 1469
+        OGF3_ICONTAINER = 19,// build 1865
+        OGF3_S_SMPARAMS_NEW = 20,// build 1472 - 1865
+        OGF3_LODDEF2 = 21,// build 1865
+        OGF3_TREEDEF2 = 22,// build 1865
+        OGF3_S_IKDATA_0 = 23,// build 1475 - 1580
+        OGF3_S_USERDATA = 24,// build 1537 - 1865
+        OGF3_S_IKDATA = 25,// build 1616 - 1829, 1844
+        OGF3_S_MOTIONS_NEW = 26,// build 1616 - 1865
+        OGF3_S_DESC = 27,// build 1844
+        OGF3_S_IKDATA_2 = 28,// build 1842 - 1865
+        OGF3_S_MOTION_REFS = 29,// build 1842
+
         OGF4_TEXTURE = 2,
         OGF4_VERTICES = 3,
         OGF4_INDICES = 4,
@@ -32,8 +70,92 @@ namespace OGF_tool
         OGF4_S_LODS = 23,    // * For skeletons only (Ini-file)
         OGF4_S_MOTION_REFS2 = 24,    // * changes in format
         OGF4_COLLISION_VERTICES = 25,
-        OGF4_COLLISION_INDICES = 26,
+        OGF4_COLLISION_INDICES = 26, 
     };
+
+    public enum OBJECT
+    {
+        EOBJ_CURRENT_VERSION = 0x0010,
+        EOBJ_CHUNK_OBJECT_BODY = 0x7777,
+        EOBJ_CHUNK_VERSION = 0x0900,
+        EOBJ_CHUNK_REFERENCE = 0x0902,
+        EOBJ_CHUNK_FLAGS = 0x0903,
+        EOBJ_CHUNK_SURFACES = 0x0905,
+        EOBJ_CHUNK_SURFACES2 = 0x0906,
+        EOBJ_CHUNK_SURFACES3 = 0x0907,
+        EOBJ_CHUNK_EDITMESHES = 0x0910,
+        EOBJ_CHUNK_CLASSSCRIPT = 0x0912,
+        EOBJ_CHUNK_BONES = 0x0913,
+        EOBJ_CHUNK_SMOTIONS = 0x0916,
+        EOBJ_CHUNK_SURFACES_XRLC = 0x0918,
+        EOBJ_CHUNK_BONEPARTS = 0x0919,
+        EOBJ_CHUNK_ACTORTRANSFORM = 0x0920,
+        EOBJ_CHUNK_BONES2 = 0x0921,
+        EOBJ_CHUNK_DESC = 0x0922,
+        EOBJ_CHUNK_BONEPARTS2 = 0x0923,
+        EOBJ_CHUNK_SMOTIONS2 = 0x0924,
+        EOBJ_CHUNK_LODS = 0x0925,
+        EOBJ_CHUNK_SMOTIONS3 = 0x0926,
+        EOBJ_CHUNK_SCALE = 0x0927
+    };
+
+    public enum MESH
+    {
+        EMESH_CURRENT_VERSION = 0x0011,
+        EMESH_CHUNK_VERSION = 0x1000,
+        EMESH_CHUNK_MESHNAME = 0x1001,
+        EMESH_CHUNK_FLAGS = 0x1002,
+        EMESH_CHUNK_NOT_USED_0 = 0x1003,
+        EMESH_CHUNK_BBOX = 0x1004,
+        EMESH_CHUNK_VERTS = 0x1005,
+        EMESH_CHUNK_FACES = 0x1006,
+        EMESH_CHUNK_VMAPS_0 = 0x1007,
+        EMESH_CHUNK_VMREFS = 0x1008,
+        EMESH_CHUNK_SFACE = 0x1009,
+        EMESH_CHUNK_BOP = 0x1010,
+        EMESH_CHUNK_VMAPS_1 = 0x1011,
+        EMESH_CHUNK_VMAPS_2 = 0x1012,
+        EMESH_CHUNK_SG = 0x1013,
+        EMESH_CHUNK_NORMALS = 0x1014
+    };
+
+
+    public enum BONE
+    {
+        BONE_VERSION = 0x0002,
+        BONE_CHUNK_VERSION = 0x0001,
+        BONE_CHUNK_DEF = 0x0002,
+        BONE_CHUNK_BIND_POSE = 0x0003,
+        BONE_CHUNK_MATERIAL = 0x0004,
+        BONE_CHUNK_SHAPE = 0x0005,
+        BONE_CHUNK_IK_JOINT = 0x0006,
+        BONE_CHUNK_MASS = 0x0007,
+        BONE_CHUNK_FLAGS = 0x0008,
+        BONE_CHUNK_IK_JOINT_BREAK = 0x0009,
+        BONE_CHUNK_IK_JOINT_FRICTION = 0x0010
+    };
+
+    public enum MTL
+    {
+        GAMEMTL_CURRENT_VERSION = 0x0001,
+        GAMEMTLS_CHUNK_VERSION = 0x1000,
+        GAMEMTLS_CHUNK_AUTOINC = 0x1001,
+        GAMEMTLS_CHUNK_MTLS = 0x1002,
+        GAMEMTLS_CHUNK_MTLS_PAIR = 0x1003,
+        GAMEMTL_CHUNK_MAIN = 0x1000,
+        GAMEMTL_CHUNK_FLAGS = 0x1001,
+        GAMEMTL_CHUNK_PHYSICS = 0x1002,
+        GAMEMTL_CHUNK_FACTORS = 0x1003,
+        GAMEMTL_CHUNK_FLOTATION = 0x1004,
+        GAMEMTL_CHUNK_DESC = 0x1005,
+        GAMEMTL_CHUNK_INJURIOUS = 0x1006,
+        GAMEMTL_CHUNK_DENSITY = 0x1007,
+        GAMEMTL_CHUNK_FACTORS_MP = 0x1008,
+        GAMEMTLPAIR_CHUNK_PAIR = 0x1000,
+        GAMEMTLPAIR_CHUNK_BREAKING = 0x1002,
+        GAMEMTLPAIR_CHUNK_STEP = 0x1003,
+        GAMEMTLPAIR_CHUNK_COLLIDE = 0x1005
+    }
 
     public enum OGF_SkeletonVertType
     {
@@ -695,7 +817,7 @@ namespace OGF_tool
             m_shader = shader;
             old_size = _old_size;
             chunk_size = _chunk_size;
-            link_type = 0;
+            links = 0;
             faces = 0;
             verts = 0;
             to_delete = false;
@@ -706,12 +828,23 @@ namespace OGF_tool
         public uint chunk_size;
         public int old_size;
 
-        public uint link_type;
+        public uint links;
         public long faces, verts;
         public bool to_delete;
 
         public List<SSkelVert> Vertices;
         public List<SSkelFace> Faces;
+
+        public uint LinksCount()
+        {
+            uint temp_links = 0;
+            if (temp_links >= 0x12071980)
+                temp_links = links / 0x12071980;
+            else
+                temp_links = links;
+
+            return temp_links;
+        }
 
         public uint NewSize()
         {

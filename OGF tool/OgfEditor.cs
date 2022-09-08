@@ -19,18 +19,20 @@ namespace OGF_tool
 	public partial class OGF_Editor : Form
 	{
 		// File sytem
+		public EditorSettings pSettings = null;
 		public OGF_Children OGF_V = null;
 		public byte[] Current_OGF = null;
 		public byte[] Current_OMF = null;
 		public List<byte> file_bytes = new List<byte>();
 		public string FILE_NAME = "";
-		IniFile Settings = null;
 		FolderSelectDialog SaveSklDialog = null;
+		public string[] game_materials = { };
 
 		// Input
 		public bool bKeyIsDown = false;
 		string number_mask = "";
-		Size DefaultSize;
+		private Size DefSize = new Size();
+		StreamWriter ObjWriter = null; // for closing
 
 		Process ViewerProcess = new Process();
 		public bool ViewerWorking = false;
@@ -81,11 +83,37 @@ namespace OGF_tool
 		public OGF_Editor()
 		{
 			InitializeComponent();
+			
+			// Start init settings
 
-			DefaultSize = Size;
+			string file_path = AppPath() + "\\Settings.ini";
+			bool SettingsExist = File.Exists(file_path);
+			pSettings = new EditorSettings(file_path);
+
+			string gamemtl = "";
+
+			if (!pSettings.CheckVers())
+			{
+				if (SettingsExist)
+					MessageBox.Show("Settings version conflict! Load defaults.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+				File.Delete(file_path);
+				Settings settings = new Settings(pSettings);
+				settings.Settings_Load(null, null); // Load defaults
+				settings.SaveParams(null, null); // Save defaults
+			}
+
+			pSettings.LoadText("GameMtlPath", ref gamemtl);
+
+			if (File.Exists(gamemtl))
+				game_materials = GameMtlParser(gamemtl);
+
+			// End init settings
+
+			DefSize = Size;
 
 			number_mask = @"^-[0-9.]*$";
-			System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+			Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
 			OgfInfo.Enabled = false;
 			SaveMenuParam.Enabled = false;
@@ -97,9 +125,6 @@ namespace OGF_tool
 			LabelBroken.Visible = false;
 
 			SaveSklDialog = new FolderSelectDialog();
-
-			string file_path = Application.ExecutablePath.Substring(0, Application.ExecutablePath.LastIndexOf('\\')) + "\\Settings.ini";
-			Settings = new IniFile(file_path);
 
 			if (Environment.GetCommandLineArgs().Length > 1)
 			{
@@ -158,7 +183,7 @@ namespace OGF_tool
 		private void AfterLoad(bool main_file)
 		{
 			Size OldSize = Size;
-			Size = DefaultSize;
+			Size = DefSize;
 
 			if (main_file)
 			{
@@ -482,7 +507,7 @@ namespace OGF_tool
 						if (!ch.to_delete)
 						{
 							file_bytes.AddRange(temp);
-							file_bytes.AddRange(BitConverter.GetBytes(ch.link_type));
+							file_bytes.AddRange(BitConverter.GetBytes(ch.links));
 						}
 
 						temp = fileStream.ReadBytes((int)ch.chunk_size - (int)(fileStream.BaseStream.Position - old_pos)); // Читаем все до конца чанка
@@ -703,18 +728,13 @@ namespace OGF_tool
 				{
 					if (loader.find_chunk((int)OGF.OGF4_VERTICES, false, true))
 					{
-						child.link_type = loader.ReadUInt32();
+						child.links = loader.ReadUInt32();
 						child.verts = loader.ReadUInt32();
-
-						uint temp_link = child.link_type;
-
-						if (temp_link >= 0x12071980)
-							temp_link /= 0x12071980;
 
 						for (int i = 0; i < child.verts; i++)
 						{
 							SSkelVert Vert = new SSkelVert();
-							switch (temp_link)
+							switch (child.LinksCount())
 							{
 								case 1:
 									Vert.offs = loader.ReadVector();
@@ -738,7 +758,7 @@ namespace OGF_tool
 									break;
 								case 3:
 								case 4:
-                                    for (int j = 0; j < temp_link; j++)
+                                    for (int j = 0; j < child.LinksCount(); j++)
                                     {
                                         loader.ReadUInt16();
                                     }
@@ -748,7 +768,7 @@ namespace OGF_tool
 									Vert.tang = loader.ReadVector();
 									Vert.binorm = loader.ReadVector();
 
-                                    for (int j = 0; j < temp_link - 1; j++)
+                                    for (int j = 0; j < child.LinksCount() - 1; j++)
                                     {
                                         loader.ReadFloat();
                                     }
@@ -1058,7 +1078,7 @@ namespace OGF_tool
 
 		private void SaveAsObj(string filename)
 		{
-			using (StreamWriter writer = File.CreateText(filename))
+			using (ObjWriter = File.CreateText(filename))
 			{
 				uint v_offs = 0;
 				uint childs = 0;
@@ -1066,51 +1086,52 @@ namespace OGF_tool
 				string mtl_name = Path.ChangeExtension(filename, ".mtl");
 				SaveMtl(mtl_name);
 
-				writer.WriteLine("# This file uses meters as units for non-parametric coordinates.");
-				writer.WriteLine("mtllib " + Path.GetFileName(mtl_name));
+				ObjWriter.WriteLine("# This file uses meters as units for non-parametric coordinates.");
+				ObjWriter.WriteLine("mtllib " + Path.GetFileName(mtl_name));
 				foreach (var ch in OGF_V.childs)
 				{
 					if (ch.to_delete) continue;
 
-					writer.WriteLine("g " + childs.ToString());
-					writer.WriteLine("usemtl " + Path.GetFileName(ch.m_texture));
+					ObjWriter.WriteLine("g " + childs.ToString());
+					ObjWriter.WriteLine("usemtl " + Path.GetFileName(ch.m_texture));
 					childs++;
 
 					for (int i = 0; i < ch.verts; i++)
                     {
-						writer.WriteLine("v " + vPUSH(transform_tiny_Z(ch.Vertices[i].offs)));
+						ObjWriter.WriteLine("v " + vPUSH(MirrorZ_transform(ch.Vertices[i].offs)));
 					}
 
 					for (int i = 0; i < ch.verts; i++)
 					{
 						float x = ch.Vertices[i].uv[0];
 						float y = Math.Abs(1.0f - ch.Vertices[i].uv[1]);
-						writer.WriteLine("vt " + x.ToString("0.000000") + " " + y.ToString("0.000000"));
+						ObjWriter.WriteLine("vt " + x.ToString("0.000000") + " " + y.ToString("0.000000"));
 					}
 
 					for (int i = 0; i < ch.verts; i++)
 					{
-						writer.WriteLine("vn " + vPUSH(transform_dir_Z(ch.Vertices[i].norm)));
+						ObjWriter.WriteLine("vn " + vPUSH(MirrorZ_transform(ch.Vertices[i].norm)));
 					}
 
 					for (int i = 0; i < ch.verts; i++)
 					{
-						writer.WriteLine("vg "+ vPUSH(transform_dir_Z(ch.Vertices[i].tang)));
+						ObjWriter.WriteLine("vg "+ vPUSH(MirrorZ_transform(ch.Vertices[i].tang)));
 					}
 
 					for (int i = 0; i < ch.verts; i++)
 					{
-						writer.WriteLine("vb "+ vPUSH(transform_dir_Z(ch.Vertices[i].binorm)));
+						ObjWriter.WriteLine("vb "+ vPUSH(MirrorZ_transform(ch.Vertices[i].binorm)));
 					}
 
 					foreach (var f_it in ch.Faces)
 					{
 						string tmp = "f " + (v_offs+f_it.v[2]+1).ToString() + "/" + (v_offs+f_it.v[2]+1).ToString() + "/" + (v_offs+f_it.v[2]+1).ToString() + " " + (v_offs+f_it.v[1]+1).ToString() + "/" + (v_offs+f_it.v[1]+1).ToString() + "/" + (v_offs+f_it.v[1]+1).ToString() + " " + (v_offs+f_it.v[0]+1).ToString() + "/" + (v_offs+f_it.v[0]+1).ToString() + "/" + (v_offs+f_it.v[0]+1).ToString();
-						writer.WriteLine(tmp);
+						ObjWriter.WriteLine(tmp);
 					}
 					v_offs += (uint)ch.verts;
 				}
-				writer.Close();
+				ObjWriter.Close();
+				ObjWriter = null;
 			}
 		}
 
@@ -1132,21 +1153,12 @@ namespace OGF_tool
 			}
 		}
 
-		private float[] transform_tiny_Z(float[] vec)
+		private float[] MirrorZ_transform(float[] vec)
         {
 			float[] dest = new float[3];
 			dest[0] = vec[0];
 			dest[1] = vec[1];
-			dest[2] = vec[2] * -1.0f;
-			return dest;
-		}
-
-		private float[] transform_dir_Z(float[] vec)
-		{
-			float[] dest = new float[3];
-			dest[0] = vec[0];
-			dest[1] = vec[1];
-			dest[2] = vec[2] * -1.0f;
+			dest[2] = -vec[2];
 			return dest;
 		}
 
@@ -1154,16 +1166,6 @@ namespace OGF_tool
         {
 			return vec[0].ToString("0.000000") + " " + vec[1].ToString("0.000000") + " " + vec[2].ToString("0.000000");
         }
-
-		private byte[] w_string(string str)
-		{
-			List<byte> temp = new List<byte>();
-
-			temp.AddRange(Encoding.Default.GetBytes(str));
-			temp.Add(0);
-
-			return temp.ToArray();
-		}
 
 		private void TextBoxKeyDown(object sender, KeyEventArgs e)
 		{
@@ -1216,46 +1218,48 @@ namespace OGF_tool
 
 		private void TextBoxBonesFilter(object sender, EventArgs e)
 		{
-			TextBox curBox = sender as TextBox;
+			Control curControl = sender as Control;
 
-			string currentField = curBox.Name.ToString().Split('_')[0];
-			int idx = Convert.ToInt32(curBox.Name.ToString().Split('_')[1]);
+			string currentField = curControl.Name.ToString().Split('_')[0];
+			int idx = Convert.ToInt32(curControl.Name.ToString().Split('_')[1]);
 
-			switch (curBox.Tag.ToString())
+			switch (curControl.Tag.ToString())
 			{
 				case "float":
 					{
 						if (bKeyIsDown)
 						{
-							if (curBox.Text.Length == 0)
+							TextBox curBox = sender as TextBox;
+
+							if (curControl.Text.Length == 0)
 								return;
 
 							int temp = curBox.SelectionStart;
 							string mask = number_mask;
-							Regex.Match(curBox.Text, mask);
+							Regex.Match(curControl.Text, mask);
 
                             try
 							{
-								Convert.ToSingle(curBox.Text);
+								Convert.ToSingle(curControl.Text);
 							}
 							catch (Exception)
 							{
 								switch (currentField)
 								{
-									case "MassBox": curBox.Text = OGF_V.ikdata.mass[idx].ToString(); break;
-									case "CenterBoxX": curBox.Text = OGF_V.ikdata.center_mass[idx][0].ToString(); break;
-									case "CenterBoxY": curBox.Text = OGF_V.ikdata.center_mass[idx][1].ToString(); break;
-									case "CenterBoxZ": curBox.Text = OGF_V.ikdata.center_mass[idx][2].ToString(); break;
-									case "PositionX": curBox.Text = OGF_V.ikdata.position[idx][0].ToString(); break;
-									case "PositionY": curBox.Text = OGF_V.ikdata.position[idx][1].ToString(); break;
-									case "PositionZ": curBox.Text = OGF_V.ikdata.position[idx][2].ToString(); break;
-									case "RotationX": curBox.Text = OGF_V.ikdata.rotation[idx][0].ToString(); break;
-									case "RotationY": curBox.Text = OGF_V.ikdata.rotation[idx][1].ToString(); break;
-									case "RotationZ": curBox.Text = OGF_V.ikdata.rotation[idx][2].ToString(); break;
+									case "MassBox": curControl.Text = OGF_V.ikdata.mass[idx].ToString(); break;
+									case "CenterBoxX": curControl.Text = OGF_V.ikdata.center_mass[idx][0].ToString(); break;
+									case "CenterBoxY": curControl.Text = OGF_V.ikdata.center_mass[idx][1].ToString(); break;
+									case "CenterBoxZ": curControl.Text = OGF_V.ikdata.center_mass[idx][2].ToString(); break;
+									case "PositionX": curControl.Text = OGF_V.ikdata.position[idx][0].ToString(); break;
+									case "PositionY": curControl.Text = OGF_V.ikdata.position[idx][1].ToString(); break;
+									case "PositionZ": curControl.Text = OGF_V.ikdata.position[idx][2].ToString(); break;
+									case "RotationX": curControl.Text = OGF_V.ikdata.rotation[idx][0].ToString(); break;
+									case "RotationY": curControl.Text = OGF_V.ikdata.rotation[idx][1].ToString(); break;
+									case "RotationZ": curControl.Text = OGF_V.ikdata.rotation[idx][2].ToString(); break;
 								}
 
 								if (curBox.SelectionStart < 1)
-									curBox.SelectionStart = curBox.Text.Length;
+									curBox.SelectionStart = curControl.Text.Length;
 
 								curBox.SelectionStart = temp - 1;
 							}
@@ -1268,7 +1272,7 @@ namespace OGF_tool
 			{
 				case "boneBox":
 					{
-						OGF_V.bones.bone_names[idx] = curBox.Text;
+						OGF_V.bones.bone_names[idx] = curControl.Text;
 
 						for (int i = 0; i < OGF_V.bones.parent_bone_names.Count; i++)
                         {
@@ -1278,7 +1282,7 @@ namespace OGF_tool
 								if (OGF_V.bones.bone_childs[idx][j] == i)
 								{
 									var MainGroup = BoneParamsPage.Controls[i];
-									OGF_V.bones.parent_bone_names[i] = curBox.Text;
+									OGF_V.bones.parent_bone_names[i] = curControl.Text;
 									MainGroup.Controls[2].Text = OGF_V.bones.parent_bone_names[i];
 								}
 							}
@@ -1295,17 +1299,17 @@ namespace OGF_tool
 						}
 					}
 					break;
-				case "MaterialBox": OGF_V.ikdata.materials[idx] = curBox.Text; break;
-				case "MassBox": OGF_V.ikdata.mass[idx] = Convert.ToSingle(curBox.Text); break;
-				case "CenterBoxX": OGF_V.ikdata.center_mass[idx][0] = Convert.ToSingle(curBox.Text); break;
-				case "CenterBoxY": OGF_V.ikdata.center_mass[idx][1] = Convert.ToSingle(curBox.Text); break;
-				case "CenterBoxZ": OGF_V.ikdata.center_mass[idx][2] = Convert.ToSingle(curBox.Text); break;
-				case "PositionX": OGF_V.ikdata.position[idx][0] = Convert.ToSingle(curBox.Text); break;
-				case "PositionY": OGF_V.ikdata.position[idx][1] = Convert.ToSingle(curBox.Text); break;
-				case "PositionZ": OGF_V.ikdata.position[idx][2] = Convert.ToSingle(curBox.Text); break;
-				case "RotationX": OGF_V.ikdata.rotation[idx][0] = Convert.ToSingle(curBox.Text); break;
-				case "RotationY": OGF_V.ikdata.rotation[idx][1] = Convert.ToSingle(curBox.Text); break;
-				case "RotationZ": OGF_V.ikdata.rotation[idx][2] = Convert.ToSingle(curBox.Text); break;
+				case "MaterialBox": OGF_V.ikdata.materials[idx] = curControl.Text; break;
+				case "MassBox": OGF_V.ikdata.mass[idx] = Convert.ToSingle(curControl.Text); break;
+				case "CenterBoxX": OGF_V.ikdata.center_mass[idx][0] = Convert.ToSingle(curControl.Text); break;
+				case "CenterBoxY": OGF_V.ikdata.center_mass[idx][1] = Convert.ToSingle(curControl.Text); break;
+				case "CenterBoxZ": OGF_V.ikdata.center_mass[idx][2] = Convert.ToSingle(curControl.Text); break;
+				case "PositionX": OGF_V.ikdata.position[idx][0] = Convert.ToSingle(curControl.Text); break;
+				case "PositionY": OGF_V.ikdata.position[idx][1] = Convert.ToSingle(curControl.Text); break;
+				case "PositionZ": OGF_V.ikdata.position[idx][2] = Convert.ToSingle(curControl.Text); break;
+				case "RotationX": OGF_V.ikdata.rotation[idx][0] = Convert.ToSingle(curControl.Text); break;
+				case "RotationY": OGF_V.ikdata.rotation[idx][1] = Convert.ToSingle(curControl.Text); break;
+				case "RotationZ": OGF_V.ikdata.rotation[idx][2] = Convert.ToSingle(curControl.Text); break;
 			}
 
 			bKeyIsDown = false;
@@ -1825,8 +1829,8 @@ namespace OGF_tool
 
 					foreach (var ch in OGF_V.childs)
 					{
-						if (ch.link_type >= 0x12071980)
-							ch.link_type /= 0x12071980;
+						if (ch.links >= 0x12071980)
+							ch.links /= 0x12071980;
 					}
 				}
 				else
@@ -1835,10 +1839,10 @@ namespace OGF_tool
 
 					foreach (var ch in OGF_V.childs)
 					{
-						if (ch.link_type >= 0x12071980)
-							links = Math.Max(links, ch.link_type / 0x12071980);
+						if (ch.links >= 0x12071980)
+							links = Math.Max(links, ch.links / 0x12071980);
 						else
-							links = Math.Max(links, ch.link_type);
+							links = Math.Max(links, ch.links);
 					}
 
 					if (links > 2)
@@ -1897,8 +1901,8 @@ namespace OGF_tool
 
 					foreach (var ch in OGF_V.childs)
 					{
-						if (ch.link_type < 0x12071980)
-							ch.link_type *= 0x12071980;
+						if (ch.links < 0x12071980)
+							ch.links *= 0x12071980;
 					}
 				}
 
@@ -1936,7 +1940,7 @@ namespace OGF_tool
 			uint links = 0;
 
 			foreach (var ch in OGF_V.childs)
-				links = Math.Max(links, ch.link_type);
+				links = Math.Max(links, ch.links);
 
 			OGF_V.IsCopModel = (IsTextCorrect(MotionRefsBox.Text) && OGF_V.motion_refs != null && !OGF_V.motion_refs.soc || !IsTextCorrect(MotionRefsBox.Text)) && links < 0x12071980;
 
@@ -1946,9 +1950,9 @@ namespace OGF_tool
 		private void editImOMFEditorToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			string Filename = TempFolder() + $"\\{StatusFile.Text}_temp.omf";
-			string OmfEditor = GetOmfEditorPath();
+			string OmfEditor = pSettings.Load("OmfEditorPath");
 
-			if (OmfEditor == null)
+			if (!File.Exists(OmfEditor))
             {
 				MessageBox.Show("Please, set OMF Editor path!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return;
@@ -1959,7 +1963,7 @@ namespace OGF_tool
 				fileStream.Write(Current_OMF, 0, Current_OMF.Length);
 			}
 
-			System.Diagnostics.Process proc = new System.Diagnostics.Process();
+			Process proc = new Process();
 			proc.StartInfo.FileName = OmfEditor;
 			proc.StartInfo.Arguments += $"\"{Filename}\"";
 			proc.Start();
@@ -1978,9 +1982,9 @@ namespace OGF_tool
 			string ObjectName = Filename.Substring(0, Filename.LastIndexOf('.'));
 			ObjectName = ObjectName.Substring(0, ObjectName.LastIndexOf('.')) + ".object";
 
-			string ObjectEditor = GetObjectEditorPath();
+			string ObjectEditor = pSettings.Load("ObjectEditorPath");
 
-			if (ObjectEditor == null || ObjectEditor == "")
+			if (!File.Exists(ObjectEditor))
 			{
 				MessageBox.Show("Please, set Object Editor path!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return;
@@ -1991,45 +1995,78 @@ namespace OGF_tool
 			SaveFile(Filename);
 			RunConverter(Filename, ObjectName, 0, 0);
 
-            System.Diagnostics.Process proc = new System.Diagnostics.Process();
+            Process proc = new Process();
             proc.StartInfo.FileName = ObjectEditor;
             proc.StartInfo.Arguments += $"\"{ObjectName}\" skeleton_only \"{FILE_NAME}\"";
             proc.Start();
 			proc.WaitForExit();
         }
 
-		private string GetOmfEditorPath()
-        {
-			string omf_editor_path = Settings.Read("omf_editor", "settings");
-			if (!File.Exists(omf_editor_path))
-			{
-				MessageBox.Show("Please, open OMF Editor path", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-				if (OpenProgramDialog.ShowDialog() == DialogResult.OK)
-				{
-					OpenProgramDialog.InitialDirectory = "";
-					omf_editor_path = OpenProgramDialog.FileName;
-					Settings.Write("omf_editor", omf_editor_path, "settings");
-				}
-			}
+		private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			string old_game_mtl = "";
+			pSettings.Load("GameMtlPath", ref old_game_mtl);
 
-			return omf_editor_path;
+			Settings ProgramSettings = new Settings(pSettings);
+			ProgramSettings.ShowDialog();
+
+			string game_mtl = "";
+			pSettings.Load("GameMtlPath", ref game_mtl);
+
+			if (old_game_mtl != game_mtl)
+				ReloadGameMtl(game_mtl);
 		}
 
-		private string GetObjectEditorPath()
+		private string[] GameMtlParser(string filename)
 		{
-			string object_editor_path = Settings.Read("object_editor", "settings");
-			if (!File.Exists(object_editor_path))
+			List<string> materials = new List<string>();
+
+			if (File.Exists(filename))
 			{
-				MessageBox.Show("Please, open Object Editor path", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-				if (OpenProgramDialog.ShowDialog() == DialogResult.OK)
+				var xr_loader = new XRayLoader();
+				using (var r = new BinaryReader(new FileStream(filename, FileMode.Open)))
 				{
-					OpenProgramDialog.InitialDirectory = "";
-					object_editor_path = OpenProgramDialog.FileName;
-					Settings.Write("object_editor", object_editor_path, "settings");
+					xr_loader.SetStream(r.BaseStream);
+					xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)MTL.GAMEMTLS_CHUNK_MTLS, false, true));
+
+					int id = 0;
+					uint size;
+
+					while (true)
+					{
+						if (!xr_loader.find_chunk(id)) break;
+
+						Stream temp = xr_loader.reader.BaseStream;
+
+						if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk(id, false, true))) break;
+
+						size = xr_loader.find_chunkSize((int)MTL.GAMEMTL_CHUNK_MAIN);
+						if (size == 0) break;
+						xr_loader.ReadBytes(4);
+						materials.Add(xr_loader.read_stringZ());
+
+						id++;
+						xr_loader.SetStream(temp);
+					}
 				}
 			}
+			string[] ret = materials.ToArray();
+			Array.Sort(ret);
+			return ret;
+		}
 
-			return object_editor_path;
+		public void ReloadGameMtl(string filename)
+		{
+			game_materials = GameMtlParser(filename);
+
+			if (OGF_V != null && OGF_V.bones != null)
+			{
+				BoneParamsPage.Controls.Clear();
+				for (int i = 0; i < OGF_V.bones.bone_names.Count; i++)
+				{
+					CreateBoneGroupBox(i, OGF_V.bones.bone_names[i], OGF_V.bones.parent_bone_names[i], OGF_V.ikdata.materials[i], OGF_V.ikdata.mass[i], OGF_V.ikdata.center_mass[i], OGF_V.ikdata.position[i], OGF_V.ikdata.rotation[i]);
+				}
+			}
 		}
 
 		string CheckNaN(float val)
@@ -2087,14 +2124,39 @@ namespace OGF_tool
 
 		private void ClosingForm(object sender, FormClosingEventArgs e)
 		{
-			if (Directory.Exists(TempFolder()))
-				Directory.Delete(TempFolder(), true);
+			try
+			{
+				if (ObjWriter != null)
+                {
+					ObjWriter.Close();
+					ObjWriter.Dispose();
+					ObjWriter = null;
+				}
+
+				if (ViewerWorking)
+				{
+					ViewerProcess.Kill();
+					ViewerProcess.Close();
+					ViewerWorking = false;
+				}
+
+				if (Directory.Exists(TempFolder(false)))
+					Directory.Delete(TempFolder(false), true);
+
+				pSettings.Save("FirstLoad", false);
+			}
+			catch (Exception) { }
+		}
+
+		private void ClosedForm(object sender, FormClosedEventArgs e)
+		{
+			ClosingForm(sender, null);
 		}
 
 		// Interface
 		private void InitViewPort()
         {
-			if (ViewerWorking) return;
+			if (ViewerWorking || OGF_V == null) return;
 
 			if (ViewerThread != null && ViewerThread.ThreadState != System.Threading.ThreadState.Stopped)
 				ViewerThread.Abort();
@@ -2115,9 +2177,32 @@ namespace OGF_tool
 					ViewerProcess.Close();
 				}
 
+				string Textures = "";
+				pSettings.LoadText("TexturesPath", ref Textures);
+
+				List<string> pTextures = new List<string>();
+
+				for (int i = 0; i < OGF_V.childs.Count; i++)
+				{
+					string texture_main = Textures + "\\" + OGF_V.childs[i].m_texture + ".dds";
+					string texture_temp = TempFolder() + "\\" + Path.GetFileName(OGF_V.childs[i].m_texture + ".png");
+
+					if (File.Exists(texture_main)) // Create png
+					{
+						pTextures.Add(texture_main);
+						pTextures.Add(texture_temp);
+					}
+				}
+
+				// Insert convert code here
+
+				pTextures.Clear();
+
 				string image_path = "";
+				pSettings.Load("ImagePath", ref image_path);
 
 				bool first_load = true;
+				pSettings.Load("FirstLoad", ref first_load, true);
 
 				SaveTools(ObjName, 6, true);
 
@@ -2222,10 +2307,21 @@ namespace OGF_tool
 			newLbl4.Anchor = VertsLabel.Anchor;
 			newLbl4.TextAlign = VertsLabel.TextAlign;
 
+			var newLbl5 = new Label();
+			newLbl5.Name = "VertsLbl_" + idx;
+			newLbl5.Text = LinksLabel.Text + OGF_V.childs[idx].LinksCount().ToString();
+			newLbl5.Size = new Size(LinksLabel.Size.Width + (OGF_V.childs[idx].links.ToString().Length * 6), LinksLabel.Size.Height);
+			newLbl5.Location = new Point(LinksLabel.Location.X - (OGF_V.childs[idx].verts.ToString().Length * 6) - (OGF_V.childs[idx].faces.ToString().Length * 6) - (OGF_V.childs[idx].LinksCount().ToString().Length * 6), LinksLabel.Location.Y);
+			newLbl5.Anchor = LinksLabel.Anchor;
+			newLbl5.TextAlign = LinksLabel.TextAlign;
+
 			box.Controls.Add(newLbl);
 			box.Controls.Add(newLbl2);
 			box.Controls.Add(newLbl3);
 			box.Controls.Add(newLbl4);
+
+			if (OGF_V.IsSkeleton())
+				box.Controls.Add(newLbl5);
 		}
 
 		private void CreateBoneGroupBox(int idx, string bone_name, string parent_bone_name, string material, float mass, float[] center, float[] pos, float[] rot)
@@ -2275,15 +2371,41 @@ namespace OGF_tool
 			ParentBoneNameLabel.Location = ParentBoneLabelEx.Location;
 			ParentBoneNameLabel.Text = "Parent Bone:";
 
-			var MaterialTextBox = new TextBox();
-			MaterialTextBox.Name = "MaterialBox_" + idx;
-			MaterialTextBox.Size = MaterialTextBoxEx.Size;
-			MaterialTextBox.Location = MaterialTextBoxEx.Location;
-			MaterialTextBox.Text = material;
-			MaterialTextBox.Tag = "string";
-			MaterialTextBox.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
-			MaterialTextBox.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
-			MaterialTextBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+			var MateriaBox = new Control();
+			if (game_materials.Count() == 0)
+			{
+				var MaterialTextBox = new TextBox();
+				MaterialTextBox.Name = "MaterialBox_" + idx;
+				MaterialTextBox.Size = MaterialTextBoxEx.Size;
+				MaterialTextBox.Location = MaterialTextBoxEx.Location;
+				MaterialTextBox.Text = material;
+				MaterialTextBox.Tag = "string";
+				MaterialTextBox.TextChanged += new System.EventHandler(this.TextBoxBonesFilter);
+				MaterialTextBox.KeyDown += new KeyEventHandler(this.TextBoxKeyDown);
+				MaterialTextBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+
+				MateriaBox = MaterialTextBox;
+			}
+			else
+			{
+				var MaterialTextBox = new ComboBox();
+				MaterialTextBox.Name = "MaterialBox_" + idx;
+				MaterialTextBox.Size = MaterialTextBoxEx.Size;
+				MaterialTextBox.Location = MaterialTextBoxEx.Location;
+				MaterialTextBox.Text = material;
+				MaterialTextBox.Tag = "string";
+				MaterialTextBox.SelectedIndexChanged += new System.EventHandler(this.TextBoxBonesFilter);
+				MaterialTextBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+				MaterialTextBox.Items.AddRange(game_materials);
+				MaterialTextBox.DropDownStyle = ComboBoxStyle.DropDownList;
+
+				if (MaterialTextBox.Items.Contains(material))
+					MaterialTextBox.SelectedIndex = MaterialTextBox.Items.IndexOf(material);
+				else
+					MaterialTextBox.Text = material;
+
+				MateriaBox = MaterialTextBox;
+			}
 
 			var MaterialLabel = new Label();
 			MaterialLabel.Name = "MaterialLabel_" + idx;
@@ -2444,7 +2566,7 @@ namespace OGF_tool
 
 			box.Controls.Add(BoneNameTextBox);
 			box.Controls.Add(ParentBoneNameTextBox);
-			box.Controls.Add(MaterialTextBox);
+			box.Controls.Add(MateriaBox);
 
 			box.Controls.Add(BoneNameLabel);
 			box.Controls.Add(ParentBoneNameLabel);

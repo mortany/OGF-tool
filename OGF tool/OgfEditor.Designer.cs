@@ -34,6 +34,7 @@ namespace OGF_tool
             this.TabControl = new System.Windows.Forms.TabControl();
             this.TexturesPage = new System.Windows.Forms.TabPage();
             this.TexturesGropuBox = new System.Windows.Forms.GroupBox();
+            this.LinksLabel = new System.Windows.Forms.Label();
             this.DeleteMesh = new System.Windows.Forms.Button();
             this.VertsLabel = new System.Windows.Forms.Label();
             this.FaceLabel = new System.Windows.Forms.Label();
@@ -103,6 +104,7 @@ namespace OGF_tool
             this.replaceMotionsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.importDataFromModelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.OgfInfo = new System.Windows.Forms.ToolStripMenuItem();
+            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.CurrentFormat = new System.Windows.Forms.ToolStripMenuItem();
             this.FileLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.StatusFile = new System.Windows.Forms.ToolStripStatusLabel();
@@ -176,6 +178,7 @@ namespace OGF_tool
             // 
             this.TexturesGropuBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.TexturesGropuBox.Controls.Add(this.LinksLabel);
             this.TexturesGropuBox.Controls.Add(this.DeleteMesh);
             this.TexturesGropuBox.Controls.Add(this.VertsLabel);
             this.TexturesGropuBox.Controls.Add(this.FaceLabel);
@@ -188,11 +191,22 @@ namespace OGF_tool
             this.TexturesGropuBox.Size = new System.Drawing.Size(470, 127);
             this.TexturesGropuBox.TabIndex = 0;
             this.TexturesGropuBox.TabStop = false;
-            this.TexturesGropuBox.Text = "TexturesBoxExample";
+            this.TexturesGropuBox.Text = "Mesh: [-]";
+            // 
+            // LinksLabel
+            // 
+            this.LinksLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.LinksLabel.AutoSize = true;
+            this.LinksLabel.Location = new System.Drawing.Point(342, 104);
+            this.LinksLabel.Name = "LinksLabel";
+            this.LinksLabel.Size = new System.Drawing.Size(38, 13);
+            this.LinksLabel.TabIndex = 7;
+            this.LinksLabel.Text = "Links: ";
+            this.LinksLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // DeleteMesh
             // 
-            this.DeleteMesh.Location = new System.Drawing.Point(6, 99);
+            this.DeleteMesh.Location = new System.Drawing.Point(5, 99);
             this.DeleteMesh.Name = "DeleteMesh";
             this.DeleteMesh.Size = new System.Drawing.Size(82, 23);
             this.DeleteMesh.TabIndex = 6;
@@ -407,7 +421,7 @@ namespace OGF_tool
             this.BoneParamsGroupBox.Size = new System.Drawing.Size(470, 213);
             this.BoneParamsGroupBox.TabIndex = 0;
             this.BoneParamsGroupBox.TabStop = false;
-            this.BoneParamsGroupBox.Text = "BoneParamsExample";
+            this.BoneParamsGroupBox.Text = "Bone id: [-]";
             // 
             // RotationLabelEx
             // 
@@ -677,10 +691,11 @@ namespace OGF_tool
             this.FileMenuItem,
             this.ToolsMenuItem,
             this.OgfInfo,
+            this.settingsToolStripMenuItem,
             this.CurrentFormat});
-            this.MenuPanel.Location = new System.Drawing.Point(0, 4);
+            this.MenuPanel.Location = new System.Drawing.Point(0, 2);
             this.MenuPanel.Name = "MenuPanel";
-            this.MenuPanel.Size = new System.Drawing.Size(254, 24);
+            this.MenuPanel.Size = new System.Drawing.Size(315, 24);
             this.MenuPanel.TabIndex = 8;
             // 
             // FileMenuItem
@@ -701,7 +716,7 @@ namespace OGF_tool
             // 
             this.LoadMenuParam.Name = "LoadMenuParam";
             this.LoadMenuParam.ShortcutKeys = System.Windows.Forms.Keys.F4;
-            this.LoadMenuParam.Size = new System.Drawing.Size(180, 22);
+            this.LoadMenuParam.Size = new System.Drawing.Size(140, 22);
             this.LoadMenuParam.Text = "Load";
             this.LoadMenuParam.Click += new System.EventHandler(this.loadToolStripMenuItem_Click);
             // 
@@ -709,7 +724,7 @@ namespace OGF_tool
             // 
             this.SaveMenuParam.Name = "SaveMenuParam";
             this.SaveMenuParam.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.SaveMenuParam.Size = new System.Drawing.Size(180, 22);
+            this.SaveMenuParam.Size = new System.Drawing.Size(140, 22);
             this.SaveMenuParam.Text = "Save";
             this.SaveMenuParam.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
@@ -717,7 +732,7 @@ namespace OGF_tool
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
             this.saveAsToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.saveAsToolStripMenuItem.Text = "Save as...";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
             // 
@@ -731,7 +746,7 @@ namespace OGF_tool
             this.sklToolStripMenuItem,
             this.sklsToolStripMenuItem});
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.exportToolStripMenuItem.Text = "Export";
             // 
             // objectToolStripMenuItem
@@ -779,20 +794,20 @@ namespace OGF_tool
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(137, 6);
             // 
             // reloadToolStripMenuItem
             // 
             this.reloadToolStripMenuItem.Name = "reloadToolStripMenuItem";
             this.reloadToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F3;
-            this.reloadToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.reloadToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.reloadToolStripMenuItem.Text = "Reload";
             this.reloadToolStripMenuItem.Click += new System.EventHandler(this.reloadToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -858,6 +873,13 @@ namespace OGF_tool
             this.OgfInfo.Size = new System.Drawing.Size(66, 20);
             this.OgfInfo.Text = "OGF Info";
             this.OgfInfo.Click += new System.EventHandler(this.oGFInfoToolStripMenuItem_Click);
+            // 
+            // settingsToolStripMenuItem
+            // 
+            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+            this.settingsToolStripMenuItem.Text = "Settings";
+            this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
             // 
             // CurrentFormat
             // 
@@ -965,6 +987,7 @@ namespace OGF_tool
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "OGF Params Editor";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ClosingForm);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ClosedForm);
             this.TabControl.ResumeLayout(false);
             this.TexturesPage.ResumeLayout(false);
             this.TexturesGropuBox.ResumeLayout(false);
@@ -1078,6 +1101,8 @@ namespace OGF_tool
         private System.Windows.Forms.TabPage ViewPage;
         private System.Windows.Forms.ToolStripMenuItem objToolStripMenuItem;
         private System.Windows.Forms.SaveFileDialog SaveObjDialog;
+        private System.Windows.Forms.Label LinksLabel;
+        private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
     }
 }
 
