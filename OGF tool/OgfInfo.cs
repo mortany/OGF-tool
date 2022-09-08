@@ -34,8 +34,8 @@ namespace OGF_tool
                     cop_links = true;
                 }
 
-                verts += ch.verts;
-                faces += ch.faces;
+                verts += ch.Vertices.Count;
+                faces += ch.Faces_SWI(0).Count;
             }
 
             OgfVersLabel.Text = OGF.m_version.ToString();

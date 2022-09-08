@@ -802,6 +802,20 @@ namespace OGF_tool
         }
     };
 
+    public class VIPM_SWR
+    {
+        public uint offset;
+        public ushort num_tris;
+        public ushort num_verts;
+
+        public VIPM_SWR()
+        {
+            offset = 0;
+            num_tris = 0;
+            num_verts = 0;
+        }
+    };
+
     public class OGF_Child
     {
         public string m_texture;
@@ -811,6 +825,7 @@ namespace OGF_tool
         {
             Vertices = new List<SSkelVert>();
             Faces = new List<SSkelFace>();
+            SWI = new List<VIPM_SWR>();
             pos = _pos;
             parent_pos = _parent_pos;
             m_texture = texture;
@@ -818,8 +833,6 @@ namespace OGF_tool
             old_size = _old_size;
             chunk_size = _chunk_size;
             links = 0;
-            faces = 0;
-            verts = 0;
             to_delete = false;
         }
 
@@ -829,11 +842,28 @@ namespace OGF_tool
         public int old_size;
 
         public uint links;
-        public long faces, verts;
         public bool to_delete;
 
         public List<SSkelVert> Vertices;
         public List<SSkelFace> Faces;
+        public List<VIPM_SWR> SWI;
+
+        public List<SSkelFace> Faces_SWI(uint lod)
+        {
+            if (SWI.Count == 0) return Faces;
+
+            List<SSkelFace> sSkelFaces = new List<SSkelFace>();
+
+            VIPM_SWR SWR = SWI[(int)lod];
+
+            for (int i = (int)SWR.offset / 3; i < Faces.Count; i++)
+            {
+                sSkelFaces.Add(Faces[i]);
+                if (sSkelFaces.Count >= SWR.num_tris) break;
+            }
+
+            return sSkelFaces;
+        }
 
         public uint LinksCount()
         {

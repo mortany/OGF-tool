@@ -643,10 +643,10 @@ namespace OGF_tool
 					xr_loader.ReadFloat();
 					xr_loader.ReadFloat();
 					OGF_Child chld = new OGF_Child( 0, 0, 0, shader.Length + texture.Length + 2, texture, shader);
-					chld.verts = xr_loader.ReadUInt32();
-					chld.faces = xr_loader.ReadUInt32() / 3;
+					uint verts = xr_loader.ReadUInt32();
+					uint faces = xr_loader.ReadUInt32() / 3;
 
-					for (int i = 0; i < chld.verts; i++)
+					for (int i = 0; i < verts; i++)
 					{
 						SSkelVert Vert = new SSkelVert();
 						Vert.offs = xr_loader.ReadVector();
@@ -654,7 +654,7 @@ namespace OGF_tool
 						chld.Vertices.Add(Vert);
 					}
 
-					for (int i = 0; i < chld.faces; i++)
+					for (int i = 0; i < faces; i++)
 					{
 						SSkelFace Face = new SSkelFace();
 						Face.v[0] = (ushort)xr_loader.ReadUInt16();
@@ -730,9 +730,9 @@ namespace OGF_tool
 					if (loader.find_chunk((int)OGF.OGF4_VERTICES, false, true))
 					{
 						child.links = loader.ReadUInt32();
-						child.verts = loader.ReadUInt32();
+						uint verts = loader.ReadUInt32();
 
-						for (int i = 0; i < child.verts; i++)
+						for (int i = 0; i < verts; i++)
 						{
 							SSkelVert Vert = new SSkelVert();
 							switch (child.LinksCount())
@@ -788,15 +788,34 @@ namespace OGF_tool
 
 					if (loader.find_chunk((int)OGF.OGF4_INDICES, false, true))
 					{
-						child.faces = loader.ReadUInt32() / 3;
+						uint faces = loader.ReadUInt32() / 3;
 
-						for (uint i = 0; i < child.faces; i++)
+						for (uint i = 0; i < faces; i++)
 						{
 							SSkelFace Face = new SSkelFace();
 							Face.v[0] = (ushort)loader.ReadUInt16();
 							Face.v[1] = (ushort)loader.ReadUInt16();
 							Face.v[2] = (ushort)loader.ReadUInt16();
 							child.Faces.Add(Face);
+						}
+					}
+
+					if (loader.find_chunk((int)OGF.OGF4_SWIDATA, false, true))
+					{
+						loader.ReadUInt32();
+						loader.ReadUInt32();
+						loader.ReadUInt32();
+						loader.ReadUInt32();
+
+						uint swi_size = loader.ReadUInt32();
+
+						for (uint i = 0; i < swi_size; i++)
+						{
+							VIPM_SWR SWR = new VIPM_SWR();
+							SWR.offset = loader.ReadUInt32();
+							SWR.num_tris = (ushort)loader.ReadUInt16();
+							SWR.num_verts = (ushort)loader.ReadUInt16();
+							child.SWI.Add(SWR);
 						}
 					}
 				};
@@ -1097,39 +1116,39 @@ namespace OGF_tool
 					ObjWriter.WriteLine("usemtl " + Path.GetFileName(ch.m_texture));
 					childs++;
 
-					for (int i = 0; i < ch.verts; i++)
+					for (int i = 0; i < ch.Vertices.Count; i++)
                     {
 						ObjWriter.WriteLine("v " + vPUSH(MirrorZ_transform(ch.Vertices[i].offs)));
 					}
 
-					for (int i = 0; i < ch.verts; i++)
+					for (int i = 0; i < ch.Vertices.Count; i++)
 					{
 						float x = ch.Vertices[i].uv[0];
 						float y = Math.Abs(1.0f - ch.Vertices[i].uv[1]);
 						ObjWriter.WriteLine("vt " + x.ToString("0.000000") + " " + y.ToString("0.000000"));
 					}
 
-					for (int i = 0; i < ch.verts; i++)
+					for (int i = 0; i < ch.Vertices.Count; i++)
 					{
 						ObjWriter.WriteLine("vn " + vPUSH(MirrorZ_transform(ch.Vertices[i].norm)));
 					}
 
-					for (int i = 0; i < ch.verts; i++)
+					for (int i = 0; i < ch.Vertices.Count; i++)
 					{
 						ObjWriter.WriteLine("vg "+ vPUSH(MirrorZ_transform(ch.Vertices[i].tang)));
 					}
 
-					for (int i = 0; i < ch.verts; i++)
+					for (int i = 0; i < ch.Vertices.Count; i++)
 					{
 						ObjWriter.WriteLine("vb "+ vPUSH(MirrorZ_transform(ch.Vertices[i].binorm)));
 					}
 
-					foreach (var f_it in ch.Faces)
+					foreach (var f_it in ch.Faces_SWI(0))
 					{
 						string tmp = "f " + (v_offs+f_it.v[2]+1).ToString() + "/" + (v_offs+f_it.v[2]+1).ToString() + "/" + (v_offs+f_it.v[2]+1).ToString() + " " + (v_offs+f_it.v[1]+1).ToString() + "/" + (v_offs+f_it.v[1]+1).ToString() + "/" + (v_offs+f_it.v[1]+1).ToString() + " " + (v_offs+f_it.v[0]+1).ToString() + "/" + (v_offs+f_it.v[0]+1).ToString() + "/" + (v_offs+f_it.v[0]+1).ToString();
 						ObjWriter.WriteLine(tmp);
 					}
-					v_offs += (uint)ch.verts;
+					v_offs += (uint)ch.Vertices.Count;
 				}
 				ObjWriter.Close();
 				ObjWriter = null;
@@ -2310,17 +2329,17 @@ namespace OGF_tool
 
 			var newLbl3 = new Label();
 			newLbl3.Name = "FacesLbl_" + idx;
-			newLbl3.Text = FaceLabel.Text + OGF_V.childs[idx].faces.ToString();
-			newLbl3.Size = new Size(FaceLabel.Size.Width + (OGF_V.childs[idx].faces.ToString().Length * 6), FaceLabel.Size.Height);
-			newLbl3.Location = new Point(FaceLabel.Location.X - (OGF_V.childs[idx].faces.ToString().Length * 6), FaceLabel.Location.Y);
+			newLbl3.Text = FaceLabel.Text + OGF_V.childs[idx].Faces_SWI(0).Count.ToString();
+			newLbl3.Size = new Size(FaceLabel.Size.Width + (OGF_V.childs[idx].Faces_SWI(0).Count.ToString().Length * 6), FaceLabel.Size.Height);
+			newLbl3.Location = new Point(FaceLabel.Location.X - (OGF_V.childs[idx].Faces_SWI(0).Count.ToString().Length * 6), FaceLabel.Location.Y);
 			newLbl3.Anchor = FaceLabel.Anchor;
 			newLbl3.TextAlign = FaceLabel.TextAlign;
 
 			var newLbl4 = new Label();
 			newLbl4.Name = "VertsLbl_" + idx;
-			newLbl4.Text = VertsLabel.Text + OGF_V.childs[idx].verts.ToString();
-			newLbl4.Size = new Size(VertsLabel.Size.Width + (OGF_V.childs[idx].verts.ToString().Length * 6), VertsLabel.Size.Height);
-			newLbl4.Location = new Point(VertsLabel.Location.X - (OGF_V.childs[idx].verts.ToString().Length * 6) - (OGF_V.childs[idx].faces.ToString().Length * 6), VertsLabel.Location.Y);
+			newLbl4.Text = VertsLabel.Text + OGF_V.childs[idx].Vertices.Count.ToString();
+			newLbl4.Size = new Size(VertsLabel.Size.Width + (OGF_V.childs[idx].Vertices.Count.ToString().Length * 6), VertsLabel.Size.Height);
+			newLbl4.Location = new Point(VertsLabel.Location.X - (OGF_V.childs[idx].Vertices.Count.ToString().Length * 6) - (OGF_V.childs[idx].Faces_SWI(0).Count.ToString().Length * 6), VertsLabel.Location.Y);
 			newLbl4.Anchor = VertsLabel.Anchor;
 			newLbl4.TextAlign = VertsLabel.TextAlign;
 
@@ -2328,7 +2347,7 @@ namespace OGF_tool
 			newLbl5.Name = "VertsLbl_" + idx;
 			newLbl5.Text = LinksLabel.Text + OGF_V.childs[idx].LinksCount().ToString();
 			newLbl5.Size = new Size(LinksLabel.Size.Width + (OGF_V.childs[idx].links.ToString().Length * 6), LinksLabel.Size.Height);
-			newLbl5.Location = new Point(LinksLabel.Location.X - (OGF_V.childs[idx].verts.ToString().Length * 6) - (OGF_V.childs[idx].faces.ToString().Length * 6) - (OGF_V.childs[idx].LinksCount().ToString().Length * 6), LinksLabel.Location.Y);
+			newLbl5.Location = new Point(LinksLabel.Location.X - (OGF_V.childs[idx].Vertices.Count.ToString().Length * 6) - (OGF_V.childs[idx].Faces_SWI(0).Count.ToString().Length * 6) - (OGF_V.childs[idx].LinksCount().ToString().Length * 6), LinksLabel.Location.Y);
 			newLbl5.Anchor = LinksLabel.Anchor;
 			newLbl5.TextAlign = LinksLabel.TextAlign;
 
