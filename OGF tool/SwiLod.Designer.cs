@@ -30,6 +30,8 @@
         {
             this.label1 = new System.Windows.Forms.Label();
             this.LodBar = new System.Windows.Forms.TrackBar();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.LodBar)).BeginInit();
             this.SuspendLayout();
             // 
@@ -44,24 +46,44 @@
             // 
             // LodBar
             // 
-            this.LodBar.Location = new System.Drawing.Point(102, 12);
+            this.LodBar.Location = new System.Drawing.Point(131, 12);
             this.LodBar.Maximum = 100;
             this.LodBar.Name = "LodBar";
             this.LodBar.Size = new System.Drawing.Size(199, 45);
             this.LodBar.TabIndex = 2;
             this.LodBar.ValueChanged += new System.EventHandler(this.LodNum_ValueChanged);
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(331, 14);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(21, 13);
+            this.label2.TabIndex = 3;
+            this.label2.Text = "LQ";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(108, 14);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(23, 13);
+            this.label3.TabIndex = 4;
+            this.label3.Text = "HQ";
+            // 
             // SwiLod
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(308, 51);
+            this.ClientSize = new System.Drawing.Size(359, 64);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.LodBar);
             this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "SwiLod";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "SwiLod";
+            this.Text = "Lod Factor";
             ((System.ComponentModel.ISupportInitialize)(this.LodBar)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -71,5 +93,7 @@
         #endregion
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TrackBar LodBar;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
     }
 }
