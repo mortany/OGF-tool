@@ -192,11 +192,9 @@ namespace OGF_tool
 			{
 				StatusFile.Text = FILE_NAME.Substring(FILE_NAME.LastIndexOf('\\') + 1);
 
-				OgfInfo.Enabled = true;
 				SaveMenuParam.Enabled = true;
 				saveAsToolStripMenuItem.Enabled = true;
 				ToolsMenuItem.Enabled = !OGF_V.IsDM;
-				OgfInfo.Enabled = !OGF_V.IsDM;
 				openSkeletonInObjectEditorToolStripMenuItem.Enabled = OGF_V.IsSkeleton();
 				exportToolStripMenuItem.Enabled = true;
 				bonesToolStripMenuItem.Enabled = OGF_V.IsSkeleton();
@@ -291,7 +289,8 @@ namespace OGF_tool
 				}
 
 				// Lod
-				TabControl.Controls.Add(LodPage);
+				if (OGF_V.m_version == 4)
+					TabControl.Controls.Add(LodPage);
 
 				if (OGF_V.lod != null)
 				{
@@ -434,7 +433,7 @@ namespace OGF_tool
 				}
 
 				fileStream.ReadBytes(8);
-				file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_HEADER));
+				file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF_HEADER));
 				file_bytes.AddRange(BitConverter.GetBytes((uint)44));
 
 				fileStream.ReadBytes(2);
@@ -453,7 +452,7 @@ namespace OGF_tool
 				else
 					file_bytes.AddRange(temp);
 
-				if (OGF_V.description != null)
+				if (OGF_V.description.exist)
 				{
 					bool old_byte = OGF_V.description.four_byte;
 					if (OGF_V.BrokenType > 0) // Если модель сломана, то восстанавливаем чанк с 8 байтными таймерами
@@ -529,7 +528,7 @@ namespace OGF_tool
 
 				if (OGF_V.IsSkeleton())
                 {
-					file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF4_S_BONE_NAMES));
+					file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF_S_BONE_NAMES));
 					file_bytes.AddRange(BitConverter.GetBytes(OGF_V.bones.chunk_size()));
 					file_bytes.AddRange(OGF_V.bones.data(false));
 
@@ -671,7 +670,7 @@ namespace OGF_tool
 					return true;
 				}
 
-				if (!xr_loader.find_chunk((int)OGF.OGF4_HEADER, false, true))
+				if (!xr_loader.find_chunk((int)OGF.OGF_HEADER, false, true))
 				{
 					MessageBox.Show("Unsupported OGF format! Can't find header chunk!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 					return false;
@@ -679,15 +678,25 @@ namespace OGF_tool
 				else
 				{
 					OGF_C.m_version = xr_loader.ReadByte();
+
+					if (OGF_C.m_version < 3)
+                    {
+						MessageBox.Show($"Unsupported OGF version: {OGF_C.m_version}!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+						return false;
+					}
+
 					OGF_C.m_model_type = xr_loader.ReadByte();
 					xr_loader.ReadBytes(42);
 				}
 
-				uint DescriptionSize = xr_loader.find_chunkSize((int)OGF.OGF4_S_DESC, false, true);
+				OGF_C.description = new Description();
+
+				int DescChunk = (OGF_C.m_version == 4 ? (int)OGF.OGF4_S_DESC : (int)OGF.OGF3_S_DESC);
+				uint DescriptionSize = xr_loader.find_chunkSize(DescChunk, false, true);
 				if (DescriptionSize > 0)
 				{
-					OGF_C.description = new Description();
 					OGF_C.description.pos = xr_loader.chunk_pos;
+					OGF_C.description.exist = true;
 
 					// Читаем таймеры в 8 байт
 					long reader_start_pos = xr_loader.reader.BaseStream.Position;
@@ -729,7 +738,7 @@ namespace OGF_tool
 					}
 				}
 
-				TriangleParser LoadTriangles = (loader, child) =>
+				TriangleParser LoadTrianglesV4 = (loader, child) =>
 				{
 					if (loader.find_chunk((int)OGF.OGF4_VERTICES, false, true))
 					{
@@ -781,6 +790,7 @@ namespace OGF_tool
                                     Vert.uv = loader.ReadVector2();
 									break;
 								default:
+									child.links = 0;
 									Vert.offs = loader.ReadVector();
 									Vert.norm = loader.ReadVector();
 									Vert.uv = loader.ReadVector2();
@@ -824,7 +834,58 @@ namespace OGF_tool
 					}
 				};
 
-				bool bFindChunk = xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_CHILDREN, false, true));
+				TriangleParser LoadTrianglesV3 = (loader, child) =>
+				{
+					if (loader.find_chunk((int)OGF.OGF3_VERTICES, false, true))
+					{
+						child.links = loader.ReadUInt32();
+						uint verts = loader.ReadUInt32();
+
+						for (int i = 0; i < verts; i++)
+						{
+							SSkelVert Vert = new SSkelVert();
+							switch (child.LinksCount())
+							{
+								case 1:
+									Vert.offs = loader.ReadVector();
+									Vert.norm = loader.ReadVector();
+									Vert.uv = loader.ReadVector2();
+
+									loader.ReadUInt32();
+									break;
+								case 2:
+									loader.ReadUInt16();
+									loader.ReadUInt16();
+
+									Vert.offs = loader.ReadVector();
+									Vert.norm = loader.ReadVector();
+									Vert.tang = loader.ReadVector();
+									Vert.binorm = loader.ReadVector();
+									loader.ReadFloat();
+									Vert.uv = loader.ReadVector2();
+									break;
+							}
+							child.Vertices.Add(Vert);
+						}
+					}
+
+					if (loader.find_chunk((int)OGF.OGF3_INDICES, false, true))
+					{
+						uint faces = loader.ReadUInt32() / 3;
+
+						for (uint i = 0; i < faces; i++)
+						{
+							SSkelFace Face = new SSkelFace();
+							Face.v[0] = (ushort)loader.ReadUInt16();
+							Face.v[1] = (ushort)loader.ReadUInt16();
+							Face.v[2] = (ushort)loader.ReadUInt16();
+							child.Faces.Add(Face);
+						}
+					}
+				};
+
+				int ChildChunk = (OGF_C.m_version == 4 ? (int)OGF.OGF4_CHILDREN : (int)OGF.OGF3_CHILDREN);
+				bool bFindChunk = xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk(ChildChunk, false, true));
 
 				OGF_C.pos = xr_loader.chunk_pos;
 
@@ -844,13 +905,16 @@ namespace OGF_tool
 						if (!xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk(id, false, true))) break;
 
 						long pos = xr_loader.chunk_pos + OGF_C.pos + 16;
-						size = xr_loader.find_chunkSize((int)OGF.OGF4_TEXTURE);
+						size = xr_loader.find_chunkSize((int)OGF.OGF_TEXTURE);
 
 						if (size == 0) break;
 
 						OGF_Child chld = new OGF_Child(xr_loader.chunk_pos + pos, pos - 8, chunk_size,(int)size, xr_loader.read_stringZ(), xr_loader.read_stringZ());
 
-						LoadTriangles(xr_loader, chld);
+						if (OGF_C.m_version == 4)
+							LoadTrianglesV4(xr_loader, chld);
+						else
+							LoadTrianglesV3(xr_loader, chld);
 
 						OGF_C.childs.Add(chld);
 
@@ -860,13 +924,13 @@ namespace OGF_tool
 				}
 				else
                 {
-					size = xr_loader.find_chunkSize((int)OGF.OGF4_TEXTURE, false, true);
+					size = xr_loader.find_chunkSize((int)OGF.OGF_TEXTURE, false, true);
 
 					if (size != 0)
 					{
 						OGF_Child chld = new OGF_Child(0, 0, 0, (int)size, xr_loader.read_stringZ(), xr_loader.read_stringZ());
 
-						LoadTriangles(xr_loader, chld);
+						LoadTrianglesV4(xr_loader, chld);
 
 						OGF_C.childs.Add(chld);
 					}
@@ -883,7 +947,7 @@ namespace OGF_tool
 				if (OGF_C.IsSkeleton())
 				{
 					// Bones
-					if (!xr_loader.find_chunk((int)OGF.OGF4_S_BONE_NAMES, false, true))
+					if (!xr_loader.find_chunk((int)OGF.OGF_S_BONE_NAMES, false, true))
 					{
 						MessageBox.Show("Unsupported OGF format! Can't find bones chunk!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 						return false;
@@ -926,54 +990,32 @@ namespace OGF_tool
 					}
 
 					// Ik Data
-					if (!xr_loader.find_chunk((int)OGF.OGF4_S_IKDATA, false, true))
-					{
-						MessageBox.Show("Unsupported OGF format! Can't find ik data chunk!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-						return false;
-					}
-					else
+					int IKDataChunk = (OGF_C.m_version == 4 ? (int)OGF.OGF4_S_IKDATA : (int)OGF.OGF3_S_IKDATA_2);
+					bool IKDataChunkFind = xr_loader.find_chunk(IKDataChunk, false, true);
+
+					// Release Ik Data
+					if (IKDataChunkFind)
 					{
 						OGF_C.ikdata = new IK_Data();
 
 						for (int i = 0; i < OGF_C.bones.bone_names.Count; i++)
 						{
 							List<byte[]> bytes_1 = new List<byte[]>();
-							OGF_C.ikdata.old_size += 4;
 
 							byte[] temp_byte;
 							uint version = xr_loader.ReadUInt32();
+							OGF_C.ikdata.old_size += 4;
 							string gmtl_name = xr_loader.read_stringZ();
 
 							temp_byte = xr_loader.ReadBytes(112);   // struct SBoneShape
 							bytes_1.Add(temp_byte);
 							OGF_C.ikdata.old_size += gmtl_name.Length + 1 + 112;
 
-							// Import
-							{
-								temp_byte = xr_loader.ReadBytes(4);
-								bytes_1.Add(temp_byte);
-								temp_byte = xr_loader.ReadBytes(16 * 3);
-								bytes_1.Add(temp_byte);
-								temp_byte = xr_loader.ReadBytes(4);
-								bytes_1.Add(temp_byte);
-								temp_byte = xr_loader.ReadBytes(4);
-								bytes_1.Add(temp_byte);
-								temp_byte = xr_loader.ReadBytes(4);
-								bytes_1.Add(temp_byte);
-								temp_byte = xr_loader.ReadBytes(4);
-								bytes_1.Add(temp_byte);
-								temp_byte = xr_loader.ReadBytes(4);
-								bytes_1.Add(temp_byte);
+							int ImportBytes = 76;
 
-								OGF_C.ikdata.old_size += 4 + 16 * 3 + 4 + 4 + 4 + 4 + 4;
-
-								if (version > 0)
-								{
-									temp_byte = xr_loader.ReadBytes(4);
-									bytes_1.Add(temp_byte);
-									OGF_C.ikdata.old_size += 4;
-								}
-							}
+							temp_byte = xr_loader.ReadBytes(ImportBytes); // Import
+							bytes_1.Add(temp_byte);
+							OGF_C.ikdata.old_size += ImportBytes;
 
 							float[] rotation = new float[3];
 							rotation = xr_loader.ReadVector();
@@ -995,11 +1037,72 @@ namespace OGF_tool
 							OGF_C.ikdata.bytes_1.Add(bytes_1);
 							OGF_C.ikdata.position.Add(position);
 							OGF_C.ikdata.rotation.Add(rotation);
+							OGF_C.ikdata.import_bytes.Add((uint)ImportBytes);
+						}
+
+						IKDataChunkFind = true;
+					}
+					else
+					{
+						IKDataChunkFind = xr_loader.find_chunk((int)OGF.OGF3_S_IKDATA, false, true);
+
+						if (IKDataChunkFind || xr_loader.find_chunk((int)OGF.OGF3_S_IKDATA_0, false, true))
+						{
+							OGF_C.ikdata = new IK_Data();
+
+							for (int i = 0; i < OGF_C.bones.bone_names.Count; i++)
+							{
+								List<byte[]> bytes_1 = new List<byte[]>();
+
+								byte[] temp_byte;
+								string gmtl_name = xr_loader.read_stringZ();
+
+								temp_byte = xr_loader.ReadBytes(112);   // struct SBoneShape
+								bytes_1.Add(temp_byte);
+								OGF_C.ikdata.old_size += gmtl_name.Length + 1 + 112;
+
+								int ImportBytes = IKDataChunkFind ? 72 : 60;
+
+								temp_byte = xr_loader.ReadBytes(ImportBytes); // Import
+								bytes_1.Add(temp_byte);
+								OGF_C.ikdata.old_size += ImportBytes;
+
+								float[] rotation = new float[3];
+								rotation = xr_loader.ReadVector();
+
+								float[] position = new float[3];
+								position = xr_loader.ReadVector();
+
+								float mass = xr_loader.ReadFloat();
+
+								float[] center = new float[3];
+								center = xr_loader.ReadVector();
+
+								OGF_C.ikdata.old_size += 12 + 12 + 4 + 12;
+
+								OGF_C.ikdata.materials.Add(gmtl_name);
+								OGF_C.ikdata.mass.Add(mass);
+								OGF_C.ikdata.version.Add(0);
+								OGF_C.ikdata.center_mass.Add(center);
+								OGF_C.ikdata.bytes_1.Add(bytes_1);
+								OGF_C.ikdata.position.Add(position);
+								OGF_C.ikdata.rotation.Add(rotation);
+								OGF_C.ikdata.import_bytes.Add((uint)ImportBytes);
+							}
+
+							IKDataChunkFind = true;
 						}
 					}
 
+					if (!IKDataChunkFind)
+					{
+						MessageBox.Show("Unsupported OGF format! Can't find ik data chunk!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+						return false;
+					}
+
 					// Userdata
-					if (xr_loader.find_chunk((int)OGF.OGF4_S_USERDATA, false, true))
+					int UserDataChunk = (OGF_C.m_version == 4 ? (int)OGF.OGF4_S_USERDATA : (int)OGF.OGF3_S_USERDATA);
+					if (xr_loader.find_chunk(UserDataChunk, false, true))
 					{
 						OGF_C.userdata = new UserData();
 						OGF_C.userdata.pos = xr_loader.chunk_pos;
@@ -1008,7 +1111,7 @@ namespace OGF_tool
 					}
 
 					// Lod ref
-					if (xr_loader.find_chunk((int)OGF.OGF4_S_LODS, false, true))
+					if (OGF_C.m_version == 4 && xr_loader.find_chunk((int)OGF.OGF4_S_LODS, false, true))
 					{
 						OGF_C.lod = new Lod();
 						OGF_C.lod.pos = xr_loader.chunk_pos;
@@ -1017,15 +1120,16 @@ namespace OGF_tool
 					}
 
 					// Motion Refs
-					bool v3 = xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS, false, true);
+					int RefsChunk = (OGF_C.m_version == 4 ? (int)OGF.OGF4_S_MOTION_REFS : (int)OGF.OGF3_S_MOTION_REFS);
+					bool StringRefs = xr_loader.find_chunk(RefsChunk, false, true);
 
-					if (v3 || xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS2, false, true))
+					if (StringRefs || xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS2, false, true) && OGF_C.m_version == 4)
 					{
 						OGF_C.motion_refs = new MotionRefs();
 						OGF_C.motion_refs.pos = xr_loader.chunk_pos;
 						OGF_C.motion_refs.refs = new List<string>();
 
-						if (v3)
+						if (StringRefs)
 						{
 							OGF_C.motion_refs.soc = true;
 
@@ -1067,13 +1171,13 @@ namespace OGF_tool
 					}
 
 					//Motions
-					if (xr_loader.find_chunk((int)OGF.OGF4_S_MOTIONS, false, true))
+					if (xr_loader.find_chunk((int)OGF.OGF_S_MOTIONS, false, true))
 					{
 						xr_loader.reader.BaseStream.Position -= 8;
 						Cur_OMF = xr_loader.ReadBytes((int)xr_loader.reader.BaseStream.Length - (int)xr_loader.reader.BaseStream.Position);
 					}
 
-					if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_S_MOTIONS, false, true)))
+					if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF_S_MOTIONS, false, true)))
 					{
 						id = 0;
 
@@ -1377,7 +1481,7 @@ namespace OGF_tool
 				{
 					xr_loader.SetStream(fileStream.BaseStream);
 
-					if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_S_MOTIONS, false, true)))
+					if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF_S_MOTIONS, false, true)))
 					{
 						int id = 0;
 
@@ -1699,7 +1803,7 @@ namespace OGF_tool
 			{
 				xr_loader.SetStream(r.BaseStream);
 
-				if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_S_MOTIONS, false, true)))
+				if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF_S_MOTIONS, false, true)))
 				{
 					// Апдейтим визуал встроенных анимаций
 					AppendOMFButton.Visible = false;
@@ -1890,7 +1994,7 @@ namespace OGF_tool
 						{
 							xr_loader.SetStream(fileStream.BaseStream);
 
-							if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF4_S_MOTIONS, false, true)))
+							if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk((int)OGF.OGF_S_MOTIONS, false, true)))
 							{
 								int id = 0;
 
@@ -1943,7 +2047,7 @@ namespace OGF_tool
 
 		private void UpdateModelType()
         {
-			if (OGF_V == null || OGF_V.description == null) return;
+			if (OGF_V == null || !OGF_V.description.exist) return;
 
 			if (OGF_V.bones == null)
 				OGF_V.m_model_type = 1;
@@ -2210,6 +2314,11 @@ namespace OGF_tool
 			ClosingForm(sender, null);
 		}
 
+		void Msg(string text)
+        {
+			MessageBox.Show(text);
+        }
+
 		// Interface
 		private void InitViewPort(bool create_model = true)
         {
@@ -2378,7 +2487,7 @@ namespace OGF_tool
 			var newLbl5 = new Label();
 			newLbl5.Name = "LinksLbl_" + idx;
 			newLbl5.Text = LinksLabel.Text + OGF_V.childs[idx].LinksCount().ToString();
-			newLbl5.Size = new Size(LinksLabel.Size.Width + (OGF_V.childs[idx].links.ToString().Length * 6), LinksLabel.Size.Height);
+			newLbl5.Size = new Size(LinksLabel.Size.Width + (OGF_V.childs[idx].LinksCount().ToString().Length * 6), LinksLabel.Size.Height);
 			newLbl5.Location = new Point(LinksLabel.Location.X - (OGF_V.childs[idx].Vertices.Count.ToString().Length * 6) - (OGF_V.childs[idx].Faces_SWI(CurrentLod).Count.ToString().Length * 6) - (OGF_V.childs[idx].LinksCount().ToString().Length * 6), LinksLabel.Location.Y);
 			newLbl5.Anchor = LinksLabel.Anchor;
 			newLbl5.TextAlign = LinksLabel.TextAlign;
@@ -2481,7 +2590,10 @@ namespace OGF_tool
 				if (MaterialTextBox.Items.Contains(material))
 					MaterialTextBox.SelectedIndex = MaterialTextBox.Items.IndexOf(material);
 				else
-					MaterialTextBox.Text = material;
+				{
+					MaterialTextBox.Items.Insert(0, material);
+					MaterialTextBox.SelectedIndex = 0;
+				}
 
 				MateriaBox = MaterialTextBox;
 			}

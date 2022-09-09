@@ -7,7 +7,10 @@ namespace OGF_tool
 {
     public enum OGF
     {
-        OGF4_HEADER = 1,
+        OGF_HEADER = 1,
+        OGF_TEXTURE = 2,
+        OGF_S_BONE_NAMES = 13,  // * For skeletons only
+        OGF_S_MOTIONS = 14, // * For skeletons only
 
         //build 729
         OGF2_TEXTURE = 2,
@@ -18,7 +21,6 @@ namespace OGF_tool
         OGF2_VCONTAINER = 11,
         OGF2_BSPHERE = 12,
 
-        OGF3_TEXTURE = 2,
         OGF3_TEXTURE_L = 3,
         OGF3_CHILD_REFS = 5,
         OGF3_BBOX = 6,
@@ -28,8 +30,6 @@ namespace OGF_tool
         OGF3_VCONTAINER = 10,
         OGF3_BSPHERE = 11,
         OGF3_CHILDREN_L = 12,
-        OGF3_S_BONE_NAMES = 13,
-        OGF3_S_MOTIONS = 14,// build 1469 - 1580
         OGF3_DPATCH = 15,  // guessed name
         OGF3_LODS = 16,   // guessed name
         OGF3_CHILDREN = 17,
@@ -46,7 +46,6 @@ namespace OGF_tool
         OGF3_S_IKDATA_2 = 28,// build 1842 - 1865
         OGF3_S_MOTION_REFS = 29,// build 1842
 
-        OGF4_TEXTURE = 2,
         OGF4_VERTICES = 3,
         OGF4_INDICES = 4,
         OGF4_P_MAP = 5,  //---------------------- unused
@@ -57,8 +56,6 @@ namespace OGF_tool
         OGF4_CHILDREN_L = 10,    // Link to child visuals
         OGF4_LODDEF2 = 11,   // + 5 channel data
         OGF4_TREEDEF2 = 12,  // + 5 channel data
-        OGF4_S_BONE_NAMES = 13,  // * For skeletons only
-        OGF4_S_MOTIONS = 14, // * For skeletons only
         OGF4_S_SMPARAMS = 15,    // * For skeletons only
         OGF4_S_IKDATA = 16,  // * For skeletons only
         OGF4_S_USERDATA = 17,    // * For skeletons only (Ini-file)
@@ -172,6 +169,40 @@ namespace OGF_tool
         flRKeyAbsent  = (1<<1),
         flTKey16IsBit = (1<<2),
         flTKeyFFT_Bit = (1<<3),
+    };
+
+    public enum ModelType
+    {
+        MT3_NORMAL = 0, // Fvisual
+        MT3_HIERRARHY = 1,    // FHierrarhyVisual
+        MT3_PROGRESSIVE = 2,  // FProgressiveFixedVisual
+        MT3_SKELETON_GEOMDEF_PM = 3,  // CSkeletonX_PM
+        MT3_SKELETON_ANIM = 4,    // CKinematics
+        MT3_DETAIL_PATCH = 6, // FDetailPatch
+        MT3_SKELETON_GEOMDEF_ST = 7,  // CSkeletonX_ST
+        MT3_CACHED = 8,   // FCached
+        MT3_PARTICLE = 9, // CPSVisual
+        MT3_PROGRESSIVE2 = 10, // FProgressive
+        MT3_LOD = 11,  // FLOD build 1472 - 1865
+        MT3_TREE = 12, // FTreeVisual build 1472 - 1865
+                        //				= 0xd,	// CParticleEffect 1844
+                        //				= 0xe,	// CParticleGroup 1844
+        MT3_SKELETON_RIGID = 15,   // CSkeletonRigid 1844
+
+        MT4_NORMAL = 0, // Fvisual
+        MT4_HIERRARHY = 1,    // FHierrarhyVisual
+        MT4_PROGRESSIVE = 2,  // FProgressive
+        MT4_SKELETON_ANIM = 3,    // CKinematicsAnimated
+        MT4_SKELETON_GEOMDEF_PM = 4,  // CSkeletonX_PM
+        MT4_SKELETON_GEOMDEF_ST = 5,  // CSkeletonX_ST
+        MT4_LOD = 6,  // FLOD
+        MT4_TREE_ST = 7,  // FTreeVisual_ST
+        MT4_PARTICLE_EFFECT = 8,  // PS::CParticleEffect
+        MT4_PARTICLE_GROUP = 9,   // PS::CParticleGroup
+        MT4_SKELETON_RIGID = 10,   // CKinematics
+        MT4_TREE_PM = 11,  // FTreeVisual_PM
+
+        MT4_OMF = 64, // fake model type to distinguish .omf
     };
 
     public class XRayLoader
@@ -446,12 +477,18 @@ namespace OGF_tool
 
         public bool IsSkeleton()
         {
-            return m_model_type == 3 || m_model_type == 10;
+            if (m_version == 4)
+                return m_model_type == (byte)ModelType.MT4_SKELETON_ANIM || m_model_type == (byte)ModelType.MT4_SKELETON_RIGID;
+            else
+                return m_model_type == (byte)ModelType.MT3_SKELETON_ANIM || m_model_type == (byte)ModelType.MT3_SKELETON_RIGID;
         }
 
         public bool IsAnimated()
         {
-            return m_model_type == 3;
+            if (m_version == 4)
+                return m_model_type == (byte)ModelType.MT4_SKELETON_ANIM;
+            else
+                return m_model_type == (byte)ModelType.MT3_SKELETON_ANIM;
         }
     }
 
@@ -648,6 +685,7 @@ namespace OGF_tool
         public List<float[]> position;
         public List<float[]> rotation;
         public List<List<byte[]>> bytes_1;
+        public List<uint> import_bytes;
 
         public IK_Data()
         {
@@ -659,6 +697,7 @@ namespace OGF_tool
             this.position = new List<float[]>();
             this.rotation = new List<float[]>();
             this.bytes_1 = new List<List<byte[]>>();
+            this.import_bytes = new List<uint>();
         }
 
         public uint chunk_size()
@@ -670,16 +709,7 @@ namespace OGF_tool
                 temp += (uint)materials[i].Length + 1;       // bone name
                 temp += 112;
 
-                temp += 4;
-                temp += 16 * 3;
-                temp += 4;
-                temp += 4;
-                temp += 4;
-                temp += 4;
-                temp += 4;
-
-                if (version[i] > 0)
-                    temp += 4;
+                temp += import_bytes[i];
 
                 temp += 12;
                 temp += 12;
@@ -696,7 +726,9 @@ namespace OGF_tool
 
             for (int i = 0; i < materials.Count; i++)
             {
-                temp.AddRange(BitConverter.GetBytes(version[i]));
+                if (import_bytes[i] == 76)
+                    temp.AddRange(BitConverter.GetBytes(version[i]));
+
                 temp.AddRange(Encoding.Default.GetBytes(materials[i]));
                 temp.Add(0);
                 for (int j = 0; j < bytes_1[i].Count; j++)
@@ -735,11 +767,23 @@ namespace OGF_tool
         public string m_export_modif_name_tool;
         public long m_modified_time;
 
+        public bool exist;
+
         public Description()
         {
             this.pos = 0;
             this.old_size = 0;
             this.four_byte = false;
+            this.exist = false;
+
+            this.m_source = "";
+            this.m_export_tool = "";
+            this.m_export_time = 0;
+            this.m_owner_name = "";
+            this.m_creation_time = 0;
+            this.m_export_modif_name_tool = "";
+            this.m_modified_time = 0;
+
         }
 
         public byte[] data()
@@ -882,7 +926,7 @@ namespace OGF_tool
         public uint LinksCount()
         {
             uint temp_links = 0;
-            if (temp_links >= 0x12071980)
+            if (links >= 0x12071980)
                 temp_links = links / 0x12071980;
             else
                 temp_links = links;

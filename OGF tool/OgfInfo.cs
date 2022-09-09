@@ -91,13 +91,18 @@ namespace OGF_tool
             VertsLabel.Text = verts.ToString();
             FacesLabel.Text = faces.ToString();
 
-            ByteLabel.Text = (OGF.description.four_byte ? "4 byte" : "8 byte");
+            ByteLabel.Text = OGF.description.exist ? (OGF.description.four_byte ? "4 byte" : "8 byte") : "-";
             RepairTimersButton.Enabled = OGF.description.four_byte;
 
             SourceTextBox.Text = OGF.description.m_source;
             ConverterTextBox.Text = OGF.description.m_export_tool;
             CreatorTextBox.Text = OGF.description.m_owner_name;
             EditorTextBox.Text = OGF.description.m_export_modif_name_tool;
+
+            SourceTextBox.Enabled = OGF.description.exist;
+            ConverterTextBox.Enabled = OGF.description.exist;
+            CreatorTextBox.Enabled = OGF.description.exist;
+            EditorTextBox.Enabled = OGF.description.exist;
 
             System.DateTime dt_e = new System.DateTime(1970, 1, 1).AddSeconds(OGF.description.m_export_time);
             System.DateTime dt_c = new System.DateTime(1970, 1, 1).AddSeconds(OGF.description.m_creation_time);
@@ -106,6 +111,10 @@ namespace OGF_tool
             ExportTimeDate.Value = dt_e;
             CreationTimeDate.Value = dt_c;
             ModifedTimeDate.Value = dt_m;
+
+            ExportTimeDate.Enabled = OGF.description.exist;
+            CreationTimeDate.Enabled = OGF.description.exist;
+            ModifedTimeDate.Enabled = OGF.description.exist;
         }
 
         private void CloseForm(object sender, FormClosingEventArgs e)
