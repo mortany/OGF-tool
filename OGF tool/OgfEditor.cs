@@ -33,6 +33,7 @@ namespace OGF_tool
 		string number_mask = "";
 		private Size DefSize = new Size();
 		StreamWriter ObjWriter = null; // for closing
+		float CurrentLod = 0.0f;
 
 		Process ViewerProcess = new Process();
 		public bool ViewerWorking = false;
@@ -124,6 +125,7 @@ namespace OGF_tool
 			exportToolStripMenuItem.Enabled = false;
 			LabelBroken.Visible = false;
 			viewPortToolStripMenuItem.Visible = false;
+			ChangeLodButton.Enabled = false;
 
 			SaveSklDialog = new FolderSelectDialog();
 
@@ -201,6 +203,7 @@ namespace OGF_tool
 				omfToolStripMenuItem.Enabled = Current_OMF != null;
 				sklToolStripMenuItem.Enabled = Current_OMF != null;
 				sklsToolStripMenuItem.Enabled = Current_OMF != null;
+				ChangeLodButton.Enabled = OGF_V.IsProgressive();
 
 				OpenOGFDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
 				OpenOGF_DmDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
@@ -223,6 +226,7 @@ namespace OGF_tool
 			TabControl.Controls.Add(TexturesPage);
 
 			OgfInfo.Enabled = OGF_V.description != null;
+			CurrentLod = 0;
 
 			if (OGF_V.IsSkeleton())
 			{
@@ -1096,7 +1100,7 @@ namespace OGF_tool
 		}
 
 
-		private void SaveAsObj(string filename)
+		private void SaveAsObj(string filename, float lod)
 		{
 			using (ObjWriter = File.CreateText(filename))
 			{
@@ -1143,7 +1147,7 @@ namespace OGF_tool
 						ObjWriter.WriteLine("vb "+ vPUSH(MirrorZ_transform(ch.Vertices[i].binorm)));
 					}
 
-					foreach (var f_it in ch.Faces_SWI(0))
+					foreach (var f_it in ch.Faces_SWI(lod))
 					{
 						string tmp = "f " + (v_offs+f_it.v[2]+1).ToString() + "/" + (v_offs+f_it.v[2]+1).ToString() + "/" + (v_offs+f_it.v[2]+1).ToString() + " " + (v_offs+f_it.v[1]+1).ToString() + "/" + (v_offs+f_it.v[1]+1).ToString() + "/" + (v_offs+f_it.v[1]+1).ToString() + " " + (v_offs+f_it.v[0]+1).ToString() + "/" + (v_offs+f_it.v[0]+1).ToString() + "/" + (v_offs+f_it.v[0]+1).ToString();
 						ObjWriter.WriteLine(tmp);
@@ -1401,7 +1405,7 @@ namespace OGF_tool
 				}
 			}
 
-			OgfInfo Info = new OgfInfo(OGF_V, IsTextCorrect(MotionRefsBox.Text), flags);
+			OgfInfo Info = new OgfInfo(OGF_V, IsTextCorrect(MotionRefsBox.Text), CurrentLod, flags);
             Info.ShowDialog();
 
 			if (Info.res)
@@ -1496,7 +1500,7 @@ namespace OGF_tool
 				}
 			}
 			else if (format == 6)
-				SaveAsObj(filename);
+				SaveAsObj(filename, CurrentLod);
 
 			if (!has_msg && !silent)
 				AutoClosingMessageBox.Show(OGF_V.BrokenType > 0 ? "Repaired and Exported!" : "Exported!", "", OGF_V.BrokenType > 0 ? 700 : 500, MessageBoxIcon.Information);
@@ -1533,7 +1537,10 @@ namespace OGF_tool
 		{
 			if (SaveObjDialog.ShowDialog() == DialogResult.OK)
 			{
+				float old_lod = CurrentLod;
+				CurrentLod = 0.0f;
 				SaveTools(SaveObjDialog.FileName, 6);
+				CurrentLod = old_lod;
 				SaveObjDialog.InitialDirectory = "";
 			}
 		}
@@ -2041,6 +2048,31 @@ namespace OGF_tool
 				ReloadGameMtl(game_mtl);
 		}
 
+		private void changeLodToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			float old_lod = CurrentLod;
+			SwiLod swiLod = new SwiLod(CurrentLod);
+			swiLod.ShowDialog();
+			CurrentLod = swiLod.Lod;
+
+			if (old_lod != CurrentLod)
+				RecalcLod();
+		}
+
+		private void RecalcLod()
+        {
+			if (ViewerWorking)
+				InitViewPort();
+
+			for (int idx = 0; idx < TexturesPage.Controls.Count; idx++)
+            {
+				Control Mesh = TexturesPage.Controls[idx];
+
+				Label FaceLbl = (Label)Mesh.Controls["FacesLbl_" + idx.ToString()];
+				FaceLbl.Text = FaceLabel.Text + OGF_V.childs[idx].Faces_SWI(CurrentLod).Count.ToString();
+			}
+        }
+
 		private string[] GameMtlParser(string filename)
 		{
 			List<string> materials = new List<string>();
@@ -2329,9 +2361,9 @@ namespace OGF_tool
 
 			var newLbl3 = new Label();
 			newLbl3.Name = "FacesLbl_" + idx;
-			newLbl3.Text = FaceLabel.Text + OGF_V.childs[idx].Faces_SWI(0).Count.ToString();
-			newLbl3.Size = new Size(FaceLabel.Size.Width + (OGF_V.childs[idx].Faces_SWI(0).Count.ToString().Length * 6), FaceLabel.Size.Height);
-			newLbl3.Location = new Point(FaceLabel.Location.X - (OGF_V.childs[idx].Faces_SWI(0).Count.ToString().Length * 6), FaceLabel.Location.Y);
+			newLbl3.Text = FaceLabel.Text + OGF_V.childs[idx].Faces_SWI(CurrentLod).Count.ToString();
+			newLbl3.Size = new Size(FaceLabel.Size.Width + (OGF_V.childs[idx].Faces_SWI(CurrentLod).Count.ToString().Length * 6), FaceLabel.Size.Height);
+			newLbl3.Location = new Point(FaceLabel.Location.X - (OGF_V.childs[idx].Faces_SWI(CurrentLod).Count.ToString().Length * 6), FaceLabel.Location.Y);
 			newLbl3.Anchor = FaceLabel.Anchor;
 			newLbl3.TextAlign = FaceLabel.TextAlign;
 
@@ -2339,17 +2371,25 @@ namespace OGF_tool
 			newLbl4.Name = "VertsLbl_" + idx;
 			newLbl4.Text = VertsLabel.Text + OGF_V.childs[idx].Vertices.Count.ToString();
 			newLbl4.Size = new Size(VertsLabel.Size.Width + (OGF_V.childs[idx].Vertices.Count.ToString().Length * 6), VertsLabel.Size.Height);
-			newLbl4.Location = new Point(VertsLabel.Location.X - (OGF_V.childs[idx].Vertices.Count.ToString().Length * 6) - (OGF_V.childs[idx].Faces_SWI(0).Count.ToString().Length * 6), VertsLabel.Location.Y);
+			newLbl4.Location = new Point(VertsLabel.Location.X - (OGF_V.childs[idx].Vertices.Count.ToString().Length * 6) - (OGF_V.childs[idx].Faces_SWI(CurrentLod).Count.ToString().Length * 6), VertsLabel.Location.Y);
 			newLbl4.Anchor = VertsLabel.Anchor;
 			newLbl4.TextAlign = VertsLabel.TextAlign;
 
 			var newLbl5 = new Label();
-			newLbl5.Name = "VertsLbl_" + idx;
+			newLbl5.Name = "LinksLbl_" + idx;
 			newLbl5.Text = LinksLabel.Text + OGF_V.childs[idx].LinksCount().ToString();
 			newLbl5.Size = new Size(LinksLabel.Size.Width + (OGF_V.childs[idx].links.ToString().Length * 6), LinksLabel.Size.Height);
-			newLbl5.Location = new Point(LinksLabel.Location.X - (OGF_V.childs[idx].Vertices.Count.ToString().Length * 6) - (OGF_V.childs[idx].Faces_SWI(0).Count.ToString().Length * 6) - (OGF_V.childs[idx].LinksCount().ToString().Length * 6), LinksLabel.Location.Y);
+			newLbl5.Location = new Point(LinksLabel.Location.X - (OGF_V.childs[idx].Vertices.Count.ToString().Length * 6) - (OGF_V.childs[idx].Faces_SWI(CurrentLod).Count.ToString().Length * 6) - (OGF_V.childs[idx].LinksCount().ToString().Length * 6), LinksLabel.Location.Y);
 			newLbl5.Anchor = LinksLabel.Anchor;
 			newLbl5.TextAlign = LinksLabel.TextAlign;
+
+			var newLbl6 = new Label();
+			newLbl6.Name = "LodsLbl_" + idx;
+			newLbl6.Text = LodLabel.Text + OGF_V.childs[idx].SWI.Count.ToString();
+			newLbl6.Size = new Size(LodLabel.Size.Width + (OGF_V.childs[idx].SWI.Count.ToString().Length * 6), LodLabel.Size.Height);
+			newLbl6.Location = new Point(LodLabel.Location.X - (OGF_V.childs[idx].Vertices.Count.ToString().Length * 6) - (OGF_V.childs[idx].Faces_SWI(CurrentLod).Count.ToString().Length * 6) - (OGF_V.childs[idx].LinksCount().ToString().Length * 6) - (OGF_V.childs[idx].SWI.Count.ToString().Length * 6), LodLabel.Location.Y);
+			newLbl6.Anchor = LodLabel.Anchor;
+			newLbl6.TextAlign = LodLabel.TextAlign;
 
 			box.Controls.Add(newLbl);
 			box.Controls.Add(newLbl2);
@@ -2358,6 +2398,9 @@ namespace OGF_tool
 
 			if (OGF_V.IsSkeleton())
 				box.Controls.Add(newLbl5);
+
+			if (OGF_V.childs[idx].SWI.Count > 0)
+				box.Controls.Add(newLbl6);
 		}
 
 		private void CreateBoneGroupBox(int idx, string bone_name, string parent_bone_name, string material, float mass, float[] center, float[] pos, float[] rot)

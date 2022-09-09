@@ -434,6 +434,16 @@ namespace OGF_tool
             this.IsCopModel = false;
         }
 
+        public bool IsProgressive()
+        {
+            foreach (OGF_Child child in this.childs)
+            {
+                if (child.SWI.Count > 0) return true;
+            }
+
+            return false;
+        }
+
         public bool IsSkeleton()
         {
             return m_model_type == 3 || m_model_type == 10;
@@ -848,13 +858,18 @@ namespace OGF_tool
         public List<SSkelFace> Faces;
         public List<VIPM_SWR> SWI;
 
-        public List<SSkelFace> Faces_SWI(uint lod)
+        private int CalcLod(float lod)
+        {
+            return (int)Math.Floor(lod * (SWI.Count - 1) + 0.5f);
+        }
+
+        public List<SSkelFace> Faces_SWI(float lod)
         {
             if (SWI.Count == 0) return Faces;
 
             List<SSkelFace> sSkelFaces = new List<SSkelFace>();
 
-            VIPM_SWR SWR = SWI[(int)lod];
+            VIPM_SWR SWR = SWI[CalcLod(lod)];
 
             for (int i = (int)SWR.offset / 3; i < ((int)SWR.offset / 3) + SWR.num_tris; i++)
             {

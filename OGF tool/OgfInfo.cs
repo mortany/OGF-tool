@@ -14,7 +14,7 @@ namespace OGF_tool
     {
         public Description descr = new Description();
         public bool res = false;
-        public OgfInfo(OGF_Children OGF, bool refs_correct, List<byte> motions_flags)
+        public OgfInfo(OGF_Children OGF, bool refs_correct, float lod, List<byte> motions_flags)
         {
             InitializeComponent();
 
@@ -35,7 +35,7 @@ namespace OGF_tool
                 }
 
                 verts += ch.Vertices.Count;
-                faces += ch.Faces_SWI(0).Count;
+                faces += ch.Faces_SWI(lod).Count;
             }
 
             OgfVersLabel.Text = OGF.m_version.ToString();
