@@ -67,7 +67,7 @@ namespace OGF_tool
 		[DllImport("converter.dll")]
 		private static extern int CSharpStartAgent(string path, string out_path, int mode, int convert_to_mode, string motion_list);
 
-		delegate void TriangleParser(XRayLoader loader, OGF_Child child);
+		delegate void TriangleParser(XRayLoader loader, OGF_Child child, bool v3);
 
 		private int RunConverter(string path, string out_path, int mode, int convert_to_mode)
 		{
@@ -284,8 +284,17 @@ namespace OGF_tool
 							BoneNamesBox.Text += "\n";
 					}
 
+
 					// Ik Data
-					TabControl.Controls.Add(BoneParamsPage);
+					if (OGF_V.ikdata != null)
+					{
+						TabControl.Controls.Add(BoneParamsPage);
+
+						for (int i = 0; i < OGF_V.bones.bone_names.Count; i++)
+						{
+							CreateBoneGroupBox(i, OGF_V.bones.bone_names[i], OGF_V.bones.parent_bone_names[i], OGF_V.ikdata.materials[i], OGF_V.ikdata.mass[i], OGF_V.ikdata.center_mass[i], OGF_V.ikdata.position[i], OGF_V.ikdata.rotation[i]);
+						}
+					}
 				}
 
 				// Lod
@@ -313,14 +322,6 @@ namespace OGF_tool
 					Cntrl.Text = OGF_V.childs[i].m_texture;
 					var Cntrl2 = box.Controls["shaderBox_" + i];
 					Cntrl2.Text = OGF_V.childs[i].m_shader;
-				}
-			}
-
-			if (OGF_V.bones != null)
-			{
-				for (int i = 0; i < OGF_V.bones.bone_names.Count; i++)
-				{
-					CreateBoneGroupBox(i, OGF_V.bones.bone_names[i], OGF_V.bones.parent_bone_names[i], OGF_V.ikdata.materials[i], OGF_V.ikdata.mass[i], OGF_V.ikdata.center_mass[i], OGF_V.ikdata.position[i], OGF_V.ikdata.rotation[i]);
 				}
 			}
 
@@ -738,9 +739,10 @@ namespace OGF_tool
 					}
 				}
 
-				TriangleParser LoadTrianglesV4 = (loader, child) =>
+				TriangleParser LoadTriangles = (loader, child, v3) =>
 				{
-					if (loader.find_chunk((int)OGF.OGF4_VERTICES, false, true))
+					int VertsChunk = v3 ? (int)OGF.OGF3_VERTICES : (int)OGF.OGF4_VERTICES;
+					if (loader.find_chunk(VertsChunk, false, true))
 					{
 						child.links = loader.ReadUInt32();
 						uint verts = loader.ReadUInt32();
@@ -753,8 +755,11 @@ namespace OGF_tool
 								case 1:
 									Vert.offs = loader.ReadVector();
 									Vert.norm = loader.ReadVector();
-									Vert.tang = loader.ReadVector();
-									Vert.binorm = loader.ReadVector();
+									if (!v3)
+									{
+										Vert.tang = loader.ReadVector();
+										Vert.binorm = loader.ReadVector();
+									}
 									Vert.uv = loader.ReadVector2();
 
 									loader.ReadUInt32();
@@ -800,7 +805,8 @@ namespace OGF_tool
 						}
 					}
 
-					if (loader.find_chunk((int)OGF.OGF4_INDICES, false, true))
+					int FacesChunk = v3 ? (int)OGF.OGF3_INDICES : (int)OGF.OGF4_INDICES;
+					if (loader.find_chunk(FacesChunk, false, true))
 					{
 						uint faces = loader.ReadUInt32() / 3;
 
@@ -814,72 +820,25 @@ namespace OGF_tool
 						}
 					}
 
-					if (loader.find_chunk((int)OGF.OGF4_SWIDATA, false, true))
+					if (!v3)
 					{
-						loader.ReadUInt32();
-						loader.ReadUInt32();
-						loader.ReadUInt32();
-						loader.ReadUInt32();
-
-						uint swi_size = loader.ReadUInt32();
-
-						for (uint i = 0; i < swi_size; i++)
+						if (loader.find_chunk((int)OGF.OGF4_SWIDATA, false, true))
 						{
-							VIPM_SWR SWR = new VIPM_SWR();
-							SWR.offset = loader.ReadUInt32();
-							SWR.num_tris = (ushort)loader.ReadUInt16();
-							SWR.num_verts = (ushort)loader.ReadUInt16();
-							child.SWI.Add(SWR);
-						}
-					}
-				};
+							loader.ReadUInt32();
+							loader.ReadUInt32();
+							loader.ReadUInt32();
+							loader.ReadUInt32();
 
-				TriangleParser LoadTrianglesV3 = (loader, child) =>
-				{
-					if (loader.find_chunk((int)OGF.OGF3_VERTICES, false, true))
-					{
-						child.links = loader.ReadUInt32();
-						uint verts = loader.ReadUInt32();
+							uint swi_size = loader.ReadUInt32();
 
-						for (int i = 0; i < verts; i++)
-						{
-							SSkelVert Vert = new SSkelVert();
-							switch (child.LinksCount())
+							for (uint i = 0; i < swi_size; i++)
 							{
-								case 1:
-									Vert.offs = loader.ReadVector();
-									Vert.norm = loader.ReadVector();
-									Vert.uv = loader.ReadVector2();
-
-									loader.ReadUInt32();
-									break;
-								case 2:
-									loader.ReadUInt16();
-									loader.ReadUInt16();
-
-									Vert.offs = loader.ReadVector();
-									Vert.norm = loader.ReadVector();
-									Vert.tang = loader.ReadVector();
-									Vert.binorm = loader.ReadVector();
-									loader.ReadFloat();
-									Vert.uv = loader.ReadVector2();
-									break;
+								VIPM_SWR SWR = new VIPM_SWR();
+								SWR.offset = loader.ReadUInt32();
+								SWR.num_tris = (ushort)loader.ReadUInt16();
+								SWR.num_verts = (ushort)loader.ReadUInt16();
+								child.SWI.Add(SWR);
 							}
-							child.Vertices.Add(Vert);
-						}
-					}
-
-					if (loader.find_chunk((int)OGF.OGF3_INDICES, false, true))
-					{
-						uint faces = loader.ReadUInt32() / 3;
-
-						for (uint i = 0; i < faces; i++)
-						{
-							SSkelFace Face = new SSkelFace();
-							Face.v[0] = (ushort)loader.ReadUInt16();
-							Face.v[1] = (ushort)loader.ReadUInt16();
-							Face.v[2] = (ushort)loader.ReadUInt16();
-							child.Faces.Add(Face);
 						}
 					}
 				};
@@ -911,10 +870,7 @@ namespace OGF_tool
 
 						OGF_Child chld = new OGF_Child(xr_loader.chunk_pos + pos, pos - 8, chunk_size,(int)size, xr_loader.read_stringZ(), xr_loader.read_stringZ());
 
-						if (OGF_C.m_version == 4)
-							LoadTrianglesV4(xr_loader, chld);
-						else
-							LoadTrianglesV3(xr_loader, chld);
+						LoadTriangles(xr_loader, chld, OGF_C.m_version != 4);
 
 						OGF_C.childs.Add(chld);
 
@@ -930,7 +886,7 @@ namespace OGF_tool
 					{
 						OGF_Child chld = new OGF_Child(0, 0, 0, (int)size, xr_loader.read_stringZ(), xr_loader.read_stringZ());
 
-						LoadTrianglesV4(xr_loader, chld);
+						LoadTriangles(xr_loader, chld, false);
 
 						OGF_C.childs.Add(chld);
 					}
@@ -1097,7 +1053,9 @@ namespace OGF_tool
 					if (!IKDataChunkFind)
 					{
 						MessageBox.Show("Unsupported OGF format! Can't find ik data chunk!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-						return false;
+
+						if (OGF_C.m_version == 4)
+							return false;
 					}
 
 					// Userdata
