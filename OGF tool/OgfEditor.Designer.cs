@@ -110,7 +110,6 @@ namespace OGF_tool
             this.CurrentFormat = new System.Windows.Forms.ToolStripMenuItem();
             this.viewPortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.reloadToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.refreshTexturesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openImageFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.FileLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.StatusFile = new System.Windows.Forms.ToolStripStatusLabel();
@@ -920,7 +919,6 @@ namespace OGF_tool
             // 
             this.viewPortToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.reloadToolStripMenuItem1,
-            this.refreshTexturesToolStripMenuItem,
             this.disableAlphaToolStripMenuItem,
             this.openImageFolderToolStripMenuItem});
             this.viewPortToolStripMenuItem.Name = "viewPortToolStripMenuItem";
@@ -933,13 +931,6 @@ namespace OGF_tool
             this.reloadToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.reloadToolStripMenuItem1.Text = "Reload";
             this.reloadToolStripMenuItem1.Click += new System.EventHandler(this.reloadToolStripMenuItem1_Click);
-            // 
-            // refreshTexturesToolStripMenuItem
-            // 
-            this.refreshTexturesToolStripMenuItem.Name = "refreshTexturesToolStripMenuItem";
-            this.refreshTexturesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.refreshTexturesToolStripMenuItem.Text = "Refresh textures";
-            this.refreshTexturesToolStripMenuItem.Click += new System.EventHandler(this.refreshTexturesToolStripMenuItem_Click);
             // 
             // openImageFolderToolStripMenuItem
             // 
@@ -1172,7 +1163,6 @@ namespace OGF_tool
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem viewPortToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem reloadToolStripMenuItem1;
-        private System.Windows.Forms.ToolStripMenuItem refreshTexturesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openImageFolderToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ChangeLodButton;
         private System.Windows.Forms.Label LodLabel;

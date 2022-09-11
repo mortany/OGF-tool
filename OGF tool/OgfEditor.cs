@@ -40,6 +40,7 @@ namespace OGF_tool
 		public Thread ViewerThread = null;
 		bool ViewPortAlpha = true;
 		List<bool> OldChildVisible = new List<bool>();
+		List<string> OldChildTextures = new List<string>();
 
 		[DllImport("user32.dll")]
 		private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
@@ -1742,24 +1743,8 @@ skip_ik_data:
 					}
 				case "ViewPage":
 					{
-						bool reloaded = false;
-						if (ViewerWorking && ViewerProcess != null && OldChildVisible.Count == OGF_V.childs.Count)
-						{
-							int i = 0;
-							foreach (var ch in OGF_V.childs)
-							{
-								if (ch.to_delete != OldChildVisible[i])
-								{
-									reloaded = true;
-									InitViewPort(true, false);
-									break;
-								}
-								i++;
-							}
-						}
+						InitViewPort();
 						ViewPortItemVisible = true;
-						if (!ViewerWorking && !reloaded)
-							InitViewPort();
 						break;
 					}
 			}
@@ -2322,9 +2307,11 @@ skip_ik_data:
         }
 
 		// Interface
-		private void InitViewPort(bool create_model = true, bool create_textures = true)
+		private void InitViewPort(bool create_model = true, bool force_texture_reload = false, bool force_reload = false)
         {
 			if (OGF_V == null) return;
+
+			if (ViewerWorking && ViewerProcess != null && CheckViewportModelVers() && !force_reload) return;
 
 			bool old_viewer = ViewerWorking;
 			ViewerWorking = false;
@@ -2351,29 +2338,50 @@ skip_ik_data:
 				string Textures = "";
 				pSettings.LoadText("TexturesPath", ref Textures);
 
-				if (create_textures)
+				List<string> pTextures = new List<string>();
+				List<string> pConvertTextures = new List<string>();
+
+				for (int i = 0; i < OGF_V.childs.Count; i++)
 				{
-					List<string> pTextures = new List<string>();
+					string texture_main = Textures + "\\" + OGF_V.childs[i].m_texture + ".dds";
+					string texture_temp = TempFolder() + "\\" + Path.GetFileName(OGF_V.childs[i].m_texture + ".png");
 
-					for (int i = 0; i < OGF_V.childs.Count; i++)
+					pTextures.Add(texture_main);
+					pTextures.Add(texture_temp);
+				}
+
+				int chld = 0;
+				for (int i = 0; i < pTextures.Count; i++)
+				{
+					if (File.Exists(pTextures[i]) && (!File.Exists(pTextures[i + 1]) || force_texture_reload))
 					{
-						string texture_main = Textures + "\\" + OGF_V.childs[i].m_texture + ".dds";
-						string texture_temp = TempFolder() + "\\" + Path.GetFileName(OGF_V.childs[i].m_texture + ".png");
+						if (OGF_V.childs[chld].to_delete)
+							continue;
 
-						if (File.Exists(texture_main)) // Create png
-						{
-							pTextures.Add(texture_main);
-							pTextures.Add(texture_temp);
-						}
+						pConvertTextures.Add(pTextures[i]);
+						pConvertTextures.Add(pTextures[i + 1]);
 					}
+					i++;
+					chld++;
+				}
 
+				OldChildVisible.Clear();
+				foreach (var ch in OGF_V.childs)
+					OldChildVisible.Add(ch.to_delete);
+
+				OldChildTextures.Clear();
+				foreach (var ch in OGF_V.childs)
+					OldChildTextures.Add(ch.m_texture);
+
+				if (pConvertTextures.Count > 0)
+				{
 					string ConverterArgs = "";
 					ConverterArgs += $"{(ViewPortAlpha ? 1 : 0)}";
-					ConverterArgs += $" {pTextures.Count}";
+					ConverterArgs += $" {pConvertTextures.Count}";
 
-					for (int i = 0; i < pTextures.Count; i++)
+					for (int i = 0; i < pConvertTextures.Count; i++)
 					{
-						ConverterArgs += $" \"{pTextures[i]}\"";
+						ConverterArgs += $" \"{pConvertTextures[i]}\"";
 					}
 
 					Process Converter = new Process();
@@ -2385,8 +2393,6 @@ skip_ik_data:
 					Converter.StartInfo = psi;
 					Converter.Start();
 					Converter.WaitForExit();
-
-					pTextures.Clear();
 				}
 
 				string image_path = "";
@@ -2407,12 +2413,6 @@ skip_ik_data:
 				ViewerProcess.WaitForInputIdle();
 				ViewerWorking = true;
 
-				OldChildVisible.Clear();
-				foreach (var ch in OGF_V.childs)
-                {
-					OldChildVisible.Add(ch.to_delete);
-				}
-
 				this.Invoke((MethodInvoker)delegate ()
 				{
 					const int GWL_STYLE = -16;
@@ -2429,20 +2429,39 @@ skip_ik_data:
 			ViewerThread.Start();
 		}
 
+		private bool CheckViewportModelVers()
+        {
+			if (OldChildTextures.Count != 0)
+            {
+				int i = 0;
+				foreach (var ch in OGF_V.childs)
+				{
+					if (ch.m_texture != OldChildTextures[i])
+						return false;
+					i++;
+				}
+			}
+
+			if (OldChildVisible.Count != 0)
+			{
+				int i = 0;
+				foreach (var ch in OGF_V.childs)
+				{
+					if (ch.to_delete != OldChildVisible[i])
+						return false;
+					i++;
+				}
+			}
+
+			return true;
+		}
+
 		private void reloadToolStripMenuItem1_Click(object sender, EventArgs e)
 		{
 			if (ViewerProcess == null || !ViewerWorking)
 				return;
 
-			InitViewPort();
-		}
-
-		private void refreshTexturesToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			if (ViewerProcess == null || !ViewerWorking)
-				return;
-
-			InitViewPort(false);
+			InitViewPort(true, true, true);
 		}
 
 		private void disableAlphaToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2456,7 +2475,7 @@ skip_ik_data:
 			else
 				disableAlphaToolStripMenuItem.Text = "Enable Alpha";
 
-			InitViewPort(false);
+			InitViewPort(false, true);
 		}
 
 		private void ResizeEmbeddedApp(object sender, EventArgs e)

@@ -68,7 +68,6 @@ void ConvertDDStoPng(string dds, string png, bool alpha)
 	BearImage Texture;
     Texture.LoadFromFile(dds.c_str());
     Texture.Convert(alpha && HasAlpha(Texture) ? BearTexturePixelFormat::R8G8B8A8 : BearTexturePixelFormat::R8G8B8);
-
     Texture.SaveToPng(png.c_str());
 }
 
