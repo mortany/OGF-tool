@@ -215,6 +215,7 @@
             this.ExportTimeDate.Name = "ExportTimeDate";
             this.ExportTimeDate.Size = new System.Drawing.Size(136, 20);
             this.ExportTimeDate.TabIndex = 21;
+            this.ExportTimeDate.Value = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
             // 
             // CreationTimeDate
             // 
@@ -227,6 +228,7 @@
             this.CreationTimeDate.Name = "CreationTimeDate";
             this.CreationTimeDate.Size = new System.Drawing.Size(136, 20);
             this.CreationTimeDate.TabIndex = 22;
+            this.CreationTimeDate.Value = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
             // 
             // ModifedTimeDate
             // 
@@ -239,6 +241,7 @@
             this.ModifedTimeDate.Name = "ModifedTimeDate";
             this.ModifedTimeDate.Size = new System.Drawing.Size(136, 20);
             this.ModifedTimeDate.TabIndex = 23;
+            this.ModifedTimeDate.Value = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
             // 
             // ByteLabel
             // 
@@ -246,9 +249,9 @@
             this.ByteLabel.AutoSize = true;
             this.ByteLabel.Location = new System.Drawing.Point(310, 238);
             this.ByteLabel.Name = "ByteLabel";
-            this.ByteLabel.Size = new System.Drawing.Size(36, 13);
+            this.ByteLabel.Size = new System.Drawing.Size(10, 13);
             this.ByteLabel.TabIndex = 24;
-            this.ByteLabel.Text = "8 byte";
+            this.ByteLabel.Text = "-";
             // 
             // RepairTimersButton
             // 

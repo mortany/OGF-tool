@@ -39,12 +39,6 @@ namespace OGF_tool
 		public bool ViewerWorking = false;
 		public Thread ViewerThread = null;
 
-		const int GWL_STYLE = -16;
-		const int WS_CAPTION = 0x00C00000;
-		const int WS_THICKFRAME = 0x00040000;
-		const int SWP_NOACTIVATE = 0x0010;
-		const int SWP_NOZORDER = 0x0004;
-
 		[DllImport("user32.dll")]
 		private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
@@ -55,14 +49,7 @@ namespace OGF_tool
 		private static extern IntPtr SetParent(IntPtr hWnd, IntPtr hWndParent);
 
 		[DllImport("user32")]
-		private static extern bool SetWindowPos(
-		  IntPtr hWnd,
-		  IntPtr hWndInsertAfter,
-		  int X,
-		  int Y,
-		  int cx,
-		  int cy,
-		  int uFlags);
+		private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, int uFlags);
 
 		[DllImport("converter.dll")]
 		private static extern int CSharpStartAgent(string path, string out_path, int mode, int convert_to_mode, string motion_list);
@@ -202,6 +189,7 @@ namespace OGF_tool
 				sklToolStripMenuItem.Enabled = Current_OMF != null;
 				sklsToolStripMenuItem.Enabled = Current_OMF != null;
 				ChangeLodButton.Enabled = OGF_V.IsProgressive();
+				OgfInfo.Enabled = !OGF_V.IsDM;
 
 				OpenOGFDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
 				OpenOGF_DmDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
@@ -218,13 +206,12 @@ namespace OGF_tool
 				SaveBonesDialog.FileName = StatusFile.Text.Substring(0, StatusFile.Text.LastIndexOf('.')) + ".bones";
 				SaveObjectDialog.InitialDirectory = FILE_NAME.Substring(0, FILE_NAME.LastIndexOf('\\'));
 				SaveObjectDialog.FileName = StatusFile.Text.Substring(0, StatusFile.Text.LastIndexOf('.')) + ".object";
+
+				CurrentLod = 0;
 			}
 
 			// Textures
 			TabControl.Controls.Add(TexturesPage);
-
-			OgfInfo.Enabled = OGF_V.description != null;
-			CurrentLod = 0;
 
 			if (OGF_V.IsSkeleton())
 			{
@@ -457,7 +444,7 @@ namespace OGF_tool
 						file_bytes.AddRange(temp);
 				}
 
-				if (OGF_V.description.exist)
+				if (OGF_V.description != null)
 				{
 					bool old_byte = OGF_V.description.four_byte;
 					if (OGF_V.BrokenType > 0) // Если модель сломана, то восстанавливаем чанк с 8 байтными таймерами
@@ -739,14 +726,12 @@ namespace OGF_tool
 					xr_loader.ReadBytes(42);
 				}
 
-				OGF_C.description = new Description();
-
 				int DescChunk = (OGF_C.m_version == 4 ? (int)OGF.OGF4_S_DESC : (int)OGF.OGF3_S_DESC);
 				uint DescriptionSize = xr_loader.find_chunkSize(DescChunk, false, true);
 				if (DescriptionSize > 0)
 				{
+					OGF_C.description = new Description();
 					OGF_C.description.pos = xr_loader.chunk_pos;
-					OGF_C.description.exist = true;
 
 					// Читаем таймеры в 8 байт
 					long reader_start_pos = xr_loader.reader.BaseStream.Position;
@@ -1096,11 +1081,17 @@ skip_ik_data:
 					{
 						OGF_C.userdata = new UserData();
 						OGF_C.userdata.pos = xr_loader.chunk_pos;
-						if (OGF_C.m_version == 4)
-							OGF_C.userdata.userdata = xr_loader.read_stringZ();
-						else
-							OGF_C.userdata.userdata = xr_loader.read_stringSize(UserDataSize);
+
+						long UserdataStreamPos = r.BaseStream.Position;
+						OGF_C.userdata.userdata = xr_loader.read_stringZ();
 						OGF_C.userdata.old_size = OGF_C.userdata.userdata.Length + 1;
+
+						if (OGF_C.userdata.userdata.Length + 1 != UserDataSize)
+                        {
+							r.BaseStream.Position = UserdataStreamPos;
+							OGF_C.userdata.userdata = xr_loader.read_stringSize(UserDataSize);
+							OGF_C.userdata.old_size = OGF_C.userdata.userdata.Length;
+						}
 					}
 
 					// Lod ref
@@ -1505,7 +1496,7 @@ skip_ik_data:
 			OgfInfo Info = new OgfInfo(OGF_V, IsTextCorrect(MotionRefsBox.Text), CurrentLod, flags);
             Info.ShowDialog();
 
-			if (Info.res)
+			if (Info.res && OGF_V.description != null)
 			{
 				OGF_V.description.m_source = Info.descr.m_source;
 				OGF_V.description.m_export_tool = Info.descr.m_export_tool;
@@ -1948,6 +1939,12 @@ skip_ik_data:
 		{
 			if (OGF_V != null)
 			{
+				if (OGF_V.m_version != 4)
+				{
+					MessageBox.Show("Can't convert model. Unsupported OGF version: " + OGF_V.m_version.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					return;
+				}
+
 				OGF_V.IsCopModel = !OGF_V.IsCopModel;
 
 				if (OGF_V.IsCopModel)
@@ -2040,7 +2037,7 @@ skip_ik_data:
 
 		private void UpdateModelType()
         {
-			if (OGF_V == null || !OGF_V.description.exist) return;
+			if (OGF_V == null) return;
 
 			if (OGF_V.bones == null)
 				OGF_V.m_model_type = OGF_V.Static();
@@ -2377,6 +2374,10 @@ skip_ik_data:
 				ViewerProcess.WaitForInputIdle();
 				this.Invoke((MethodInvoker)delegate ()
 				{
+					const int GWL_STYLE = -16;
+					const int WS_CAPTION = 0x00C00000;
+					const int WS_THICKFRAME = 0x00040000;
+
 					SetParent(ViewerProcess.MainWindowHandle, ViewPage.Handle);
 					int style = GetWindowLong(ViewerProcess.MainWindowHandle, GWL_STYLE);
 					style = style & ~WS_CAPTION & ~WS_THICKFRAME;
@@ -2401,6 +2402,10 @@ skip_ik_data:
 		{
 			if (ViewerProcess == null || !ViewerWorking)
 				return;
+
+			const int SWP_NOACTIVATE = 0x0010;
+			const int SWP_NOZORDER = 0x0004;
+
 			int width = ViewPage.Width;
 			int height = ViewPage.Height;
 			SetWindowPos(ViewerProcess.MainWindowHandle, IntPtr.Zero, 0, 0, width, height, SWP_NOACTIVATE | SWP_NOZORDER);
