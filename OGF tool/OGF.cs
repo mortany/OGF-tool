@@ -503,6 +503,59 @@ namespace OGF_tool
             else
                 return m_model_type == (byte)ModelType.MT3_SKELETON_ANIM;
         }
+
+        public bool IsStatic()
+        {
+            if (m_version == 4)
+                return m_model_type == (byte)ModelType.MT4_HIERRARHY;
+            else
+                return m_model_type == (byte)ModelType.MT3_HIERRARHY;
+        }
+
+        public bool IsStaticSingle()
+        {
+            if (m_version == 4)
+                return m_model_type == (byte)ModelType.MT4_NORMAL || m_model_type == (byte)ModelType.MT4_PROGRESSIVE;
+            else
+                return m_model_type == (byte)ModelType.MT3_NORMAL || m_model_type == (byte)ModelType.MT3_PROGRESSIVE || m_model_type == (byte)ModelType.MT3_PROGRESSIVE2;
+        }
+
+        public byte Skeleton()
+        {
+            if (m_version == 4)
+                return (byte)ModelType.MT4_SKELETON_RIGID;
+            else
+                return (byte)ModelType.MT3_SKELETON_RIGID;
+        }
+
+
+        public byte Animated()
+        {
+            if (m_version == 4)
+                return (byte)ModelType.MT4_SKELETON_ANIM;
+            else
+                return (byte)ModelType.MT3_SKELETON_ANIM;
+        }
+
+        public byte Static()
+        {
+            if (childs.Count == 1) return StaticSingle();
+
+            if (m_version == 4)
+                return (byte)ModelType.MT4_HIERRARHY;
+            else
+                return (byte)ModelType.MT3_HIERRARHY;
+        }
+
+        private byte StaticSingle()
+        {
+            if (childs.Count > 1) return Static();
+
+            if (m_version == 4)
+                return (childs[0].SWI.Count > 0) ? (byte)ModelType.MT4_PROGRESSIVE : (byte)ModelType.MT4_NORMAL;
+            else
+                return (childs[0].SWI.Count > 0) ? (byte)ModelType.MT3_PROGRESSIVE : (byte)ModelType.MT3_NORMAL;
+        }
     }
 
     public class MotionRefs

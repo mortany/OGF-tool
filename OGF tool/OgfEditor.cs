@@ -470,7 +470,7 @@ namespace OGF_tool
 					OGF_V.description.four_byte = old_byte; // Восстанавливаем отображение колличества байтов у таймера
 				}
 
-				if (OGF_V.childs.Count == 1 && OGF_V.childs[0].chunk_size == 0) // Single mesh
+				if (OGF_V.IsStaticSingle()) // Single mesh
 				{
 					file_bytes.AddRange(OGF_V.childs[0].data());
 					fileStream.ReadBytes(OGF_V.childs[0].old_size + 8);
@@ -519,13 +519,17 @@ namespace OGF_tool
 						}
 
 						fileStream.BaseStream.Position += ch.old_size + 8;
-						temp = fileStream.ReadBytes(8);
-						fileStream.ReadUInt32();
 
-						if (!ch.to_delete)
+						if (ch.links != 0)
 						{
-							file_bytes.AddRange(temp);
-							file_bytes.AddRange(BitConverter.GetBytes(ch.links));
+							temp = fileStream.ReadBytes(8);
+							fileStream.ReadUInt32();
+
+							if (!ch.to_delete)
+							{
+								file_bytes.AddRange(temp);
+								file_bytes.AddRange(BitConverter.GetBytes(ch.links));
+							}
 						}
 
 						temp = fileStream.ReadBytes((int)ch.chunk_size - (int)(fileStream.BaseStream.Position - old_pos)); // Читаем все до конца чанка
@@ -2024,11 +2028,11 @@ skip_ik_data:
 			if (OGF_V == null || !OGF_V.description.exist) return;
 
 			if (OGF_V.bones == null)
-				OGF_V.m_model_type = 1;
+				OGF_V.m_model_type = OGF_V.Static();
 			else if (Current_OMF == null && !IsTextCorrect(MotionRefsBox.Text))
-				OGF_V.m_model_type = 10;
+				OGF_V.m_model_type = OGF_V.Skeleton();
 			else
-				OGF_V.m_model_type = 3;
+				OGF_V.m_model_type = OGF_V.Animated();
 
 			// Апдейтим экспорт аним тут, т.к. при любом изменении омф вызывается эта функция
 			omfToolStripMenuItem.Enabled = Current_OMF != null;

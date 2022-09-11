@@ -39,7 +39,7 @@ namespace OGF_tool
             }
 
             OgfVersLabel.Text = OGF.m_version.ToString();
-            ModelTypeLabel.Text = (OGF.m_model_type == 1 ? "Object" : OGF.m_model_type == 3 ? "Animated" : "Rigid");
+            ModelTypeLabel.Text = (OGF.IsStaticSingle() ? "Single Static" : OGF.IsStatic() ? "Static" : OGF.IsAnimated() ? "Animated" : "Rigid");
             LinksLabel.Text = links > 0 ? links.ToString() + ", " + (cop_links ? "CoP" : "SoC") : "None";
             MotionRefsTypeLabel.Text = (OGF.motion_refs == null || !refs_correct) ? "None" : (OGF.motion_refs.soc ? "SoC" : "CoP");
 
