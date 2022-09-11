@@ -38,6 +38,7 @@ namespace OGF_tool
 		Process ViewerProcess = new Process();
 		public bool ViewerWorking = false;
 		public Thread ViewerThread = null;
+		bool ViewPortAlpha = true;
 
 		[DllImport("user32.dll")]
 		private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
@@ -2309,6 +2310,9 @@ skip_ik_data:
         {
 			if (OGF_V == null) return;
 
+			bool old_viewer = ViewerWorking;
+			ViewerWorking = false;
+
 			if (ViewerThread != null && ViewerThread.ThreadState != System.Threading.ThreadState.Stopped)
 				ViewerThread.Abort();
 
@@ -2322,7 +2326,7 @@ skip_ik_data:
 					return;
 				}
 
-				if (ViewerWorking)
+				if (old_viewer)
 				{
 					ViewerProcess.Kill();
 					ViewerProcess.Close();
@@ -2345,7 +2349,24 @@ skip_ik_data:
 					}
 				}
 
-				// Insert convert code here
+				string ConverterArgs = "";
+				ConverterArgs += $"{(ViewPortAlpha ? 1 : 0)}";
+				ConverterArgs += $" {pTextures.Count}";
+
+				for (int i = 0; i < pTextures.Count; i++)
+                {
+					ConverterArgs += $" \"{pTextures[i]}\"";
+				}
+
+				Process Converter = new Process();
+				ProcessStartInfo psi = new ProcessStartInfo();
+				psi.CreateNoWindow = true;
+				psi.UseShellExecute = false;
+				psi.FileName = AppPath() + "\\TextureConverter.exe";
+				psi.Arguments = ConverterArgs;
+				Converter.StartInfo = psi;
+				Converter.Start();
+				Converter.WaitForExit(); 
 
 				pTextures.Clear();
 
@@ -2364,9 +2385,9 @@ skip_ik_data:
 				ViewerProcess.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
 
 				ViewerProcess.Start();
+				ViewerProcess.WaitForInputIdle();
 				ViewerWorking = true;
 
-				ViewerProcess.WaitForInputIdle();
 				this.Invoke((MethodInvoker)delegate ()
 				{
 					const int GWL_STYLE = -16;
@@ -2385,11 +2406,31 @@ skip_ik_data:
 
 		private void reloadToolStripMenuItem1_Click(object sender, EventArgs e)
 		{
+			if (ViewerProcess == null || !ViewerWorking)
+				return;
+
 			InitViewPort();
 		}
 
 		private void refreshTexturesToolStripMenuItem_Click(object sender, EventArgs e)
 		{
+			if (ViewerProcess == null || !ViewerWorking)
+				return;
+
+			InitViewPort(false);
+		}
+
+		private void disableAlphaToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (ViewerProcess == null || !ViewerWorking)
+				return;
+
+			ViewPortAlpha = !ViewPortAlpha;
+			if (ViewPortAlpha)
+				disableAlphaToolStripMenuItem.Text = "Disable Alpha";
+			else
+				disableAlphaToolStripMenuItem.Text = "Enable Alpha";
+
 			InitViewPort(false);
 		}
 

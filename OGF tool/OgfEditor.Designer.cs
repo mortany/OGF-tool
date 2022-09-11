@@ -126,6 +126,7 @@ namespace OGF_tool
             this.SaveObjectDialog = new System.Windows.Forms.SaveFileDialog();
             this.LabelBroken = new System.Windows.Forms.Label();
             this.SaveObjDialog = new System.Windows.Forms.SaveFileDialog();
+            this.disableAlphaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.TabControl.SuspendLayout();
             this.TexturesPage.SuspendLayout();
             this.TexturesGropuBox.SuspendLayout();
@@ -920,6 +921,7 @@ namespace OGF_tool
             this.viewPortToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.reloadToolStripMenuItem1,
             this.refreshTexturesToolStripMenuItem,
+            this.disableAlphaToolStripMenuItem,
             this.openImageFolderToolStripMenuItem});
             this.viewPortToolStripMenuItem.Name = "viewPortToolStripMenuItem";
             this.viewPortToolStripMenuItem.Size = new System.Drawing.Size(66, 20);
@@ -928,21 +930,21 @@ namespace OGF_tool
             // reloadToolStripMenuItem1
             // 
             this.reloadToolStripMenuItem1.Name = "reloadToolStripMenuItem1";
-            this.reloadToolStripMenuItem1.Size = new System.Drawing.Size(173, 22);
+            this.reloadToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.reloadToolStripMenuItem1.Text = "Reload";
             this.reloadToolStripMenuItem1.Click += new System.EventHandler(this.reloadToolStripMenuItem1_Click);
             // 
             // refreshTexturesToolStripMenuItem
             // 
             this.refreshTexturesToolStripMenuItem.Name = "refreshTexturesToolStripMenuItem";
-            this.refreshTexturesToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
+            this.refreshTexturesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.refreshTexturesToolStripMenuItem.Text = "Refresh textures";
             this.refreshTexturesToolStripMenuItem.Click += new System.EventHandler(this.refreshTexturesToolStripMenuItem_Click);
             // 
             // openImageFolderToolStripMenuItem
             // 
             this.openImageFolderToolStripMenuItem.Name = "openImageFolderToolStripMenuItem";
-            this.openImageFolderToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
+            this.openImageFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openImageFolderToolStripMenuItem.Text = "Open image folder";
             this.openImageFolderToolStripMenuItem.Click += new System.EventHandler(this.openImageFolderToolStripMenuItem_Click);
             // 
@@ -1027,6 +1029,13 @@ namespace OGF_tool
             // SaveObjDialog
             // 
             this.SaveObjDialog.Filter = "Obj file|*.obj";
+            // 
+            // disableAlphaToolStripMenuItem
+            // 
+            this.disableAlphaToolStripMenuItem.Name = "disableAlphaToolStripMenuItem";
+            this.disableAlphaToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.disableAlphaToolStripMenuItem.Text = "Disable Alpha";
+            this.disableAlphaToolStripMenuItem.Click += new System.EventHandler(this.disableAlphaToolStripMenuItem_Click);
             // 
             // OGF_Editor
             // 
@@ -1167,6 +1176,7 @@ namespace OGF_tool
         private System.Windows.Forms.ToolStripMenuItem openImageFolderToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ChangeLodButton;
         private System.Windows.Forms.Label LodLabel;
+        private System.Windows.Forms.ToolStripMenuItem disableAlphaToolStripMenuItem;
     }
 }
 

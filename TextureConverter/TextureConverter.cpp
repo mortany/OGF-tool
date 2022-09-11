@@ -11,7 +11,7 @@
 
 #include "Utils.hpp"
 
-int iReaderPos = 0;
+int iReaderPos = 1;
 
 using namespace std;
 
@@ -66,7 +66,6 @@ bool HasAlpha(BearImage& Texture)
 void ConvertDDStoPng(string dds, string png, bool alpha)
 {
 	BearImage Texture;
-
     Texture.LoadFromFile(dds.c_str());
     Texture.Convert(alpha && HasAlpha(Texture) ? BearTexturePixelFormat::R8G8B8A8 : BearTexturePixelFormat::R8G8B8);
 
@@ -78,14 +77,14 @@ int main(int argc, char** argv)
     BearCore::Initialize();
 
     bool use_alpha = false;
-    int textures_cnt = 0;
 
-    use_alpha = !!atoi(argv[0]); iReaderPos++;
-    textures_cnt = atoi(argv[1]); iReaderPos++;
+    use_alpha = !!atoi(argv[iReaderPos]); iReaderPos++;
+    int textures_cnt = atoi(argv[iReaderPos]); iReaderPos++;
 
-    vector<Textures> pTextures = LoadObJTexturesVector(argv, textures_cnt);
+    cout << textures_cnt << endl;
 
-    if (use_alpha || pTextures.size() < 2)
+    vector<Textures> pTextures = LoadObJTexturesVector(argv, textures_cnt / 2);
+    if (pTextures.size() < 2)
     {
         for (int i = 0; i < pTextures.size(); i++)
             ConvertDDStoPng(pTextures[i].main, pTextures[i].temp, use_alpha);
@@ -94,10 +93,11 @@ int main(int argc, char** argv)
     {
         FOR_START(int, 0, pTextures.size(), i)
         {
-            ConvertDDStoPng(pTextures[i].main, pTextures[i].temp, false);
+            ConvertDDStoPng(pTextures[i].main, pTextures[i].temp, use_alpha);
         }
         FOR_END
     }
 
     BearCore::Destroy();
+    return 0;
 }

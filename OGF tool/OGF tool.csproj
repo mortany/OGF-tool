@@ -148,4 +148,7 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /y /d  "$(SolutionDir)SDK\binaries\f3d.exe" "$(OutDir)..\..\..\"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
