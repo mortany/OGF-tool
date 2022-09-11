@@ -475,7 +475,7 @@ namespace OGF_tool
 					file_bytes.AddRange(OGF_V.childs[0].data());
 					fileStream.ReadBytes(OGF_V.childs[0].old_size + 8);
 				}
-				else
+				else // Hierrarhy mesh
 				{
 					fileStream.ReadBytes((int)(OGF_V.pos - fileStream.BaseStream.Position));
 
@@ -541,14 +541,29 @@ namespace OGF_tool
 
 				if (OGF_V.IsSkeleton())
                 {
-					file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF_S_BONE_NAMES));
-					file_bytes.AddRange(BitConverter.GetBytes(OGF_V.bones.chunk_size()));
-					file_bytes.AddRange(OGF_V.bones.data(false));
+					if (OGF_V.bones != null)
+					{
+						if (OGF_V.BrokenType == 0 && OGF_V.bones.pos > 0 && (OGF_V.bones.pos - fileStream.BaseStream.Position) > 0) // Двигаемся до текущего чанка
+						{
+							temp = fileStream.ReadBytes((int)(OGF_V.bones.pos - fileStream.BaseStream.Position));
+							file_bytes.AddRange(temp);
+						}
 
-					fileStream.ReadBytes(OGF_V.bones.old_size + 8);
+						file_bytes.AddRange(BitConverter.GetBytes((uint)OGF.OGF_S_BONE_NAMES));
+						file_bytes.AddRange(BitConverter.GetBytes(OGF_V.bones.chunk_size()));
+						file_bytes.AddRange(OGF_V.bones.data(false));
+
+						fileStream.ReadBytes(OGF_V.bones.old_size + 8);
+					}
 
 					if (OGF_V.ikdata != null)
 					{
+						if (OGF_V.BrokenType == 0 && OGF_V.ikdata.pos > 0 && (OGF_V.ikdata.pos - fileStream.BaseStream.Position) > 0) // Двигаемся до текущего чанка
+						{
+							temp = fileStream.ReadBytes((int)(OGF_V.ikdata.pos - fileStream.BaseStream.Position));
+							file_bytes.AddRange(temp);
+						}
+
 						uint IKDataChunk = 0;
 
 						switch (OGF_V.ikdata.chunk_version)
@@ -583,7 +598,7 @@ namespace OGF_tool
 						{
 							uint UserDataChunk = (OGF_V.m_version == 4 ? (uint)OGF.OGF4_S_USERDATA : (uint)OGF.OGF3_S_USERDATA);
 							file_bytes.AddRange(BitConverter.GetBytes(UserDataChunk));
-							file_bytes.AddRange(BitConverter.GetBytes(OGF_V.userdata.chunk_size()));
+							file_bytes.AddRange(BitConverter.GetBytes(OGF_V.userdata.chunk_size(OGF_V.m_version)));
 							file_bytes.AddRange(OGF_V.userdata.data(OGF_V.m_version));
 						}
 
@@ -1010,8 +1025,8 @@ namespace OGF_tool
 					goto skip_ik_data;
 
 load_ik_data:
-
 					OGF_C.ikdata = new IK_Data();
+					OGF_C.ikdata.pos = xr_loader.chunk_pos;
 					OGF_C.ikdata.chunk_version = IKDataVers;
 
 					for (int i = 0; i < OGF_C.bones.bone_names.Count; i++)

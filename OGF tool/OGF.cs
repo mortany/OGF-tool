@@ -638,9 +638,9 @@ namespace OGF_tool
             return temp.ToArray();
         }
 
-        public uint chunk_size()
+        public uint chunk_size(uint ogf_ver)
         {
-            return (uint)userdata.Length + 1;
+            return (uint)userdata.Length + (uint)(ogf_ver == 4 ? 1 : 0);
         }
     }
 
@@ -743,6 +743,7 @@ namespace OGF_tool
 
     public class IK_Data
     {
+        public long pos;
         public int old_size;
 
         public List<string> materials;
@@ -756,6 +757,7 @@ namespace OGF_tool
 
         public IK_Data()
         {
+            this.pos = 0;
             this.old_size = 0;
             this.materials = new List<string>();
             this.mass = new List<float>();
