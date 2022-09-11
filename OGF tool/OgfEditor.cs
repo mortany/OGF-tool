@@ -42,6 +42,9 @@ namespace OGF_tool
 		List<bool> OldChildVisible = new List<bool>();
 		List<string> OldChildTextures = new List<string>();
 
+		Process ConverterProcess = new Process();
+		public bool ConverterWorking = false;
+
 		[DllImport("user32.dll")]
 		private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
@@ -1196,52 +1199,56 @@ skip_ik_data:
 				string mtl_name = Path.ChangeExtension(filename, ".mtl");
 				SaveMtl(mtl_name);
 
-				ObjWriter.WriteLine("# This file uses meters as units for non-parametric coordinates.");
-				ObjWriter.WriteLine("mtllib " + Path.GetFileName(mtl_name));
-				foreach (var ch in OGF_V.childs)
+				try
 				{
-					if (ch.to_delete) continue;
-
-					ObjWriter.WriteLine($"g {childs}");
-					ObjWriter.WriteLine($"usemtl {Path.GetFileName(ch.m_texture)}");
-					childs++;
-
-					for (int i = 0; i < ch.Vertices.Count; i++)
-                    {
-						ObjWriter.WriteLine($"v {vPUSH(MirrorZ_transform(ch.Vertices[i].offs))}");
-					}
-
-					for (int i = 0; i < ch.Vertices.Count; i++)
+					ObjWriter.WriteLine("# This file uses meters as units for non-parametric coordinates.");
+					ObjWriter.WriteLine("mtllib " + Path.GetFileName(mtl_name));
+					foreach (var ch in OGF_V.childs)
 					{
-						float x = ch.Vertices[i].uv[0];
-						float y = Math.Abs(1.0f - ch.Vertices[i].uv[1]);
-						ObjWriter.WriteLine($"vt {x.ToString("0.000000")} {y.ToString("0.000000")}");
-					}
+						if (ch.to_delete) continue;
 
-					for (int i = 0; i < ch.Vertices.Count; i++)
-					{
-						ObjWriter.WriteLine($"vn {vPUSH(MirrorZ_transform(ch.Vertices[i].norm))}");
-					}
+						ObjWriter.WriteLine($"g {childs}");
+						ObjWriter.WriteLine($"usemtl {Path.GetFileName(ch.m_texture)}");
+						childs++;
 
-					for (int i = 0; i < ch.Vertices.Count; i++)
-					{
-						ObjWriter.WriteLine($"vg {vPUSH(MirrorZ_transform(ch.Vertices[i].tang))}");
-					}
+						for (int i = 0; i < ch.Vertices.Count; i++)
+						{
+							ObjWriter.WriteLine($"v {vPUSH(MirrorZ_transform(ch.Vertices[i].offs))}");
+						}
 
-					for (int i = 0; i < ch.Vertices.Count; i++)
-					{
-						ObjWriter.WriteLine($"vb {vPUSH(MirrorZ_transform(ch.Vertices[i].binorm))}");
-					}
+						for (int i = 0; i < ch.Vertices.Count; i++)
+						{
+							float x = ch.Vertices[i].uv[0];
+							float y = Math.Abs(1.0f - ch.Vertices[i].uv[1]);
+							ObjWriter.WriteLine($"vt {x.ToString("0.000000")} {y.ToString("0.000000")}");
+						}
 
-					foreach (var f_it in ch.Faces_SWI(lod))
-					{
-						string tmp = $"f {v_offs+f_it.v[2]+1}/{v_offs+f_it.v[2]+1}/{v_offs+f_it.v[2]+1} {v_offs+f_it.v[1]+1}/{v_offs+f_it.v[1]+1}/{v_offs+f_it.v[1]+1} {v_offs+f_it.v[0]+1}/{v_offs+f_it.v[0]+1}/{v_offs+f_it.v[0]+1}";
-						ObjWriter.WriteLine(tmp);
+						for (int i = 0; i < ch.Vertices.Count; i++)
+						{
+							ObjWriter.WriteLine($"vn {vPUSH(MirrorZ_transform(ch.Vertices[i].norm))}");
+						}
+
+						for (int i = 0; i < ch.Vertices.Count; i++)
+						{
+							ObjWriter.WriteLine($"vg {vPUSH(MirrorZ_transform(ch.Vertices[i].tang))}");
+						}
+
+						for (int i = 0; i < ch.Vertices.Count; i++)
+						{
+							ObjWriter.WriteLine($"vb {vPUSH(MirrorZ_transform(ch.Vertices[i].binorm))}");
+						}
+
+						foreach (var f_it in ch.Faces_SWI(lod))
+						{
+							string tmp = $"f {v_offs+f_it.v[2]+1}/{v_offs+f_it.v[2]+1}/{v_offs+f_it.v[2]+1} {v_offs+f_it.v[1]+1}/{v_offs+f_it.v[1]+1}/{v_offs+f_it.v[1]+1} {v_offs+f_it.v[0]+1}/{v_offs+f_it.v[0]+1}/{v_offs+f_it.v[0]+1}";
+							ObjWriter.WriteLine(tmp);
+						}
+						v_offs += (uint)ch.Vertices.Count;
 					}
-					v_offs += (uint)ch.Vertices.Count;
+					ObjWriter.Close();
+					ObjWriter = null;
 				}
-				ObjWriter.Close();
-				ObjWriter = null;
+				catch(Exception) { }
 			}
 		}
 
@@ -2273,23 +2280,49 @@ skip_ik_data:
 		{
 			try
 			{
+				if (ViewerThread != null && ViewerThread.ThreadState != System.Threading.ThreadState.Stopped)
+					ViewerThread.Abort();
+			}
+			catch (Exception) { }
+
+			try
+			{
 				if (ObjWriter != null)
                 {
 					ObjWriter.Close();
 					ObjWriter.Dispose();
 					ObjWriter = null;
 				}
+			}
+			catch (Exception) { }
 
-				if (ViewerWorking)
-					pSettings.Save("FirstLoad", false);
+			if (ViewerWorking)
+				pSettings.Save("FirstLoad", false);
 
+			try
+			{
 				if (ViewerWorking)
 				{
 					ViewerProcess.Kill();
 					ViewerProcess.Close();
 					ViewerWorking = false;
 				}
+			}
+			catch (Exception) { }
 
+			try
+			{
+				if (ConverterWorking)
+                {
+					ConverterProcess.Kill();
+					ConverterProcess.Close();
+					ConverterWorking = false;
+				}
+			}
+			catch (Exception) { }
+
+			try
+			{
 				if (Directory.Exists(TempFolder(false)))
 					Directory.Delete(TempFolder(false), true);
 			}
@@ -2333,6 +2366,13 @@ skip_ik_data:
 				{
 					ViewerProcess.Kill();
 					ViewerProcess.Close();
+				}
+
+				if (ConverterWorking)
+				{
+					ConverterProcess.Kill();
+					ConverterProcess.Close();
+					ConverterWorking = false;
 				}
 
 				string Textures = "";
@@ -2384,15 +2424,17 @@ skip_ik_data:
 						ConverterArgs += $" \"{pConvertTextures[i]}\"";
 					}
 
-					Process Converter = new Process();
+					ConverterWorking = true;
+					ConverterProcess = new Process();
 					ProcessStartInfo psi = new ProcessStartInfo();
 					psi.CreateNoWindow = true;
 					psi.UseShellExecute = false;
 					psi.FileName = AppPath() + "\\TextureConverter.exe";
 					psi.Arguments = ConverterArgs;
-					Converter.StartInfo = psi;
-					Converter.Start();
-					Converter.WaitForExit();
+					ConverterProcess.StartInfo = psi;
+					ConverterProcess.Start();
+					ConverterProcess.WaitForExit();
+					ConverterWorking = false;
 				}
 
 				string image_path = "";
@@ -2413,18 +2455,22 @@ skip_ik_data:
 				ViewerProcess.WaitForInputIdle();
 				ViewerWorking = true;
 
-				this.Invoke((MethodInvoker)delegate ()
+				try
 				{
-					const int GWL_STYLE = -16;
-					const int WS_CAPTION = 0x00C00000;
-					const int WS_THICKFRAME = 0x00040000;
+					this.Invoke((MethodInvoker)delegate ()
+					{
+						const int GWL_STYLE = -16;
+						const int WS_CAPTION = 0x00C00000;
+						const int WS_THICKFRAME = 0x00040000;
 
-					SetParent(ViewerProcess.MainWindowHandle, ViewPage.Handle);
-					int style = GetWindowLong(ViewerProcess.MainWindowHandle, GWL_STYLE);
-					style = style & ~WS_CAPTION & ~WS_THICKFRAME;
-					SetWindowLong(ViewerProcess.MainWindowHandle, GWL_STYLE, style);
-					ResizeEmbeddedApp(null, null);
-				});
+						SetParent(ViewerProcess.MainWindowHandle, ViewPage.Handle);
+						int style = GetWindowLong(ViewerProcess.MainWindowHandle, GWL_STYLE);
+						style = style & ~WS_CAPTION & ~WS_THICKFRAME;
+						SetWindowLong(ViewerProcess.MainWindowHandle, GWL_STYLE, style);
+						ResizeEmbeddedApp(null, null);
+					});
+				}
+				catch(Exception) { }
 			});
 			ViewerThread.Start();
 		}
