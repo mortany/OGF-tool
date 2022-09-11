@@ -39,6 +39,7 @@ namespace OGF_tool
 		public bool ViewerWorking = false;
 		public Thread ViewerThread = null;
 		bool ViewPortAlpha = true;
+		List<bool> OldChildVisible = new List<bool>();
 
 		[DllImport("user32.dll")]
 		private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
@@ -1741,8 +1742,23 @@ skip_ik_data:
 					}
 				case "ViewPage":
 					{
+						bool reloaded = false;
+						if (ViewerWorking && ViewerProcess != null && OldChildVisible.Count == OGF_V.childs.Count)
+						{
+							int i = 0;
+							foreach (var ch in OGF_V.childs)
+							{
+								if (ch.to_delete != OldChildVisible[i])
+								{
+									reloaded = true;
+									InitViewPort(true, false);
+									break;
+								}
+								i++;
+							}
+						}
 						ViewPortItemVisible = true;
-						if (!ViewerWorking)
+						if (!ViewerWorking && !reloaded)
 							InitViewPort();
 						break;
 					}
@@ -2306,7 +2322,7 @@ skip_ik_data:
         }
 
 		// Interface
-		private void InitViewPort(bool create_model = true)
+		private void InitViewPort(bool create_model = true, bool create_textures = true)
         {
 			if (OGF_V == null) return;
 
@@ -2335,40 +2351,43 @@ skip_ik_data:
 				string Textures = "";
 				pSettings.LoadText("TexturesPath", ref Textures);
 
-				List<string> pTextures = new List<string>();
-
-				for (int i = 0; i < OGF_V.childs.Count; i++)
+				if (create_textures)
 				{
-					string texture_main = Textures + "\\" + OGF_V.childs[i].m_texture + ".dds";
-					string texture_temp = TempFolder() + "\\" + Path.GetFileName(OGF_V.childs[i].m_texture + ".png");
+					List<string> pTextures = new List<string>();
 
-					if (File.Exists(texture_main)) // Create png
+					for (int i = 0; i < OGF_V.childs.Count; i++)
 					{
-						pTextures.Add(texture_main);
-						pTextures.Add(texture_temp);
+						string texture_main = Textures + "\\" + OGF_V.childs[i].m_texture + ".dds";
+						string texture_temp = TempFolder() + "\\" + Path.GetFileName(OGF_V.childs[i].m_texture + ".png");
+
+						if (File.Exists(texture_main)) // Create png
+						{
+							pTextures.Add(texture_main);
+							pTextures.Add(texture_temp);
+						}
 					}
+
+					string ConverterArgs = "";
+					ConverterArgs += $"{(ViewPortAlpha ? 1 : 0)}";
+					ConverterArgs += $" {pTextures.Count}";
+
+					for (int i = 0; i < pTextures.Count; i++)
+					{
+						ConverterArgs += $" \"{pTextures[i]}\"";
+					}
+
+					Process Converter = new Process();
+					ProcessStartInfo psi = new ProcessStartInfo();
+					psi.CreateNoWindow = true;
+					psi.UseShellExecute = false;
+					psi.FileName = AppPath() + "\\TextureConverter.exe";
+					psi.Arguments = ConverterArgs;
+					Converter.StartInfo = psi;
+					Converter.Start();
+					Converter.WaitForExit();
+
+					pTextures.Clear();
 				}
-
-				string ConverterArgs = "";
-				ConverterArgs += $"{(ViewPortAlpha ? 1 : 0)}";
-				ConverterArgs += $" {pTextures.Count}";
-
-				for (int i = 0; i < pTextures.Count; i++)
-                {
-					ConverterArgs += $" \"{pTextures[i]}\"";
-				}
-
-				Process Converter = new Process();
-				ProcessStartInfo psi = new ProcessStartInfo();
-				psi.CreateNoWindow = true;
-				psi.UseShellExecute = false;
-				psi.FileName = AppPath() + "\\TextureConverter.exe";
-				psi.Arguments = ConverterArgs;
-				Converter.StartInfo = psi;
-				Converter.Start();
-				Converter.WaitForExit(); 
-
-				pTextures.Clear();
 
 				string image_path = "";
 				pSettings.Load("ImagePath", ref image_path);
@@ -2387,6 +2406,12 @@ skip_ik_data:
 				ViewerProcess.Start();
 				ViewerProcess.WaitForInputIdle();
 				ViewerWorking = true;
+
+				OldChildVisible.Clear();
+				foreach (var ch in OGF_V.childs)
+                {
+					OldChildVisible.Add(ch.to_delete);
+				}
 
 				this.Invoke((MethodInvoker)delegate ()
 				{
