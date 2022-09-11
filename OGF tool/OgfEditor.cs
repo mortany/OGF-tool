@@ -1063,15 +1063,10 @@ load_ik_data:
 
 skip_ik_data:
 
-					if (IKDataVers == 0) // Chunk not find
+					if (IKDataVers == 0 && OGF_C.m_version == 4) // Chunk not find, exit if Release OGF
 					{
-						if (OGF_C.m_version == 4) // Exit if Release OGF
-						{
-							MessageBox.Show("Unsupported OGF format! Can't find ik data chunk!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-							return false;
-						}
-						else
-							MessageBox.Show("Unsupported OGF chunk! Can't find ik data chunk!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+						MessageBox.Show("Unsupported OGF format! Can't find ik data chunk!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+						return false;
 					}
 
 					// Userdata
