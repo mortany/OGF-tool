@@ -398,7 +398,7 @@ namespace OGF_tool
             while (reader.BaseStream.Position < reader.BaseStream.Length)
             {
                 byte[] one = { reader.ReadByte() };
-                if (one[0] != 0)
+                if (one[0] != 0 && one[0] != 0xE)
                 {
                     str += Encoding.Default.GetString(one);
                 }
@@ -409,6 +409,19 @@ namespace OGF_tool
             }
             return str;
         }
+
+        public string read_stringSize(uint size)
+        {
+            string str = "";
+
+            for (uint i = 0; i < size; i++)
+            {
+                byte[] one = { reader.ReadByte() };
+                str += Encoding.Default.GetString(one);
+            }
+            return str;
+        }
+
 
         public void write_stringZ(BinaryWriter w, string str)
         {
@@ -561,12 +574,13 @@ namespace OGF_tool
             this.userdata = "";
         }
 
-        public byte[] data()
+        public byte[] data(uint ogf_ver)
         {
             List<byte> temp = new List<byte>();
 
             temp.AddRange(Encoding.Default.GetBytes(userdata));
-            temp.Add(0);
+            if (ogf_ver == 4)
+                temp.Add(0);
 
             return temp.ToArray();
         }
@@ -685,7 +699,7 @@ namespace OGF_tool
         public List<float[]> position;
         public List<float[]> rotation;
         public List<List<byte[]>> bytes_1;
-        public List<uint> import_bytes;
+        public byte chunk_version;
 
         public IK_Data()
         {
@@ -697,7 +711,7 @@ namespace OGF_tool
             this.position = new List<float[]>();
             this.rotation = new List<float[]>();
             this.bytes_1 = new List<List<byte[]>>();
-            this.import_bytes = new List<uint>();
+            this.chunk_version = 0;
         }
 
         public uint chunk_size()
@@ -705,11 +719,14 @@ namespace OGF_tool
             uint temp = 0;
             for (int i = 0; i < materials.Count; i++)
             {
-                temp += 4;
+                if (chunk_version == 4)
+                    temp += 4;
+
                 temp += (uint)materials[i].Length + 1;       // bone name
                 temp += 112;
 
-                temp += import_bytes[i];
+                uint ImportBytes = (uint)((chunk_version == 4) ? 76 : ((chunk_version == 3) ? 72 : 60));
+                temp += ImportBytes;
 
                 temp += 12;
                 temp += 12;
@@ -726,11 +743,12 @@ namespace OGF_tool
 
             for (int i = 0; i < materials.Count; i++)
             {
-                if (import_bytes[i] == 76)
+                if (chunk_version == 4)
                     temp.AddRange(BitConverter.GetBytes(version[i]));
 
                 temp.AddRange(Encoding.Default.GetBytes(materials[i]));
                 temp.Add(0);
+
                 for (int j = 0; j < bytes_1[i].Count; j++)
                     temp.AddRange(bytes_1[i][j]);
 
