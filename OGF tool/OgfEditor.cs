@@ -1199,40 +1199,40 @@ skip_ik_data:
 				{
 					if (ch.to_delete) continue;
 
-					ObjWriter.WriteLine("g " + childs.ToString());
-					ObjWriter.WriteLine("usemtl " + Path.GetFileName(ch.m_texture));
+					ObjWriter.WriteLine($"g {childs}");
+					ObjWriter.WriteLine($"usemtl {Path.GetFileName(ch.m_texture)}");
 					childs++;
 
 					for (int i = 0; i < ch.Vertices.Count; i++)
                     {
-						ObjWriter.WriteLine("v " + vPUSH(MirrorZ_transform(ch.Vertices[i].offs)));
+						ObjWriter.WriteLine($"v {vPUSH(MirrorZ_transform(ch.Vertices[i].offs))}");
 					}
 
 					for (int i = 0; i < ch.Vertices.Count; i++)
 					{
 						float x = ch.Vertices[i].uv[0];
 						float y = Math.Abs(1.0f - ch.Vertices[i].uv[1]);
-						ObjWriter.WriteLine("vt " + x.ToString("0.000000") + " " + y.ToString("0.000000"));
+						ObjWriter.WriteLine($"vt {x.ToString("0.000000")} {y.ToString("0.000000")}");
 					}
 
 					for (int i = 0; i < ch.Vertices.Count; i++)
 					{
-						ObjWriter.WriteLine("vn " + vPUSH(MirrorZ_transform(ch.Vertices[i].norm)));
+						ObjWriter.WriteLine($"vn {vPUSH(MirrorZ_transform(ch.Vertices[i].norm))}");
 					}
 
 					for (int i = 0; i < ch.Vertices.Count; i++)
 					{
-						ObjWriter.WriteLine("vg "+ vPUSH(MirrorZ_transform(ch.Vertices[i].tang)));
+						ObjWriter.WriteLine($"vg {vPUSH(MirrorZ_transform(ch.Vertices[i].tang))}");
 					}
 
 					for (int i = 0; i < ch.Vertices.Count; i++)
 					{
-						ObjWriter.WriteLine("vb "+ vPUSH(MirrorZ_transform(ch.Vertices[i].binorm)));
+						ObjWriter.WriteLine($"vb {vPUSH(MirrorZ_transform(ch.Vertices[i].binorm))}");
 					}
 
 					foreach (var f_it in ch.Faces_SWI(lod))
 					{
-						string tmp = "f " + (v_offs+f_it.v[2]+1).ToString() + "/" + (v_offs+f_it.v[2]+1).ToString() + "/" + (v_offs+f_it.v[2]+1).ToString() + " " + (v_offs+f_it.v[1]+1).ToString() + "/" + (v_offs+f_it.v[1]+1).ToString() + "/" + (v_offs+f_it.v[1]+1).ToString() + " " + (v_offs+f_it.v[0]+1).ToString() + "/" + (v_offs+f_it.v[0]+1).ToString() + "/" + (v_offs+f_it.v[0]+1).ToString();
+						string tmp = $"f {v_offs+f_it.v[2]+1}/{v_offs+f_it.v[2]+1}/{v_offs+f_it.v[2]+1} {v_offs+f_it.v[1]+1}/{v_offs+f_it.v[1]+1}/{v_offs+f_it.v[1]+1} {v_offs+f_it.v[0]+1}/{v_offs+f_it.v[0]+1}/{v_offs+f_it.v[0]+1}";
 						ObjWriter.WriteLine(tmp);
 					}
 					v_offs += (uint)ch.Vertices.Count;
