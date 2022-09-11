@@ -2160,7 +2160,7 @@ skip_ik_data:
 		private void RecalcLod()
         {
 			if (ViewerWorking)
-				InitViewPort();
+				InitViewPort(true, false, true);
 
 			for (int idx = 0; idx < TexturesPage.Controls.Count; idx++)
             {
@@ -2521,7 +2521,7 @@ skip_ik_data:
 			else
 				disableAlphaToolStripMenuItem.Text = "Enable Alpha";
 
-			InitViewPort(false, true);
+			InitViewPort(false, true, true);
 		}
 
 		private void ResizeEmbeddedApp(object sender, EventArgs e)
