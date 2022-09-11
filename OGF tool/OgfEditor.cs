@@ -946,116 +946,98 @@ namespace OGF_tool
 					}
 
 					// Ik Data
-					int IKDataChunk = (OGF_C.m_version == 4 ? (int)OGF.OGF4_S_IKDATA : (int)OGF.OGF3_S_IKDATA_2);
-					bool IKDataChunkFind = xr_loader.find_chunk(IKDataChunk, false, true);
+					byte IKDataVers = 0;
 
-					// Release Ik Data
-					if (IKDataChunkFind)
+					int IKDataChunkRelease = (OGF_C.m_version == 4 ? (int)OGF.OGF4_S_IKDATA : (int)OGF.OGF3_S_IKDATA_2);
+					bool IKDataChunkFind = xr_loader.find_chunk(IKDataChunkRelease, false, true);
+
+					if (IKDataChunkFind) // Load Release chunk
 					{
-						OGF_C.ikdata = new IK_Data();
+						IKDataVers = 4;
+						goto load_ik_data;
+					}
 
-						for (int i = 0; i < OGF_C.bones.bone_names.Count; i++)
+					IKDataChunkFind = OGF_C.m_version == 3 && xr_loader.find_chunk((int)OGF.OGF3_S_IKDATA, false, true);
+
+					if (IKDataChunkFind) // Load Pre Release chunk
+					{
+						IKDataVers = 3;
+						goto load_ik_data;
+					}
+
+					IKDataChunkFind = OGF_C.m_version == 3 && xr_loader.find_chunk((int)OGF.OGF3_S_IKDATA_0, false, true);
+
+					if (IKDataChunkFind) // Load Builds chunk
+					{
+						IKDataVers = 2;
+						goto load_ik_data;
+					}
+
+					goto skip_ik_data;
+
+load_ik_data:
+
+					OGF_C.ikdata = new IK_Data();
+
+					for (int i = 0; i < OGF_C.bones.bone_names.Count; i++)
+					{
+						List<byte[]> bytes_1 = new List<byte[]>();
+
+						byte[] temp_byte;
+						uint version = 0;
+
+						if (IKDataVers == 4)
 						{
-							List<byte[]> bytes_1 = new List<byte[]>();
-
-							byte[] temp_byte;
-							uint version = xr_loader.ReadUInt32();
+							version = xr_loader.ReadUInt32();
 							OGF_C.ikdata.old_size += 4;
-							string gmtl_name = xr_loader.read_stringZ();
-
-							temp_byte = xr_loader.ReadBytes(112);   // struct SBoneShape
-							bytes_1.Add(temp_byte);
-							OGF_C.ikdata.old_size += gmtl_name.Length + 1 + 112;
-
-							int ImportBytes = 76;
-
-							temp_byte = xr_loader.ReadBytes(ImportBytes); // Import
-							bytes_1.Add(temp_byte);
-							OGF_C.ikdata.old_size += ImportBytes;
-
-							float[] rotation = new float[3];
-							rotation = xr_loader.ReadVector();
-
-							float[] position = new float[3];
-							position = xr_loader.ReadVector();
-
-							float mass = xr_loader.ReadFloat();
-
-							float[] center = new float[3];
-							center = xr_loader.ReadVector();
-
-							OGF_C.ikdata.old_size += 12 + 12 + 4 + 12;
-
-							OGF_C.ikdata.materials.Add(gmtl_name);
-							OGF_C.ikdata.mass.Add(mass);
-							OGF_C.ikdata.version.Add(version);
-							OGF_C.ikdata.center_mass.Add(center);
-							OGF_C.ikdata.bytes_1.Add(bytes_1);
-							OGF_C.ikdata.position.Add(position);
-							OGF_C.ikdata.rotation.Add(rotation);
-							OGF_C.ikdata.import_bytes.Add((uint)ImportBytes);
 						}
 
-						IKDataChunkFind = true;
-					}
-					else
-					{
-						IKDataChunkFind = xr_loader.find_chunk((int)OGF.OGF3_S_IKDATA, false, true);
+						string gmtl_name = xr_loader.read_stringZ();
 
-						if (IKDataChunkFind || xr_loader.find_chunk((int)OGF.OGF3_S_IKDATA_0, false, true))
+						temp_byte = xr_loader.ReadBytes(112);   // struct SBoneShape
+						bytes_1.Add(temp_byte);
+						OGF_C.ikdata.old_size += gmtl_name.Length + 1 + 112;
+
+						int ImportBytes = (IKDataVers == 4 ? 76 : (IKDataVers == 3 ? 72 : 60));
+
+						temp_byte = xr_loader.ReadBytes(ImportBytes); // Import
+						bytes_1.Add(temp_byte);
+						OGF_C.ikdata.old_size += ImportBytes;
+
+						float[] rotation = new float[3];
+						rotation = xr_loader.ReadVector();
+
+						float[] position = new float[3];
+						position = xr_loader.ReadVector();
+
+						float mass = xr_loader.ReadFloat();
+
+						float[] center = new float[3];
+						center = xr_loader.ReadVector();
+
+						OGF_C.ikdata.old_size += 12 + 12 + 4 + 12;
+
+						OGF_C.ikdata.materials.Add(gmtl_name);
+						OGF_C.ikdata.mass.Add(mass);
+						OGF_C.ikdata.version.Add(version);
+						OGF_C.ikdata.center_mass.Add(center);
+						OGF_C.ikdata.bytes_1.Add(bytes_1);
+						OGF_C.ikdata.position.Add(position);
+						OGF_C.ikdata.rotation.Add(rotation);
+						OGF_C.ikdata.import_bytes.Add((uint)ImportBytes);
+					}
+
+skip_ik_data:
+
+					if (IKDataVers == 0) // Chunk not find
+					{
+						if (OGF_C.m_version == 4) // Exit if Release OGF
 						{
-							OGF_C.ikdata = new IK_Data();
-
-							for (int i = 0; i < OGF_C.bones.bone_names.Count; i++)
-							{
-								List<byte[]> bytes_1 = new List<byte[]>();
-
-								byte[] temp_byte;
-								string gmtl_name = xr_loader.read_stringZ();
-
-								temp_byte = xr_loader.ReadBytes(112);   // struct SBoneShape
-								bytes_1.Add(temp_byte);
-								OGF_C.ikdata.old_size += gmtl_name.Length + 1 + 112;
-
-								int ImportBytes = IKDataChunkFind ? 72 : 60;
-
-								temp_byte = xr_loader.ReadBytes(ImportBytes); // Import
-								bytes_1.Add(temp_byte);
-								OGF_C.ikdata.old_size += ImportBytes;
-
-								float[] rotation = new float[3];
-								rotation = xr_loader.ReadVector();
-
-								float[] position = new float[3];
-								position = xr_loader.ReadVector();
-
-								float mass = xr_loader.ReadFloat();
-
-								float[] center = new float[3];
-								center = xr_loader.ReadVector();
-
-								OGF_C.ikdata.old_size += 12 + 12 + 4 + 12;
-
-								OGF_C.ikdata.materials.Add(gmtl_name);
-								OGF_C.ikdata.mass.Add(mass);
-								OGF_C.ikdata.version.Add(0);
-								OGF_C.ikdata.center_mass.Add(center);
-								OGF_C.ikdata.bytes_1.Add(bytes_1);
-								OGF_C.ikdata.position.Add(position);
-								OGF_C.ikdata.rotation.Add(rotation);
-								OGF_C.ikdata.import_bytes.Add((uint)ImportBytes);
-							}
-
-							IKDataChunkFind = true;
-						}
-					}
-
-					if (!IKDataChunkFind)
-					{
-						MessageBox.Show("Unsupported OGF format! Can't find ik data chunk!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-						if (OGF_C.m_version == 4)
+							MessageBox.Show("Unsupported OGF format! Can't find ik data chunk!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 							return false;
+						}
+						else
+							MessageBox.Show("Unsupported OGF chunk! Can't find ik data chunk!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 					}
 
 					// Userdata
@@ -1081,7 +1063,7 @@ namespace OGF_tool
 					int RefsChunk = (OGF_C.m_version == 4 ? (int)OGF.OGF4_S_MOTION_REFS : (int)OGF.OGF3_S_MOTION_REFS);
 					bool StringRefs = xr_loader.find_chunk(RefsChunk, false, true);
 
-					if (StringRefs || xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS2, false, true) && OGF_C.m_version == 4)
+					if (StringRefs || OGF_C.m_version == 4 && xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS2, false, true))
 					{
 						OGF_C.motion_refs = new MotionRefs();
 						OGF_C.motion_refs.pos = xr_loader.chunk_pos;
