@@ -396,7 +396,30 @@ namespace OGF_tool
 
                 bool v3 = false;
 
-				if (v3 = !xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS_1, false, true))
+                xr_loader.SetStream(r.BaseStream);
+
+                if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk(14, reset: true)))
+                {
+                    richTextBox3.Clear();
+                    int chunkId = 0;
+                    while (xr_loader.find_chunk(chunkId))
+                    {
+                        Stream baseStream = xr_loader.reader.BaseStream;
+                        if (xr_loader.SetData(xr_loader.find_and_return_chunk_in_chunk(chunkId, reset: true)))
+                        {
+                            if (chunkId == 0)
+                                richTextBox3.Text += string.Format("Motions count : {0}\n", (object)xr_loader.ReadUInt32());
+                            else
+                                richTextBox3.Text += string.Format("\n{0}. {1}", (object)chunkId, (object)xr_loader.read_stringZ());
+                            ++chunkId;
+                            xr_loader.SetStream(baseStream);
+                        }
+                        else
+                            break;
+                    }
+                }
+
+                if (v3 = !xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS_1, false, true))
 					if (!xr_loader.find_chunk((int)OGF.OGF4_S_MOTION_REFS_0, false, true))
 						return;
 
@@ -411,7 +434,7 @@ namespace OGF_tool
                     for (int i = 0; i < count; i++)
                         OGF_V.refs.refs0.Add(xr_loader.read_stringZ());
                 }
-			}
+            }
 		}
     }
 }

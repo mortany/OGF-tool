@@ -55,11 +55,15 @@ namespace OGF_tool
             this.label2 = new System.Windows.Forms.Label();
             this.SourceTBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.tabPage6 = new System.Windows.Forms.TabPage();
+            this.richTextBox3 = new System.Windows.Forms.RichTextBox();
             this.tabControl1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage4.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.tabPage5.SuspendLayout();
             this.SuspendLayout();
             // 
             // button1
@@ -94,6 +98,8 @@ namespace OGF_tool
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.tabPage4);
             this.tabControl1.Controls.Add(this.tabPage3);
+            this.tabControl1.Controls.Add(this.tabPage5);
+            this.tabControl1.Controls.Add(this.tabPage6);
             this.tabControl1.Location = new System.Drawing.Point(12, 91);
             this.tabControl1.Multiline = true;
             this.tabControl1.Name = "tabControl1";
@@ -129,7 +135,7 @@ namespace OGF_tool
             this.richTextBox1.DetectUrls = false;
             this.richTextBox1.Location = new System.Drawing.Point(0, 3);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(392, 533);
+            this.richTextBox1.Size = new System.Drawing.Size(392, 495);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
             this.richTextBox1.WordWrap = false;
@@ -148,7 +154,7 @@ namespace OGF_tool
             // 
             this.richTextBox2.Location = new System.Drawing.Point(0, 3);
             this.richTextBox2.Name = "richTextBox2";
-            this.richTextBox2.Size = new System.Drawing.Size(392, 533);
+            this.richTextBox2.Size = new System.Drawing.Size(392, 498);
             this.richTextBox2.TabIndex = 0;
             this.richTextBox2.Text = "";
             // 
@@ -159,7 +165,7 @@ namespace OGF_tool
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Size = new System.Drawing.Size(395, 504);
             this.tabPage3.TabIndex = 3;
-            this.tabPage3.Text = "ObjectInfo";
+            this.tabPage3.Text = "ExportInfo";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
             // groupBox1
@@ -305,11 +311,39 @@ namespace OGF_tool
             this.label1.TabIndex = 0;
             this.label1.Text = "Source:";
             // 
+            // tabPage5
+            // 
+            this.tabPage5.Controls.Add(this.richTextBox3);
+            this.tabPage5.Location = new System.Drawing.Point(4, 25);
+            this.tabPage5.Name = "tabPage5";
+            this.tabPage5.Size = new System.Drawing.Size(395, 504);
+            this.tabPage5.TabIndex = 4;
+            this.tabPage5.Text = "Motions";
+            this.tabPage5.UseVisualStyleBackColor = true;
+            // 
+            // tabPage6
+            // 
+            this.tabPage6.Location = new System.Drawing.Point(4, 25);
+            this.tabPage6.Name = "tabPage6";
+            this.tabPage6.Size = new System.Drawing.Size(365, 504);
+            this.tabPage6.TabIndex = 5;
+            this.tabPage6.Text = "Bones";
+            this.tabPage6.UseVisualStyleBackColor = true;
+            // 
+            // richTextBox3
+            // 
+            this.richTextBox3.Location = new System.Drawing.Point(0, 3);
+            this.richTextBox3.Name = "richTextBox3";
+            this.richTextBox3.ReadOnly = true;
+            this.richTextBox3.Size = new System.Drawing.Size(392, 498);
+            this.richTextBox3.TabIndex = 8;
+            this.richTextBox3.Text = "";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(427, 635);
+            this.ClientSize = new System.Drawing.Size(427, 634);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
@@ -324,6 +358,7 @@ namespace OGF_tool
             this.tabPage3.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.tabPage5.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -354,6 +389,9 @@ namespace OGF_tool
         private System.Windows.Forms.MaskedTextBox maskedTextBox3;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.MaskedTextBox maskedTextBox2;
+        private System.Windows.Forms.TabPage tabPage5;
+        private System.Windows.Forms.RichTextBox richTextBox3;
+        private System.Windows.Forms.TabPage tabPage6;
     }
 }
 
